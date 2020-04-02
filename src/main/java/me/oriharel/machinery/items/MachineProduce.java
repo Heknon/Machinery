@@ -1,4 +1,6 @@
 package me.oriharel.machinery.items;
 
-public class MachineProduce {
+import java.io.Serializable;
+
+public class MachineProduce implements Serializable {
 }

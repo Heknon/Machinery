@@ -11,11 +11,12 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class Machine implements IMachine {
+public class Machine implements IMachine, Serializable {
 
     private final Material referenceBlockType;
     private final int machineReach;

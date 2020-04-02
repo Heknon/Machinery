@@ -7,8 +7,9 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.craftbukkit.libs.jline.internal.Nullable;
 
 import java.io.File;
+import java.io.Serializable;
 
-public class Fuel {
+public class Fuel implements Serializable {
 
     @Nullable
     private final Material material;
