@@ -8,19 +8,20 @@ import org.bukkit.Material;
 import java.util.List;
 
 class ExcavatorMachine extends Machine {
-
     public ExcavatorMachine(Material referenceBlockType, int machineReach, int speed, int maxFuel, int fuelDeficiency, List<Fuel> fuelTypes, double cost,
-                            List<Fuel> fuel, int fuelPerUse, MachineType machineType, Structure structure, Recipe recipe, List<MachineProduce> totalResourcesGained) {
-        super(referenceBlockType, machineReach, speed, maxFuel, fuelDeficiency, fuelTypes, cost, fuel, fuelPerUse, machineType, structure, recipe, machineName, totalResourcesGained);
+                            List<Fuel> fuel, int fuelPerUse, MachineType machineType, Structure structure, Recipe recipe, String machineName,
+                            List<MachineProduce> totalResourcesGained) {
+        super(referenceBlockType, machineReach, speed, maxFuel, fuelDeficiency, fuelTypes, cost, fuel, fuelPerUse, machineType, structure, recipe, machineName,
+                totalResourcesGained);
     }
 
     public ExcavatorMachine(Material referenceBlockType, int machineReach, int speed, int maxFuel, int fuelDeficiency, List<Fuel> fuelTypes, double cost,
-                            List<Fuel> fuel, int fuelPerUse, MachineType machineType, Structure structure, Recipe recipe) {
+                            List<Fuel> fuel, int fuelPerUse, MachineType machineType, Structure structure, Recipe recipe, String machineName) {
         super(referenceBlockType, machineReach, speed, maxFuel, fuelDeficiency, fuelTypes, cost, fuel, fuelPerUse, machineType, structure, recipe, machineName);
     }
 
     public ExcavatorMachine(Material referenceBlockType, int machineReach, int speed, int maxFuel, int fuelDeficiency, List<Fuel> fuelTypes, double cost,
-                            int fuelPerUse, MachineType machineType, Structure structure, Recipe recipe) {
+                            int fuelPerUse, MachineType machineType, Structure structure, Recipe recipe, String machineName) {
         super(referenceBlockType, machineReach, speed, maxFuel, fuelDeficiency, fuelTypes, cost, fuelPerUse, machineType, structure, recipe, machineName);
     }
 }
