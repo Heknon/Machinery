@@ -5,10 +5,10 @@ import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.exceptions.MachineNotFoundException;
 import me.oriharel.machinery.items.Fuel;
 import me.oriharel.machinery.items.MachineBlock;
-import me.oriharel.machinery.items.MachineProduce;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.io.Serializable;
@@ -33,7 +33,7 @@ public class Machine implements IMachine, Serializable {
     private final String machineName;
     private ConfigurationSection machineSection;
 
-    private List<MachineProduce> totalResourcesGained;
+    private List<ItemStack> totalResourcesGained;
 
     public Machine(
             Material referenceBlockType,
@@ -49,7 +49,7 @@ public class Machine implements IMachine, Serializable {
             Structure structure,
             Recipe recipe,
             String machineName,
-            List<MachineProduce> totalResourcesGained)
+            List<ItemStack> totalResourcesGained)
             throws MachineNotFoundException {
         this.referenceBlockType = referenceBlockType;
         this.machineReach = machineReach;
@@ -108,7 +108,7 @@ public class Machine implements IMachine, Serializable {
         this.structure = structure;
         this.recipe = recipe;
         this.machineName = machineName;
-        this.totalResourcesGained = new ArrayList<>();
+        this.totalResourcesGained = new ArrayList<ItemStack>();
         FileConfiguration configLoad =
                 Machinery.getInstance()
                         .getFileManager()
@@ -151,7 +151,7 @@ public class Machine implements IMachine, Serializable {
         this.fuelPerUse = fuelPerUse;
         this.machineType = machineType;
         this.structure = structure;
-        this.totalResourcesGained = new ArrayList<>();
+        this.totalResourcesGained = new ArrayList<ItemStack>();
         FileConfiguration configLoad =
                 Machinery.getInstance()
                         .getFileManager()
@@ -223,12 +223,12 @@ public class Machine implements IMachine, Serializable {
     }
 
     @Override
-    public List<MachineProduce> getTotalResourcesGained() {
+    public List<ItemStack> getTotalResourcesGained() {
         return totalResourcesGained;
     }
 
     @Override
-    public List<MachineProduce> run() {
+    public List<ItemStack> run() {
         return null;
     }
 

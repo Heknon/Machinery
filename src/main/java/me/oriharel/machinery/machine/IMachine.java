@@ -3,8 +3,8 @@ package me.oriharel.machinery.machine;
 import me.oriharel.customrecipes.recipe.Recipe;
 import me.oriharel.machinery.items.Fuel;
 import me.oriharel.machinery.items.MachineBlock;
-import me.oriharel.machinery.items.MachineProduce;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
@@ -30,9 +30,9 @@ interface IMachine {
 
     MachineType getType();
 
-    List<MachineProduce> getTotalResourcesGained();
+    List<ItemStack> getTotalResourcesGained();
 
-    List<MachineProduce> run();
+    List<ItemStack> run();
 
     boolean build();
 

@@ -4,15 +4,15 @@ import me.oriharel.customrecipes.recipe.Recipe;
 import me.oriharel.machinery.exceptions.MachineNotFoundException;
 import me.oriharel.machinery.items.Fuel;
 import me.oriharel.machinery.items.MachineBlock;
-import me.oriharel.machinery.items.MachineProduce;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
 class LumberjackMachine extends Machine {
     public LumberjackMachine(Material referenceBlockType, int machineReach, int speed, int maxFuel, int fuelDeficiency, List<Fuel> fuelTypes, double cost,
                              List<Fuel> fuel, int fuelPerUse, MachineType machineType, Structure structure, Recipe recipe, String machineName,
-                             MachineBlock machineBlock, List<MachineProduce> totalResourcesGained) throws MachineNotFoundException {
+                             MachineBlock machineBlock, List<ItemStack> totalResourcesGained) throws MachineNotFoundException {
         super(referenceBlockType, machineReach, speed, maxFuel, fuelDeficiency, fuelTypes, cost, fuel, fuelPerUse, machineType, structure, recipe, machineName,
                 totalResourcesGained);
     }
@@ -30,7 +30,7 @@ class LumberjackMachine extends Machine {
     }
 
     @Override
-    public List<MachineProduce> run() {
+    public List<ItemStack> run() {
         return super.run();
     }
 

@@ -3,14 +3,14 @@ package me.oriharel.machinery.machine;
 import me.oriharel.customrecipes.recipe.Recipe;
 import me.oriharel.machinery.exceptions.MachineNotFoundException;
 import me.oriharel.machinery.items.Fuel;
-import me.oriharel.machinery.items.MachineProduce;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
 class MineMachine extends Machine {
     public MineMachine(Material referenceBlockType, int machineReach, int speed, int maxFuel, int fuelDeficiency, List<Fuel> fuelTypes, double cost, List<Fuel> fuel,
-                       int fuelPerUse, MachineType machineType, Structure structure, Recipe recipe, String machineName, List<MachineProduce> totalResourcesGained) throws MachineNotFoundException {
+                       int fuelPerUse, MachineType machineType, Structure structure, Recipe recipe, String machineName, List<ItemStack> totalResourcesGained) throws MachineNotFoundException {
         super(referenceBlockType, machineReach, speed, maxFuel, fuelDeficiency, fuelTypes, cost, fuel, fuelPerUse, machineType, structure, recipe, machineName,
                 totalResourcesGained);
     }
@@ -27,7 +27,7 @@ class MineMachine extends Machine {
     }
 
     @Override
-    public List<MachineProduce> run() {
+    public List<ItemStack> run() {
         return super.run();
     }
 
