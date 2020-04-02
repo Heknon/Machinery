@@ -1,0 +1,8 @@
+name: Machinery
+version: ${project.version}
+main: me.oriharel.machinery.Machinery
+api-version: 1.13
+depend: [MultiEconomy, WorldEdit]
+authors: [Heknon]
+description: Adds machines to the game
+website: oriharel.me
