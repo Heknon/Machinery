@@ -38,4 +38,6 @@ interface IMachine {
     Structure getStructure();
 
     Recipe getRecipe();
+
+    String getMachineName();
 }

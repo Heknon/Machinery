@@ -23,6 +23,7 @@ public class Machine implements IMachine {
     private final MachineType machineType;
     private final Structure structure;
     private final Recipe recipe;
+    private final String machineName;
 
     private List<MachineProduce> totalResourcesGained;
 
@@ -38,7 +39,7 @@ public class Machine implements IMachine {
             int fuelPerUse,
             MachineType machineType,
             Structure structure,
-            Recipe recipe, List<MachineProduce> totalResourcesGained) {
+            Recipe recipe, String machineName, List<MachineProduce> totalResourcesGained) {
         this.referenceBlockType = referenceBlockType;
         this.machineReach = machineReach;
         this.speed = speed;
@@ -51,6 +52,7 @@ public class Machine implements IMachine {
         this.machineType = machineType;
         this.structure = structure;
         this.recipe = recipe;
+        this.machineName = machineName;
         this.totalResourcesGained = totalResourcesGained;
     }
 
@@ -65,7 +67,7 @@ public class Machine implements IMachine {
             List<Fuel> fuel,
             int fuelPerUse,
             MachineType machineType,
-            Structure structure, Recipe recipe) {
+            Structure structure, Recipe recipe, String machineName) {
         this.referenceBlockType = referenceBlockType;
         this.machineReach = machineReach;
         this.speed = speed;
@@ -78,6 +80,7 @@ public class Machine implements IMachine {
         this.machineType = machineType;
         this.structure = structure;
         this.recipe = recipe;
+        this.machineName = machineName;
         this.totalResourcesGained = new ArrayList<>();
     }
 
@@ -91,7 +94,7 @@ public class Machine implements IMachine {
             double cost,
             int fuelPerUse,
             MachineType machineType,
-            Structure structure, Recipe recipe) {
+            Structure structure, Recipe recipe, String machineName) {
         this.referenceBlockType = referenceBlockType;
         this.machineReach = machineReach;
         this.speed = speed;
@@ -100,6 +103,7 @@ public class Machine implements IMachine {
         this.fuelTypes = fuelTypes;
         this.cost = cost;
         this.recipe = recipe;
+        this.machineName = machineName;
         this.fuel = new ArrayList<>();
         this.fuelPerUse = fuelPerUse;
         this.machineType = machineType;
@@ -180,6 +184,11 @@ public class Machine implements IMachine {
     @Override
     public Recipe getRecipe() {
         return recipe;
+    }
+
+    @Override
+    public String getMachineName() {
+        return machineName;
     }
 
     @Override
