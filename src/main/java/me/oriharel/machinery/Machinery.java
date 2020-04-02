@@ -8,37 +8,38 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Machinery extends JavaPlugin {
 
-  private static Machinery INSTANCE;
-  private FileManager fileManager;
-  private MachineManager machineManager;
+    private static Machinery INSTANCE;
+    private FileManager fileManager;
+    private MachineManager machineManager;
 
-  public static Machinery getInstance() {
-    return INSTANCE;
-  }
+    public static Machinery getInstance() {
+        return INSTANCE;
+    }
 
-  @Override
-  public void onLoad() {
-    INSTANCE = this;
-  }
+    @Override
+    public void onLoad() {
+        INSTANCE = this;
+    }
 
-  @Override
-  public void onEnable() {
+    @Override
+    public void onEnable() {
 
-    ConsoleCommandSender console = Bukkit.getConsoleSender();
-    console.sendMessage("Starting up CustomRecipes");
+        ConsoleCommandSender console = Bukkit.getConsoleSender();
+        console.sendMessage("Starting up CustomRecipes");
 
-    fileManager = new FileManager(this);
-    machineManager = new MachineManager(this);
-  }
+        fileManager = new FileManager(this);
+        machineManager = new MachineManager(this);
+    }
 
-  @Override
-  public void onDisable() {}
+    @Override
+    public void onDisable() {
+    }
 
-  public FileManager getFileManager() {
-    return fileManager;
-  }
+    public FileManager getFileManager() {
+        return fileManager;
+    }
 
-  public MachineManager getMachineManager() {
-    return machineManager;
-  }
+    public MachineManager getMachineManager() {
+        return machineManager;
+    }
 }

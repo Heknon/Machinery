@@ -1,60 +1,26 @@
 package me.oriharel.machinery.machine;
 
+import me.oriharel.customrecipes.recipe.Recipe;
 import me.oriharel.machinery.items.Fuel;
 import me.oriharel.machinery.items.MachineProduce;
+import org.bukkit.Material;
 
 import java.util.List;
 
-class LumberjackMachine implements IMachine {
+class LumberjackMachine extends Machine {
 
-  private final Fuel fuelPerUse;
-  private List<Fuel> fuel;
-  private List<MachineProduce> totalResourcesGained;
+    public LumberjackMachine(Material referenceBlockType, int machineReach, int speed, int maxFuel, int fuelDeficiency, List<Fuel> fuelTypes, double cost,
+                             List<Fuel> fuel, int fuelPerUse, MachineType machineType, Structure structure, Recipe recipe, List<MachineProduce> totalResourcesGained) {
+        super(referenceBlockType, machineReach, speed, maxFuel, fuelDeficiency, fuelTypes, cost, fuel, fuelPerUse, machineType, structure, recipe, totalResourcesGained);
+    }
 
-  public LumberjackMachine(List<Fuel> fuel, List<MachineProduce> totalResourcesGained, Fuel fuelPerUse) {
+    public LumberjackMachine(Material referenceBlockType, int machineReach, int speed, int maxFuel, int fuelDeficiency, List<Fuel> fuelTypes, double cost,
+                             List<Fuel> fuel, int fuelPerUse, MachineType machineType, Structure structure, Recipe recipe) {
+        super(referenceBlockType, machineReach, speed, maxFuel, fuelDeficiency, fuelTypes, cost, fuel, fuelPerUse, machineType, structure, recipe);
+    }
 
-    this.fuel = fuel;
-    this.totalResourcesGained = totalResourcesGained;
-    this.fuelPerUse = fuelPerUse;
-  }
-
-  @Override
-  public Structure getStructure() {
-    return null;
-  }
-
-  @Override
-  public List<Fuel> getFuel() {
-    return fuel;
-  }
-
-  @Override
-  public double getCost() {
-    return 0;
-  }
-
-  @Override
-  public Fuel getFuelPerUse() {
-    return fuelPerUse;
-  }
-
-  @Override
-  public MachineType getType() {
-    return MachineType.LUMBERJACK;
-  }
-
-  @Override
-  public List<MachineProduce> getTotalResourcesGained() {
-    return totalResourcesGained;
-  }
-
-  @Override
-  public List<MachineProduce> run() {
-    return null;
-  }
-
-  @Override
-  public boolean build() {
-    return false;
-  }
+    public LumberjackMachine(Material referenceBlockType, int machineReach, int speed, int maxFuel, int fuelDeficiency, List<Fuel> fuelTypes, double cost,
+                             int fuelPerUse, MachineType machineType, Structure structure, Recipe recipe) {
+        super(referenceBlockType, machineReach, speed, maxFuel, fuelDeficiency, fuelTypes, cost, fuelPerUse, machineType, structure, recipe);
+    }
 }

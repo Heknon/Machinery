@@ -30,5 +30,6 @@
     <orderEntry type="library" name="spigot-1.15.2" level="project" />
     <orderEntry type="library" name="MultiEconomy-1.0.6-RELEASE" level="project" />
     <orderEntry type="library" name="worldedit-bukkit-7.1.0" level="project" />
+    <orderEntry type="library" name="CustomRecipes" level="project" />
   </component>
 </module>

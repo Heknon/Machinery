@@ -1,25 +1,41 @@
 package me.oriharel.machinery.machine;
 
+import me.oriharel.customrecipes.recipe.Recipe;
 import me.oriharel.machinery.items.Fuel;
 import me.oriharel.machinery.items.MachineProduce;
+import org.bukkit.Material;
 
 import java.util.List;
 
-public interface IMachine {
+interface IMachine {
 
-  double getCost();
+    Material getReferenceBlockType();
 
-  List<Fuel> getFuel();
+    int getMachineReach();
 
-  Fuel getFuelPerUse();
+    int getSpeed();
 
-  MachineType getType();
+    int getMaxFuel();
 
-  List<MachineProduce> getTotalResourcesGained();
+    int getFuelDeficiency();
 
-  List<MachineProduce> run();
+    List<Fuel> getFuelTypes();
 
-  boolean build();
+    double getCost();
 
-  Structure getStructure();
+    List<Fuel> getFuel();
+
+    int getFuelPerUse();
+
+    MachineType getType();
+
+    List<MachineProduce> getTotalResourcesGained();
+
+    List<MachineProduce> run();
+
+    boolean build();
+
+    Structure getStructure();
+
+    Recipe getRecipe();
 }
