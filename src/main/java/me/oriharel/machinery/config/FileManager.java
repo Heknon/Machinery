@@ -32,6 +32,7 @@ public class FileManager {
 
         Map<String, File> configFiles = new LinkedHashMap<>();
         configFiles.put("machines.yml", new File(machinery.getDataFolder(), "machines.yml"));
+        configFiles.put("fuels.yml", new File(machinery.getDataFolder(), "fuels.yml"));
         configFiles.put("machine_registry.yml", new File(machinery.getDataFolder(), "machine_registry.yml"));
         configFiles.put("config.yml", new File(machinery.getDataFolder(), "config.yml"));
 
