@@ -3,6 +3,7 @@ package me.oriharel.machinery.machine;
 import me.oriharel.customrecipes.recipe.Recipe;
 import me.oriharel.machinery.items.Fuel;
 import me.oriharel.machinery.items.MachineBlock;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -34,7 +35,7 @@ interface IMachine {
 
     List<ItemStack> run();
 
-    boolean build();
+    boolean build(Location location);
 
     Structure getStructure();
 

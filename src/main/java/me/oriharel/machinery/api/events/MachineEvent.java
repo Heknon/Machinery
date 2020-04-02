@@ -1,17 +1,18 @@
 package me.oriharel.machinery.api.events;
 
-import me.oriharel.machinery.machine.IMachine;
-import org.bukkit.event.Cancellable;
+import me.oriharel.machinery.machine.Machine;
+import org.bukkit.Location;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class MachineEvent extends Event implements Cancellable {
+public class MachineEvent extends Event {
     private static final HandlerList HANDLERS = new HandlerList();
-    private final IMachine machine;
-    private boolean cancelled;
+    private final Machine machine;
+    private final Location buildLocation;
 
-    public MachineEvent(IMachine machine) {
+    public MachineEvent(Machine machine, Location buildLocation) {
         this.machine = machine;
+        this.buildLocation = buildLocation;
     }
 
     public static HandlerList getHandlerList() {
@@ -22,17 +23,11 @@ public class MachineEvent extends Event implements Cancellable {
         return HANDLERS;
     }
 
-    public IMachine getMachine() {
+    public Machine getMachine() {
         return machine;
     }
 
-    @Override
-    public boolean isCancelled() {
-        return cancelled;
-    }
-
-    @Override
-    public void setCancelled(boolean cancel) {
-        this.cancelled = cancel;
+    public Location getBuildLocation() {
+        return buildLocation;
     }
 }

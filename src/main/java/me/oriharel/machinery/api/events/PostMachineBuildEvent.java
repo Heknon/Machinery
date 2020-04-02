@@ -7,7 +7,7 @@ public class PostMachineBuildEvent extends MachineEvent {
     private static final HandlerList HANDLERS = new HandlerList();
 
     public PostMachineBuildEvent(IMachine machine) {
-        super(machine);
+        super(machine, buildLocation);
     }
 
     public static HandlerList getHandlerList() {

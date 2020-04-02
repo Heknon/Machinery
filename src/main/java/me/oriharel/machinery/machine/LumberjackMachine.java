@@ -33,9 +33,4 @@ class LumberjackMachine extends Machine {
     public List<ItemStack> run() {
         return super.run();
     }
-
-    @Override
-    public boolean build() {
-        return super.build();
-    }
 }

@@ -2,9 +2,13 @@ package me.oriharel.machinery.machine;
 
 import me.oriharel.customrecipes.recipe.Recipe;
 import me.oriharel.machinery.Machinery;
+import me.oriharel.machinery.api.events.PostMachineBuildEvent;
+import me.oriharel.machinery.api.events.PreMachineBuildEvent;
 import me.oriharel.machinery.exceptions.MachineNotFoundException;
 import me.oriharel.machinery.items.Fuel;
 import me.oriharel.machinery.items.MachineBlock;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -18,19 +22,19 @@ import java.util.Objects;
 
 public class Machine implements IMachine, Serializable {
 
-    private final Material referenceBlockType;
-    private final int machineReach;
-    private final int speed;
-    private final int maxFuel;
-    private final int fuelDeficiency;
-    private final List<Fuel> fuelTypes;
-    private final double cost;
-    private final List<Fuel> fuel;
-    private final int fuelPerUse;
-    private final MachineType machineType;
-    private final Structure structure;
-    private final Recipe recipe;
-    private final String machineName;
+    protected Material referenceBlockType;
+    protected List<Fuel> fuelTypes;
+    protected double cost;
+    protected MachineType machineType;
+    protected Structure structure;
+    protected Recipe recipe;
+    protected String machineName;
+    protected int machineReach;
+    protected int fuelDeficiency;
+    protected List<Fuel> fuel;
+    protected int fuelPerUse;
+    protected int speed;
+    protected int maxFuel;
     private ConfigurationSection machineSection;
 
     private List<ItemStack> totalResourcesGained;
@@ -169,6 +173,7 @@ public class Machine implements IMachine, Serializable {
 
     @Override
     public Material getReferenceBlockType() {
+        if (referenceBlockType == null) this.referenceBlockType = Material.getMaterial(this.machineSection.getString("reference_block_type", "___"));
         return referenceBlockType;
     }
 
@@ -233,8 +238,15 @@ public class Machine implements IMachine, Serializable {
     }
 
     @Override
-    public boolean build() {
-        return false;
+    public boolean build(Location loc) {
+        PreMachineBuildEvent preMachineBuildEvent = new PreMachineBuildEvent(this);
+        Bukkit.getPluginManager().callEvent(preMachineBuildEvent);
+        if (preMachineBuildEvent.isCancelled()) return false;
+        structure.build(loc, () -> {
+            PostMachineBuildEvent postMachineBuildEvent = new PostMachineBuildEvent(this);
+            Bukkit.getPluginManager().callEvent(postMachineBuildEvent);
+        });
+        return true;
     }
 
     @Override
