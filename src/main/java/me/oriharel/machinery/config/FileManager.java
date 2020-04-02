@@ -149,7 +149,8 @@ public class FileManager {
 
         for (String line : lines) {
             if (line.contains(machinery.getDescription().getName() + "_COMMENT")) {
-                config.append(line.replace("IMPORTANT", "[!]").replace("\n", "").replace(machinery.getDescription().getName() + "_COMMENT_", "#").replaceAll("[0-9]+:", "") + "\n");
+                config.append(line.replace("IMPORTANT", "[!]").replace("\n", "").replace(machinery.getDescription().getName() + "_COMMENT_", "#").replaceAll("[0-9]+:",
+                        "") + "\n");
             } else if (line.contains(":")) {
                 config.append(line + "\n");
             }

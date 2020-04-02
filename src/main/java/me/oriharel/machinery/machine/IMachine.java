@@ -2,6 +2,7 @@ package me.oriharel.machinery.machine;
 
 import me.oriharel.customrecipes.recipe.Recipe;
 import me.oriharel.machinery.items.Fuel;
+import me.oriharel.machinery.items.MachineBlock;
 import me.oriharel.machinery.items.MachineProduce;
 import org.bukkit.Material;
 
@@ -38,6 +39,8 @@ interface IMachine {
     Structure getStructure();
 
     Recipe getRecipe();
+
+    MachineBlock getMachineBlock();
 
     String getMachineName();
 }

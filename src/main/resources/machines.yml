@@ -20,14 +20,6 @@ schematic_name:
   recipe: "schematic_name_recipe"
   type: MINER
 
-  block:
-    material: "DIAMOND_ORE"
-    display_name: "&7Poor people machine"
-    lore: [
-      "&6This is the X machine."
-      "&8Use it to...."
-    ]
-
 schematic_name_super_machine:
   reference_block_type: "BEDROCK"
   mine_radius: 20
@@ -35,13 +27,5 @@ schematic_name_super_machine:
   max_fuel: 1000
   deficiency: 50
   fuel_types: ["fuel_type_name3"]
-  recipe: "schematic_name_recipe"
+  recipe: "schematic_name_super_machine_recipe"
   type: MINER
-
-  block:
-    material: "GOLD_ORE"
-    display_name: "&7Super machine"
-    lore: [
-      "&6This is the X machine."
-      "&8Use it to...."
-    ]

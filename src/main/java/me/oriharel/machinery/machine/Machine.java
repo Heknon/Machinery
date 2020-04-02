@@ -1,10 +1,16 @@
 package me.oriharel.machinery.machine;
 
 import me.oriharel.customrecipes.recipe.Recipe;
+import me.oriharel.machinery.Machinery;
+import me.oriharel.machinery.exceptions.MachineNotFoundException;
 import me.oriharel.machinery.items.Fuel;
+import me.oriharel.machinery.items.MachineBlock;
 import me.oriharel.machinery.items.MachineProduce;
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -24,6 +30,7 @@ public class Machine implements IMachine {
     private final Structure structure;
     private final Recipe recipe;
     private final String machineName;
+    private ConfigurationSection machineSection;
 
     private List<MachineProduce> totalResourcesGained;
 
@@ -39,7 +46,10 @@ public class Machine implements IMachine {
             int fuelPerUse,
             MachineType machineType,
             Structure structure,
-            Recipe recipe, String machineName, List<MachineProduce> totalResourcesGained) {
+            Recipe recipe,
+            String machineName,
+            List<MachineProduce> totalResourcesGained)
+            throws MachineNotFoundException {
         this.referenceBlockType = referenceBlockType;
         this.machineReach = machineReach;
         this.speed = speed;
@@ -54,6 +64,19 @@ public class Machine implements IMachine {
         this.recipe = recipe;
         this.machineName = machineName;
         this.totalResourcesGained = totalResourcesGained;
+        FileConfiguration configLoad =
+                Machinery.getInstance()
+                        .getFileManager()
+                        .getConfig(new File(Machinery.getInstance().getDataFolder(), "machines.yml"))
+                        .getFileConfiguration();
+        this.machineSection = configLoad.getConfigurationSection(machineName);
+        if (this.machineSection == null)
+            throw new MachineNotFoundException(
+                    "The machine named \""
+                            + machineName
+                            + "\" does not have a section named \""
+                            + machineName
+                            + "\"in the machines.yml");
     }
 
     public Machine(
@@ -67,7 +90,10 @@ public class Machine implements IMachine {
             List<Fuel> fuel,
             int fuelPerUse,
             MachineType machineType,
-            Structure structure, Recipe recipe, String machineName) {
+            Structure structure,
+            Recipe recipe,
+            String machineName)
+            throws MachineNotFoundException {
         this.referenceBlockType = referenceBlockType;
         this.machineReach = machineReach;
         this.speed = speed;
@@ -82,6 +108,19 @@ public class Machine implements IMachine {
         this.recipe = recipe;
         this.machineName = machineName;
         this.totalResourcesGained = new ArrayList<>();
+        FileConfiguration configLoad =
+                Machinery.getInstance()
+                        .getFileManager()
+                        .getConfig(new File(Machinery.getInstance().getDataFolder(), "machines.yml"))
+                        .getFileConfiguration();
+        this.machineSection = configLoad.getConfigurationSection(machineName);
+        if (this.machineSection == null)
+            throw new MachineNotFoundException(
+                    "The machine named \""
+                            + machineName
+                            + "\" does not have a section named \""
+                            + machineName
+                            + "\"in the machines.yml");
     }
 
     public Machine(
@@ -94,7 +133,10 @@ public class Machine implements IMachine {
             double cost,
             int fuelPerUse,
             MachineType machineType,
-            Structure structure, Recipe recipe, String machineName) {
+            Structure structure,
+            Recipe recipe,
+            String machineName)
+            throws MachineNotFoundException {
         this.referenceBlockType = referenceBlockType;
         this.machineReach = machineReach;
         this.speed = speed;
@@ -109,6 +151,19 @@ public class Machine implements IMachine {
         this.machineType = machineType;
         this.structure = structure;
         this.totalResourcesGained = new ArrayList<>();
+        FileConfiguration configLoad =
+                Machinery.getInstance()
+                        .getFileManager()
+                        .getConfig(new File(Machinery.getInstance().getDataFolder(), "machines.yml"))
+                        .getFileConfiguration();
+        this.machineSection = configLoad.getConfigurationSection(machineName);
+        if (this.machineSection == null)
+            throw new MachineNotFoundException(
+                    "The machine named \""
+                            + machineName
+                            + "\" does not have a section named \""
+                            + machineName
+                            + "\"in the machines.yml");
     }
 
     @Override
@@ -144,6 +199,11 @@ public class Machine implements IMachine {
     @Override
     public double getCost() {
         return cost;
+    }
+
+    @Override
+    public MachineBlock getMachineBlock() {
+        return null;
     }
 
     @Override
@@ -196,41 +256,66 @@ public class Machine implements IMachine {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Machine machine = (Machine) o;
-        return machineReach == machine.machineReach &&
-                speed == machine.speed &&
-                maxFuel == machine.maxFuel &&
-                fuelDeficiency == machine.fuelDeficiency &&
-                Double.compare(machine.cost, cost) == 0 &&
-                fuelPerUse == machine.fuelPerUse &&
-                referenceBlockType == machine.referenceBlockType &&
-                Objects.equals(fuelTypes, machine.fuelTypes) &&
-                Objects.equals(fuel, machine.fuel) &&
-                machineType == machine.machineType &&
-                Objects.equals(structure, machine.structure) &&
-                Objects.equals(recipe, machine.recipe);
+        return machineReach == machine.machineReach
+                && speed == machine.speed
+                && maxFuel == machine.maxFuel
+                && fuelDeficiency == machine.fuelDeficiency
+                && Double.compare(machine.cost, cost) == 0
+                && fuelPerUse == machine.fuelPerUse
+                && referenceBlockType == machine.referenceBlockType
+                && Objects.equals(fuelTypes, machine.fuelTypes)
+                && Objects.equals(fuel, machine.fuel)
+                && machineType == machine.machineType
+                && Objects.equals(structure, machine.structure)
+                && Objects.equals(recipe, machine.recipe);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(referenceBlockType, machineReach, speed, maxFuel, fuelDeficiency, fuelTypes, cost, fuel, fuelPerUse, machineType, structure, recipe);
+        return Objects.hash(
+                referenceBlockType,
+                machineReach,
+                speed,
+                maxFuel,
+                fuelDeficiency,
+                fuelTypes,
+                cost,
+                fuel,
+                fuelPerUse,
+                machineType,
+                structure,
+                recipe);
     }
 
     @Override
     public String toString() {
-        return "Machine{" +
-                "referenceBlockType=" + referenceBlockType +
-                ", machineReach=" + machineReach +
-                ", speed=" + speed +
-                ", maxFuel=" + maxFuel +
-                ", fuelDeficiency=" + fuelDeficiency +
-                ", fuelTypes=" + fuelTypes +
-                ", cost=" + cost +
-                ", fuel=" + fuel +
-                ", fuelPerUse=" + fuelPerUse +
-                ", machineType=" + machineType +
-                ", structure=" + structure +
-                ", recipe=" + recipe +
-                ", totalResourcesGained=" + totalResourcesGained +
-                '}';
+        return "Machine{"
+                + "referenceBlockType="
+                + referenceBlockType
+                + ", machineReach="
+                + machineReach
+                + ", speed="
+                + speed
+                + ", maxFuel="
+                + maxFuel
+                + ", fuelDeficiency="
+                + fuelDeficiency
+                + ", fuelTypes="
+                + fuelTypes
+                + ", cost="
+                + cost
+                + ", fuel="
+                + fuel
+                + ", fuelPerUse="
+                + fuelPerUse
+                + ", machineType="
+                + machineType
+                + ", structure="
+                + structure
+                + ", recipe="
+                + recipe
+                + ", totalResourcesGained="
+                + totalResourcesGained
+                + '}';
     }
 }
