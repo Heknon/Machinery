@@ -1,0 +1,6 @@
+# recipe - in order to make fuel you must use the CustomRecipes plugin. reference a name of a recipe to add it as a fuel type.
+# energy - say a machine requires 10 fuel for one go. Fuel with energy 10 will be used up, fuel with energy 20 will have half of it's energy left
+
+fuel_type_name:
+  recipe: name_of_customrecipes_recipe
+  energy: 10
