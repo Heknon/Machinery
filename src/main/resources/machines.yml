@@ -5,12 +5,40 @@
 # speed - every how long should resources be gotten in seconds
 # max_fuel - max fuel the machine can have
 # efficiency - the amount of fuel taken each resource get event
+# fuel_types - the types of fuel the machine accepts
 # type - the machine type: LUMBERJACK, EXCAVATOR, MINER, FARMER, ALL
+# block - the block that when placed will build the machine.
 
 schematic_name:
   reference_block_type: "BEDROCK"
   mine_radius: 3
   speed: 1
   max_fuel: 100
-  efficiency: 10
+  defficiency: 10
+  fuel_types: ["fuel_type_name", "fuel_type_name2"]
   type: MINER
+
+  block:
+    material: "DIAMOND_ORE"
+    display_name: "&7Poor people machine"
+    lore: [
+      "&6This is the X machine."
+      "&8Use it to...."
+    ]
+
+schematic_name_super_machine:
+  reference_block_type: "BEDROCK"
+  mine_radius: 20
+  speed: 10
+  max_fuel: 1000
+  defficiency: 50
+  fuel_types: ["fuel_type_name3"]
+  type: MINER
+
+  block:
+    material: "GOLD_ORE"
+    display_name: "&7Super machine"
+    lore: [
+      "&6This is the X machine."
+      "&8Use it to...."
+    ]

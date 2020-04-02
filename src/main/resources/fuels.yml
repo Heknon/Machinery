@@ -4,3 +4,11 @@
 fuel_type_name:
   recipe: name_of_customrecipes_recipe
   energy: 10
+
+fuel_type_name2:
+  recipe: name_of_customrecipes_recipe2
+  energy: 50
+
+fuel_type_name3:
+  recipe: name_of_customrecipes_recipe3
+  energy: 20
