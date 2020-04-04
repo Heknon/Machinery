@@ -1,6 +1,8 @@
 package me.oriharel.machinery;
 
+import me.oriharel.customrecipes.api.CustomRecipesAPI;
 import me.oriharel.machinery.config.FileManager;
+import me.oriharel.machinery.listeners.Block;
 import me.oriharel.machinery.machine.MachineManager;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
@@ -28,7 +30,13 @@ public final class Machinery extends JavaPlugin {
         console.sendMessage("Starting up CustomRecipes");
 
         fileManager = new FileManager(this);
-        machineManager = new MachineManager(this);
+        fileManager.getConfig("config.yml").copyDefaults(true).save();
+        fileManager.getConfig("fuels.yml").copyDefaults(true).save();
+        fileManager.getConfig("machine_registry.yml").copyDefaults(true).save();
+        fileManager.getConfig("machines.yml").copyDefaults(true).save();
+        CustomRecipesAPI.getImplementation().getRecipesManager().registerRecipesDoneCallback(() -> Bukkit.getScheduler().runTask(this, () -> machineManager =
+                new MachineManager(this)));
+        Bukkit.getServer().getPluginManager().registerEvents(new Block(), this);
     }
 
     @Override

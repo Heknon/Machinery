@@ -21,6 +21,8 @@ interface IMachine {
 
     int getMaxFuel();
 
+    double getCost();
+
     int getFuelDeficiency();
 
     List<Fuel> getFuelTypes();

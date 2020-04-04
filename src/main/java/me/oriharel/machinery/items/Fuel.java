@@ -3,13 +3,10 @@ package me.oriharel.machinery.items;
 import me.oriharel.machinery.Machinery;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.libs.jline.internal.Nullable;
 
-import java.io.File;
-import java.io.Serializable;
-
-public class Fuel implements Serializable {
+public class Fuel {
 
     @Nullable
     private final Material material;
@@ -44,11 +41,11 @@ public class Fuel implements Serializable {
     }
 
     public Fuel(String fuelName) throws Exception {
-        FileConfiguration configLoad =
+        YamlConfiguration configLoad =
                 Machinery.getInstance()
                         .getFileManager()
-                        .getConfig(new File(Machinery.getInstance().getDataFolder(), "fuels.yml"))
-                        .getFileConfiguration();
+                        .getConfig("fuels.yml")
+                        .get();
         this.material = Material.getMaterial(configLoad.getString(fuelName.concat(".material"), "___"));
         this.nbt = new NBTTagCompound();
         this.nbt.setString(configLoad.getString(fuelName.concat(".nbt"), ""), "");
@@ -60,5 +57,17 @@ public class Fuel implements Serializable {
             throw new Exception(
                     "There is no way to recognize the fuel made. You must set material or nbt"
                             + " in fuels.yml");
+    }
+
+    public Material getMaterial() {
+        return material;
+    }
+
+    public NBTTagCompound getNbt() {
+        return nbt;
+    }
+
+    public int getEnergy() {
+        return energy;
     }
 }

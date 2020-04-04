@@ -1,47 +1,53 @@
 package me.oriharel.machinery.items;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import me.oriharel.customrecipes.recipe.Recipe;
 import me.oriharel.machinery.exceptions.MachineNotFoundException;
 import me.oriharel.machinery.machine.Machine;
-import net.minecraft.server.v1_15_R1.NBTTagCompound;
+import me.oriharel.machinery.serialization.MachineTypeAdapter;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
-import java.io.*;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Inject Machine into recipe NBT
  */
 public class MachineBlock {
 
-    private final Recipe recipe;
-    private final Machine machine;
+    private transient final Recipe recipe;
+    private transient final Machine machine;
 
-    public MachineBlock(Recipe recipe, Machine machine) throws IOException {
+    public MachineBlock(Recipe recipe, Machine machine) {
         this.recipe = recipe;
         this.machine = machine;
-        ItemStack itemStack = recipe.getResult().getItemStackWithNBT();
-        net.minecraft.server.v1_15_R1.ItemStack nmsIs = CraftItemStack.asNMSCopy(itemStack);
-        NBTTagCompound tagCompound = nmsIs.getTag();
-        if (tagCompound == null) tagCompound = new NBTTagCompound();
-
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(bos);
-        oos.writeObject(machine);
-        oos.flush();
-        byte[] data = bos.toByteArray();
-        tagCompound.setByteArray("machine", data);
     }
 
-    public MachineBlock(ItemStack itemStack) throws MachineNotFoundException, IOException, ClassNotFoundException {
+    public MachineBlock(ItemStack itemStack) throws MachineNotFoundException {
         net.minecraft.server.v1_15_R1.ItemStack is = CraftItemStack.asNMSCopy(itemStack);
         if (!is.hasTag() || !is.getTag().hasKey("machine")) throw new MachineNotFoundException("Machine not found in ItemStack passed to MachineBlock constructor.");
-        byte[] data = is.getTag().getByteArray("machine");
-        ByteArrayInputStream in = new ByteArrayInputStream(data);
-        ObjectInputStream ois = new ObjectInputStream(in);
-        this.machine = (Machine) ois.readObject();
+        String data = is.getTag().getString("machine");
+        Gson gson = new GsonBuilder().setPrettyPrinting().registerTypeHierarchyAdapter(Machine.class, new MachineTypeAdapter()).create();
+        this.machine = gson.fromJson(data, Machine.class);
         this.recipe = this.machine.getRecipe();
+    }
+
+    public ItemStack getItemStackWithAppliedPlaceholders() {
+        ItemStack is = recipe.getResult().getItemStackWithNBT();
+        ItemMeta meta = is.getItemMeta();
+        meta.setDisplayName(applyPlaceholders(meta.getDisplayName()));
+        meta.setLore(meta.getLore().stream().map(this::applyPlaceholders).collect(Collectors.toList()));
+        is.setItemMeta(meta);
+        return is;
+    }
+
+    private String applyPlaceholders(String string) {
+        string = string.replaceAll("%resources_gained%", String.valueOf(machine.getTotalResourcesGained().stream().mapToInt(ItemStack::getAmount).sum()));
+        string = string.replaceAll("%energy%", String.valueOf(machine.getFuel().stream().mapToInt(Fuel::getEnergy).sum()));
+        return string;
     }
 
     public Recipe getRecipe() {

@@ -1,29 +1,33 @@
 package me.oriharel.machinery.machine;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import me.oriharel.customrecipes.api.CustomRecipesAPI;
 import me.oriharel.customrecipes.recipe.Recipe;
+import me.oriharel.customrecipes.recipe.item.RecipeResultReference;
+import me.oriharel.customrecipes.serialize.NBTTagCompound;
 import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.api.events.PostMachineBuildEvent;
 import me.oriharel.machinery.api.events.PreMachineBuildEvent;
 import me.oriharel.machinery.exceptions.MachineNotFoundException;
 import me.oriharel.machinery.items.Fuel;
 import me.oriharel.machinery.items.MachineBlock;
+import me.oriharel.machinery.serialization.MachineTypeAdapter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.lang.reflect.Field;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Level;
 
-public class Machine implements IMachine, Serializable {
+public class Machine implements IMachine {
 
     protected Material referenceBlockType;
     protected List<Fuel> fuelTypes;
@@ -40,7 +44,7 @@ public class Machine implements IMachine, Serializable {
     protected int maxFuel;
     protected MachineBlock machineBlock;
     protected List<ItemStack> totalResourcesGained;
-    private ConfigurationSection machineSection;
+    transient private ConfigurationSection machineSection;
 
     public Machine(
             Material referenceBlockType,
@@ -51,12 +55,11 @@ public class Machine implements IMachine, Serializable {
             List<Fuel> fuelTypes,
             double cost,
             List<Fuel> fuel,
-            int fuelPerUse,
             MachineType machineType,
             Structure structure,
             Recipe recipe,
             String machineName,
-            List<ItemStack> totalResourcesGained) {
+            List<ItemStack> totalResourcesGained, MachineBlock machineBlock) {
         this.referenceBlockType = referenceBlockType;
         this.machineReach = machineReach;
         this.speed = speed;
@@ -65,12 +68,12 @@ public class Machine implements IMachine, Serializable {
         this.fuelTypes = fuelTypes;
         this.cost = cost;
         this.fuel = fuel;
-        this.fuelPerUse = fuelPerUse;
         this.machineType = machineType;
         this.structure = structure;
         this.recipe = recipe;
         this.machineName = machineName;
         this.totalResourcesGained = totalResourcesGained;
+        this.machineBlock = machineBlock;
     }
 
     public Machine(
@@ -82,7 +85,6 @@ public class Machine implements IMachine, Serializable {
             List<Fuel> fuelTypes,
             double cost,
             List<Fuel> fuel,
-            int fuelPerUse,
             MachineType machineType,
             Structure structure,
             Recipe recipe,
@@ -95,7 +97,6 @@ public class Machine implements IMachine, Serializable {
         this.fuelTypes = fuelTypes;
         this.cost = cost;
         this.fuel = fuel;
-        this.fuelPerUse = fuelPerUse;
         this.machineType = machineType;
         this.structure = structure;
         this.recipe = recipe;
@@ -111,7 +112,6 @@ public class Machine implements IMachine, Serializable {
             int fuelDeficiency,
             List<Fuel> fuelTypes,
             double cost,
-            int fuelPerUse,
             MachineType machineType,
             Structure structure,
             Recipe recipe,
@@ -126,7 +126,6 @@ public class Machine implements IMachine, Serializable {
         this.recipe = recipe;
         this.machineName = machineName;
         this.fuel = new ArrayList<>();
-        this.fuelPerUse = fuelPerUse;
         this.machineType = machineType;
         this.structure = structure;
         this.totalResourcesGained = new ArrayList<ItemStack>();
@@ -134,11 +133,11 @@ public class Machine implements IMachine, Serializable {
 
     public Machine(String machineName) throws MachineNotFoundException, IOException {
         this.machineName = machineName;
-        FileConfiguration configLoad =
+        YamlConfiguration configLoad =
                 Machinery.getInstance()
                         .getFileManager()
-                        .getConfig(new File(Machinery.getInstance().getDataFolder(), "machines.yml"))
-                        .getFileConfiguration();
+                        .getConfig("machines.yml")
+                        .get();
         this.machineSection = configLoad.getConfigurationSection(machineName);
         if (this.machineSection == null)
             throw new MachineNotFoundException(
@@ -159,6 +158,7 @@ public class Machine implements IMachine, Serializable {
         getStructure();
         getTotalResourcesGained();
         getType();
+        getCost();
     }
 
     @Override
@@ -199,16 +199,45 @@ public class Machine implements IMachine, Serializable {
     }
 
     @Override
-    public MachineBlock getMachineBlock() throws IOException {
+    public MachineBlock getMachineBlock() {
         if (machineSection != null && machineBlock == null) this.machineBlock = new MachineBlock(getRecipe(), this);
         return machineBlock;
+    }
+
+    public void setMachineBlock(MachineBlock machineBlock) {
+        this.machineBlock = machineBlock;
     }
 
     public Recipe getRecipe() {
         if (machineSection != null && recipe == null) {
             String recipe = this.machineSection.getString("recipe");
-            this.recipe =
-                    CustomRecipesAPI.getImplementation().getRecipesManager().getRecipes().stream().filter(rec -> rec.getRecipeKey().equalsIgnoreCase(recipe)).findFirst().get();
+            AtomicReference<String> currRecipeName = new AtomicReference<>("");
+            try {
+                Bukkit.getLogger().log(Level.INFO, "[Machinery] Loading machine recipe: " + recipe);
+                this.recipe =
+                        CustomRecipesAPI.getImplementation().getRecipesManager().getRecipes().stream().filter(rec -> {
+                            currRecipeName.set(rec.getRecipeKey());
+                            return rec.getRecipeKey().equalsIgnoreCase(recipe);
+                        }).findFirst().get();
+                try {
+                    RecipeResultReference recipeResultReference = this.recipe.getResult();
+                    Field nbtTagField = RecipeResultReference.class.getSuperclass().getDeclaredField("nbtTagCompound");
+                    nbtTagField.setAccessible(true);
+                    NBTTagCompound nbtTagCompound = (NBTTagCompound) recipeResultReference.getNBTTagCompound();
+                    if (nbtTagCompound == null) nbtTagCompound = new NBTTagCompound();
+                    Gson gson = new GsonBuilder().setPrettyPrinting().registerTypeHierarchyAdapter(Machine.class, new MachineTypeAdapter()).create();
+                    nbtTagCompound.setString("machine", gson.toJson(this));
+                    nbtTagField.set(recipeResultReference, nbtTagCompound);
+                    this.recipe.setRecipe(this.recipe.constructRecipe());
+                    CustomRecipesAPI.getImplementation().getRecipesManager().replaceRecipeNamed(recipe, this.recipe);
+                } catch (NoSuchFieldException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+                RecipeResultReference recipeResultReference = this.recipe.getResult();
+                Bukkit.getLogger().log(Level.INFO, "[Machinery] Loaded machine recipe: " + recipe);
+            } catch (NoSuchElementException e) {
+                Bukkit.getLogger().log(Level.SEVERE, "Failed to find CustomRecipe with key of: " + currRecipeName.get());
+            }
         }
         return this.recipe;
     }
@@ -253,6 +282,12 @@ public class Machine implements IMachine, Serializable {
             return true;
         });
         return true;
+    }
+
+    @Override
+    public double getCost() {
+        if (cost == -1 && machineSection != null) cost = machineSection.getInt("cost");
+        return cost;
     }
 
     @Override
