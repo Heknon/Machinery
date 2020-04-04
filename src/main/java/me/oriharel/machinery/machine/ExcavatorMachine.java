@@ -3,30 +3,33 @@ package me.oriharel.machinery.machine;
 import me.oriharel.customrecipes.recipe.Recipe;
 import me.oriharel.machinery.exceptions.MachineNotFoundException;
 import me.oriharel.machinery.items.Fuel;
-import me.oriharel.machinery.items.MachineBlock;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import java.io.IOException;
 import java.util.List;
 
 class ExcavatorMachine extends Machine {
+
     public ExcavatorMachine(Material referenceBlockType, int machineReach, int speed, int maxFuel, int fuelDeficiency, List<Fuel> fuelTypes, double cost,
-                            List<Fuel> fuel, int fuelPerUse, MachineType machineType, Structure structure, Recipe recipe, String machineName, MachineBlock machineBlock
-            , List<ItemStack> totalResourcesGained) throws MachineNotFoundException {
+                            List<Fuel> fuel, int fuelPerUse, MachineType machineType, Structure structure, Recipe recipe, String machineName,
+                            List<ItemStack> totalResourcesGained) {
         super(referenceBlockType, machineReach, speed, maxFuel, fuelDeficiency, fuelTypes, cost, fuel, fuelPerUse, machineType, structure, recipe, machineName,
                 totalResourcesGained);
     }
 
     public ExcavatorMachine(Material referenceBlockType, int machineReach, int speed, int maxFuel, int fuelDeficiency, List<Fuel> fuelTypes, double cost,
-                            List<Fuel> fuel, int fuelPerUse, MachineType machineType, Structure structure, Recipe recipe, String machineName,
-                            MachineBlock machineBlock) throws MachineNotFoundException {
-        super(referenceBlockType, machineReach, speed, maxFuel, fuelDeficiency, fuelTypes, cost, fuel, fuelPerUse, machineType, structure, recipe, machineName
-        );
+                            List<Fuel> fuel, int fuelPerUse, MachineType machineType, Structure structure, Recipe recipe, String machineName) {
+        super(referenceBlockType, machineReach, speed, maxFuel, fuelDeficiency, fuelTypes, cost, fuel, fuelPerUse, machineType, structure, recipe, machineName);
     }
 
     public ExcavatorMachine(Material referenceBlockType, int machineReach, int speed, int maxFuel, int fuelDeficiency, List<Fuel> fuelTypes, double cost,
-                            int fuelPerUse, MachineType machineType, Structure structure, Recipe recipe, String machineName, MachineBlock machineBlock) throws MachineNotFoundException {
+                            int fuelPerUse, MachineType machineType, Structure structure, Recipe recipe, String machineName) {
         super(referenceBlockType, machineReach, speed, maxFuel, fuelDeficiency, fuelTypes, cost, fuelPerUse, machineType, structure, recipe, machineName);
+    }
+
+    public ExcavatorMachine(String machineName) throws MachineNotFoundException, IOException {
+        super(machineName);
     }
 
     @Override

@@ -6,24 +6,28 @@ import me.oriharel.machinery.items.Fuel;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import java.io.IOException;
 import java.util.List;
 
 class FarmMachine extends Machine {
     public FarmMachine(Material referenceBlockType, int machineReach, int speed, int maxFuel, int fuelDeficiency, List<Fuel> fuelTypes, double cost, List<Fuel> fuel,
-                       int fuelPerUse, MachineType machineType, Structure structure, Recipe recipe, String machineName, List<ItemStack> totalResourcesGained) throws MachineNotFoundException {
+                       int fuelPerUse, MachineType machineType, Structure structure, Recipe recipe, String machineName, List<ItemStack> totalResourcesGained) {
         super(referenceBlockType, machineReach, speed, maxFuel, fuelDeficiency, fuelTypes, cost, fuel, fuelPerUse, machineType, structure, recipe, machineName,
                 totalResourcesGained);
     }
 
     public FarmMachine(Material referenceBlockType, int machineReach, int speed, int maxFuel, int fuelDeficiency, List<Fuel> fuelTypes, double cost, List<Fuel> fuel,
-                       int fuelPerUse, MachineType machineType, Structure structure, Recipe recipe, String machineName) throws MachineNotFoundException {
-        super(referenceBlockType, machineReach, speed, maxFuel, fuelDeficiency, fuelTypes, cost, fuel, fuelPerUse, machineType, structure, recipe, machineName
-        );
+                       int fuelPerUse, MachineType machineType, Structure structure, Recipe recipe, String machineName) {
+        super(referenceBlockType, machineReach, speed, maxFuel, fuelDeficiency, fuelTypes, cost, fuel, fuelPerUse, machineType, structure, recipe, machineName);
     }
 
     public FarmMachine(Material referenceBlockType, int machineReach, int speed, int maxFuel, int fuelDeficiency, List<Fuel> fuelTypes, double cost, int fuelPerUse,
-                       MachineType machineType, Structure structure, Recipe recipe, String machineName) throws MachineNotFoundException {
+                       MachineType machineType, Structure structure, Recipe recipe, String machineName) {
         super(referenceBlockType, machineReach, speed, maxFuel, fuelDeficiency, fuelTypes, cost, fuelPerUse, machineType, structure, recipe, machineName);
+    }
+
+    public FarmMachine(String machineName) throws MachineNotFoundException, IOException {
+        super(machineName);
     }
 
     @Override
