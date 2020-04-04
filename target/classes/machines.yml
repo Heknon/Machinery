@@ -1,0 +1,31 @@
+# DEFAULT MACHINE VALUES
+
+# reference_block_type - is the type of block in the schematic that from that block all blocks are "mined"
+# mine_radius - the mine radius from the reference block
+# speed - every how long should resources be gotten in seconds
+# max_fuel - max fuel the machine can have
+# efficiency - the amount of fuel taken each resource get event
+# fuel_types - the types of fuel the machine accepts
+# type - the machine type: LUMBERJACK, EXCAVATOR, MINER, FARMER, ALL
+# block - the block that when placed will build the machine.
+# recipe - in order to make a machine you must use the CustomRecipes plugin. reference a name of a recipe to add it as a machine type.
+
+schematic_name:
+  reference_block_type: "BEDROCK"
+  mine_radius: 3
+  speed: 1
+  max_fuel: 100
+  deficiency: 10
+  fuel_types: ["fuel_type_name", "fuel_type_name2"]
+  recipe: "schematic_name_recipe"
+  type: MINER
+
+schematic_name_super_machine:
+  reference_block_type: "BEDROCK"
+  mine_radius: 20
+  speed: 10
+  max_fuel: 1000
+  deficiency: 50
+  fuel_types: ["fuel_type_name3"]
+  recipe: "schematic_name_super_machine_recipe"
+  type: MINER

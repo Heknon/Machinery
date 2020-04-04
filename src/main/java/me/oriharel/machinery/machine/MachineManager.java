@@ -1,12 +1,12 @@
 package me.oriharel.machinery.machine;
 
+import com.sun.javaws.exceptions.InvalidArgumentException;
 import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.exceptions.MachineNotRegisteredException;
+import org.bukkit.configuration.file.FileConfiguration;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.io.File;
+import java.util.*;
 
 public class MachineManager {
     private final Machinery machinery;
@@ -19,6 +19,22 @@ public class MachineManager {
         this.machineFactory = new MachineFactory();
         this.machines = new ArrayList<Machine>();
         this.playerMachines = new HashMap<>();
+    }
+
+    private void initializeBaseMachines() {
+        FileConfiguration configLoad = machinery.getFileManager().getConfig(new File(machinery.getDataFolder(), "machines.yml")).getFileConfiguration();
+        Set<String> machineKeys = configLoad.getKeys(false);
+        for (String key : machineKeys) {
+            try {
+                machines.add(machineFactory.createMachine(key, MachineType.valueOf(configLoad.getString(key + ".type"))));
+            } catch (InvalidArgumentException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void initializePlayerMachines() {
+
     }
 
     public void registerPlayerMachine(UUID uuid, PlayerMachine playerMachine) {

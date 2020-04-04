@@ -1,5 +1,6 @@
 package me.oriharel.machinery.machine;
 
+import com.sun.javaws.exceptions.InvalidArgumentException;
 import me.oriharel.machinery.exceptions.MachineNotFoundException;
 
 import javax.annotation.Nullable;
@@ -7,8 +8,9 @@ import java.io.IOException;
 
 class MachineFactory {
     @Nullable
-    public IMachine createMachine(String machineName, MachineType machineType) {
-        IMachine machine = null;
+    public Machine createMachine(String machineName, MachineType machineType) throws InvalidArgumentException {
+        if (machineType == null) throw new InvalidArgumentException(new String[]{"Machine type must not be null (MachineFactory)"});
+        Machine machine = null;
         try {
             switch (machineType) {
                 case LUMBERJACK:

@@ -12,20 +12,20 @@ import java.util.List;
 class ExcavatorMachine extends Machine {
 
     public ExcavatorMachine(Material referenceBlockType, int machineReach, int speed, int maxFuel, int fuelDeficiency, List<Fuel> fuelTypes, double cost,
-                            List<Fuel> fuel, int fuelPerUse, MachineType machineType, Structure structure, Recipe recipe, String machineName,
+                            List<Fuel> fuel, int fuelPerUse, Structure structure, Recipe recipe, String machineName,
                             List<ItemStack> totalResourcesGained) {
-        super(referenceBlockType, machineReach, speed, maxFuel, fuelDeficiency, fuelTypes, cost, fuel, fuelPerUse, machineType, structure, recipe, machineName,
+        super(referenceBlockType, machineReach, speed, maxFuel, fuelDeficiency, fuelTypes, cost, fuel, fuelPerUse, MachineType.EXCAVATOR, structure, recipe, machineName,
                 totalResourcesGained);
     }
 
     public ExcavatorMachine(Material referenceBlockType, int machineReach, int speed, int maxFuel, int fuelDeficiency, List<Fuel> fuelTypes, double cost,
-                            List<Fuel> fuel, int fuelPerUse, MachineType machineType, Structure structure, Recipe recipe, String machineName) {
-        super(referenceBlockType, machineReach, speed, maxFuel, fuelDeficiency, fuelTypes, cost, fuel, fuelPerUse, machineType, structure, recipe, machineName);
+                            List<Fuel> fuel, int fuelPerUse, Structure structure, Recipe recipe, String machineName) {
+        super(referenceBlockType, machineReach, speed, maxFuel, fuelDeficiency, fuelTypes, cost, fuel, fuelPerUse, MachineType.EXCAVATOR, structure, recipe, machineName);
     }
 
     public ExcavatorMachine(Material referenceBlockType, int machineReach, int speed, int maxFuel, int fuelDeficiency, List<Fuel> fuelTypes, double cost,
-                            int fuelPerUse, MachineType machineType, Structure structure, Recipe recipe, String machineName) {
-        super(referenceBlockType, machineReach, speed, maxFuel, fuelDeficiency, fuelTypes, cost, fuelPerUse, machineType, structure, recipe, machineName);
+                            int fuelPerUse, Structure structure, Recipe recipe, String machineName) {
+        super(referenceBlockType, machineReach, speed, maxFuel, fuelDeficiency, fuelTypes, cost, fuelPerUse, MachineType.EXCAVATOR, structure, recipe, machineName);
     }
 
     public ExcavatorMachine(String machineName) throws MachineNotFoundException, IOException {

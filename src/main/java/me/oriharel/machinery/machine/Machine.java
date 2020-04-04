@@ -21,6 +21,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 public class Machine implements IMachine, Serializable {
 
@@ -203,7 +204,7 @@ public class Machine implements IMachine, Serializable {
         return machineBlock;
     }
 
-    private Recipe getRecipe() {
+    public Recipe getRecipe() {
         if (machineSection != null && recipe == null) {
             String recipe = this.machineSection.getString("recipe");
             this.recipe =
@@ -220,7 +221,11 @@ public class Machine implements IMachine, Serializable {
 
     @Override
     public MachineType getType() {
-        if (machineSection != null && machineType == null) this.machineType = MachineType.valueOf(this.machineSection.getString("type"));
+        if (machineType == null && this instanceof ExcavatorMachine) this.machineType = MachineType.EXCAVATOR;
+        else if (machineType == null && this instanceof LumberjackMachine) this.machineType = MachineType.LUMBERJACK;
+        else if (machineType == null && this instanceof FarmMachine) this.machineType = MachineType.FARMER;
+        else if (machineType == null && this instanceof MineMachine) this.machineType = MachineType.MINER;
+        else if (machineSection != null && machineType == null) this.machineType = MachineType.valueOf(this.machineSection.getString("type"));
         return machineType;
     }
 
@@ -236,18 +241,15 @@ public class Machine implements IMachine, Serializable {
     }
 
     @Override
-    public boolean build(Location loc) {
+    public boolean build(UUID playerUuid, Location loc) {
         PreMachineBuildEvent preMachineBuildEvent = new PreMachineBuildEvent(this, loc);
         Bukkit.getPluginManager().callEvent(preMachineBuildEvent);
         if (preMachineBuildEvent.isCancelled()) return false;
         structure.build(loc, (success) -> {
             PostMachineBuildEvent postMachineBuildEvent = new PostMachineBuildEvent(this, loc);
             Bukkit.getPluginManager().callEvent(postMachineBuildEvent);
-            try {
-                PlayerMachine playerMachine = new PlayerMachine(this, loc);
-            } catch (MachineNotFoundException e) {
-                e.printStackTrace();
-            }
+            PlayerMachine playerMachine = new PlayerMachine(this, loc);
+            Machinery.getInstance().getMachineManager().registerPlayerMachine(playerUuid, playerMachine);
             return true;
         });
         return true;

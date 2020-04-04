@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 interface IMachine {
 
@@ -32,7 +33,7 @@ interface IMachine {
 
     List<ItemStack> run();
 
-    boolean build(Location location);
+    boolean build(UUID playerUuid, Location location);
 
     Structure getStructure();
 

@@ -1,0 +1,15 @@
+# material - what material is the fuel
+# energy - say a machine requires 10 fuel for one go. Fuel with energy 10 will be used up, fuel with energy 20 will have half of it's energy left
+# nbt - allows to check if the item has a certain nbt if it does, it is the fuel
+
+fuel_type_name:
+  material: "BEDROCK"
+  energy: 50
+
+fuel_type_name2:
+  material: "OBSIDIAN"
+  energy: 30
+
+fuel_type_name3:
+  nbt: "if_it_has_this_nbt_key_it_is_fuel"
+  energy: 5
