@@ -1,5 +1,6 @@
 package me.oriharel.machinery.machine;
 
+import me.oriharel.customrecipes.api.CustomRecipesAPI;
 import me.oriharel.customrecipes.recipe.Recipe;
 import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.api.events.PostMachineBuildEvent;
@@ -15,6 +16,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,9 +37,9 @@ public class Machine implements IMachine, Serializable {
     protected int fuelPerUse;
     protected int speed;
     protected int maxFuel;
+    protected MachineBlock machineBlock;
+    protected List<ItemStack> totalResourcesGained;
     private ConfigurationSection machineSection;
-
-    private List<ItemStack> totalResourcesGained;
 
     public Machine(
             Material referenceBlockType,
@@ -53,8 +55,7 @@ public class Machine implements IMachine, Serializable {
             Structure structure,
             Recipe recipe,
             String machineName,
-            List<ItemStack> totalResourcesGained)
-            throws MachineNotFoundException {
+            List<ItemStack> totalResourcesGained) {
         this.referenceBlockType = referenceBlockType;
         this.machineReach = machineReach;
         this.speed = speed;
@@ -69,19 +70,6 @@ public class Machine implements IMachine, Serializable {
         this.recipe = recipe;
         this.machineName = machineName;
         this.totalResourcesGained = totalResourcesGained;
-        FileConfiguration configLoad =
-                Machinery.getInstance()
-                        .getFileManager()
-                        .getConfig(new File(Machinery.getInstance().getDataFolder(), "machines.yml"))
-                        .getFileConfiguration();
-        this.machineSection = configLoad.getConfigurationSection(machineName);
-        if (this.machineSection == null)
-            throw new MachineNotFoundException(
-                    "The machine named \""
-                            + machineName
-                            + "\" does not have a section named \""
-                            + machineName
-                            + "\"in the machines.yml");
     }
 
     public Machine(
@@ -97,8 +85,7 @@ public class Machine implements IMachine, Serializable {
             MachineType machineType,
             Structure structure,
             Recipe recipe,
-            String machineName)
-            throws MachineNotFoundException {
+            String machineName) {
         this.referenceBlockType = referenceBlockType;
         this.machineReach = machineReach;
         this.speed = speed;
@@ -113,19 +100,6 @@ public class Machine implements IMachine, Serializable {
         this.recipe = recipe;
         this.machineName = machineName;
         this.totalResourcesGained = new ArrayList<ItemStack>();
-        FileConfiguration configLoad =
-                Machinery.getInstance()
-                        .getFileManager()
-                        .getConfig(new File(Machinery.getInstance().getDataFolder(), "machines.yml"))
-                        .getFileConfiguration();
-        this.machineSection = configLoad.getConfigurationSection(machineName);
-        if (this.machineSection == null)
-            throw new MachineNotFoundException(
-                    "The machine named \""
-                            + machineName
-                            + "\" does not have a section named \""
-                            + machineName
-                            + "\"in the machines.yml");
     }
 
     public Machine(
@@ -140,8 +114,7 @@ public class Machine implements IMachine, Serializable {
             MachineType machineType,
             Structure structure,
             Recipe recipe,
-            String machineName)
-            throws MachineNotFoundException {
+            String machineName) {
         this.referenceBlockType = referenceBlockType;
         this.machineReach = machineReach;
         this.speed = speed;
@@ -156,6 +129,10 @@ public class Machine implements IMachine, Serializable {
         this.machineType = machineType;
         this.structure = structure;
         this.totalResourcesGained = new ArrayList<ItemStack>();
+    }
+
+    public Machine(String machineName) throws MachineNotFoundException, IOException {
+        this.machineName = machineName;
         FileConfiguration configLoad =
                 Machinery.getInstance()
                         .getFileManager()
@@ -169,66 +146,87 @@ public class Machine implements IMachine, Serializable {
                             + "\" does not have a section named \""
                             + machineName
                             + "\"in the machines.yml");
+        getFuel();
+        getFuelDeficiency();
+        getFuelTypes();
+        getMachineBlock();
+        getMachineReach();
+        getMaxFuel();
+        getRecipe();
+        getReferenceBlockType();
+        getSpeed();
+        getStructure();
+        getTotalResourcesGained();
+        getType();
     }
 
     @Override
     public Material getReferenceBlockType() {
-        if (referenceBlockType == null) this.referenceBlockType = Material.getMaterial(this.machineSection.getString("reference_block_type", "___"));
+        if (machineSection != null && referenceBlockType == null) this.referenceBlockType = Material.getMaterial(this.machineSection.getString("reference_block_type",
+                "___"));
         return referenceBlockType;
     }
 
     @Override
     public int getMachineReach() {
+        if (machineSection != null && machineReach == -1) this.machineReach = this.machineSection.getInt("mine_radius", 0);
         return machineReach;
     }
 
     @Override
     public int getSpeed() {
+        if (machineSection != null && speed == -1) this.speed = this.machineSection.getInt("speed", 0);
         return speed;
     }
 
     @Override
     public int getMaxFuel() {
+        if (machineSection != null && maxFuel == -1) this.maxFuel = this.machineSection.getInt("max_fuel", 0);
         return maxFuel;
     }
 
     @Override
     public int getFuelDeficiency() {
+        if (machineSection != null && fuelDeficiency == -1) this.fuelDeficiency = this.machineSection.getInt("deficiency", 0);
         return fuelDeficiency;
     }
 
     @Override
     public List<Fuel> getFuelTypes() {
+        if (machineSection != null && fuelTypes == null) this.fuelTypes = new ArrayList<>();
         return fuelTypes;
     }
 
     @Override
-    public double getCost() {
-        return cost;
+    public MachineBlock getMachineBlock() throws IOException {
+        if (machineSection != null && machineBlock == null) this.machineBlock = new MachineBlock(getRecipe(), this);
+        return machineBlock;
     }
 
-    @Override
-    public MachineBlock getMachineBlock() {
-        return null;
+    private Recipe getRecipe() {
+        if (machineSection != null && recipe == null) {
+            String recipe = this.machineSection.getString("recipe");
+            this.recipe =
+                    CustomRecipesAPI.getImplementation().getRecipesManager().getRecipes().stream().filter(rec -> rec.getRecipeKey().equalsIgnoreCase(recipe)).findFirst().get();
+        }
+        return this.recipe;
     }
 
     @Override
     public List<Fuel> getFuel() {
+        if (fuel == null) this.fuel = new ArrayList<>();
         return fuel;
     }
 
     @Override
-    public int getFuelPerUse() {
-        return fuelPerUse;
-    }
-
-    @Override
     public MachineType getType() {
+        if (machineSection != null && machineType == null) this.machineType = MachineType.valueOf(this.machineSection.getString("type"));
         return machineType;
     }
 
     @Override
     public List<ItemStack> getTotalResourcesGained() {
+        if (totalResourcesGained == null) this.totalResourcesGained = new ArrayList<>();
         return totalResourcesGained;
     }
 
@@ -239,24 +237,27 @@ public class Machine implements IMachine, Serializable {
 
     @Override
     public boolean build(Location loc) {
-        PreMachineBuildEvent preMachineBuildEvent = new PreMachineBuildEvent(this);
+        PreMachineBuildEvent preMachineBuildEvent = new PreMachineBuildEvent(this, loc);
         Bukkit.getPluginManager().callEvent(preMachineBuildEvent);
         if (preMachineBuildEvent.isCancelled()) return false;
-        structure.build(loc, () -> {
-            PostMachineBuildEvent postMachineBuildEvent = new PostMachineBuildEvent(this);
+        structure.build(loc, (success) -> {
+            PostMachineBuildEvent postMachineBuildEvent = new PostMachineBuildEvent(this, loc);
             Bukkit.getPluginManager().callEvent(postMachineBuildEvent);
+            try {
+                PlayerMachine playerMachine = new PlayerMachine(this, loc);
+            } catch (MachineNotFoundException e) {
+                e.printStackTrace();
+            }
+            return true;
         });
         return true;
     }
 
     @Override
     public Structure getStructure() {
+        if (machineSection != null && structure == null)
+            this.structure = new Structure(new File(Machinery.getInstance().getDataFolder(), "structures/" + machineName), machineName);
         return structure;
-    }
-
-    @Override
-    public Recipe getRecipe() {
-        return recipe;
     }
 
     @Override

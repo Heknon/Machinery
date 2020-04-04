@@ -16,6 +16,7 @@ import org.bukkit.Location;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.function.Function;
 
 public class Structure {
     private final File schematic;
@@ -44,7 +45,7 @@ public class Structure {
         return name;
     }
 
-    public void build(@NotNull Location loc, Runnable callback) {
+    public void build(@NotNull Location loc, Function<Boolean, Boolean> callback) {
         PasteBuilder builder;
         this.editSession =
                 WorldEdit.getInstance()
@@ -59,18 +60,17 @@ public class Structure {
                             .createPaste(editSession);
         } catch (IOException e) {
             e.printStackTrace();
-            builder = null;
+            callback.apply(false);
+            return;
         }
-        if (builder == null)
-            throw new NullPointerException("Structure (" + name + ") builder is null!");
         Operation operation = builder.to(BlockVector3.at(loc.getX(), loc.getY(), loc.getZ())).ignoreAirBlocks(true).build();
         try {
             Operations.complete(operation);
             editSession.flushSession();
-            callback.run();
+            callback.apply(true);
 
         } catch (WorldEditException e) {
-            callback.run();
+            callback.apply(false);
             e.printStackTrace();
         }
     }

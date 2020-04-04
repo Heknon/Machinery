@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import java.io.IOException;
 import java.util.List;
 
 interface IMachine {
@@ -23,11 +24,7 @@ interface IMachine {
 
     List<Fuel> getFuelTypes();
 
-    double getCost();
-
     List<Fuel> getFuel();
-
-    int getFuelPerUse();
 
     MachineType getType();
 
@@ -39,9 +36,7 @@ interface IMachine {
 
     Structure getStructure();
 
-    Recipe getRecipe();
-
-    MachineBlock getMachineBlock();
+    MachineBlock getMachineBlock() throws IOException;
 
     String getMachineName();
 }

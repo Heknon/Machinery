@@ -34,8 +34,4 @@ class ExcavatorMachine extends Machine {
         return super.run();
     }
 
-    @Override
-    public boolean build() {
-        return super.build();
-    }
 }

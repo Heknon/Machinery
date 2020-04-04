@@ -1,6 +1,7 @@
 package me.oriharel.machinery.api.events;
 
 import me.oriharel.machinery.machine.Machine;
+import org.bukkit.Location;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 
@@ -9,8 +10,8 @@ public class PreMachineBuildEvent extends MachineEvent implements Cancellable {
 
     private boolean cancelled;
 
-    public PreMachineBuildEvent(Machine machine) {
-        super(machine, buildLocation);
+    public PreMachineBuildEvent(Machine machine, Location loc) {
+        super(machine, loc);
     }
 
     public static HandlerList getHandlerList() {
