@@ -69,6 +69,6 @@ public class MachineBlock {
 
     @Override
     public int hashCode() {
-        return Objects.hash(recipe, machine);
+        return Objects.hash(recipe);
     }
 }

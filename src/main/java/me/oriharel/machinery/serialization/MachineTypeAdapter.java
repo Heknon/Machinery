@@ -12,7 +12,6 @@ import me.oriharel.machinery.machine.Structure;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.List;
 
@@ -31,13 +30,12 @@ public class MachineTypeAdapter implements JsonSerializer<Machine>, JsonDeserial
                 CustomRecipesAPI.getImplementation().getRecipesManager().getRecipes().stream().filter(r -> r.getRecipeKey().equalsIgnoreCase(recipeName)).findAny().orElse(null);
         List<Fuel> fuel = jsonDeserializationContext.deserialize(obj.get("machineFuel"), List.class);
         int machineFuelDeficiency = obj.get("machineFuelDeficiency").getAsInt();
-        List<Fuel> fuelTypes = jsonDeserializationContext.deserialize(obj.get("machineFuelTypes"), List.class);
+        List<String> fuelTypes = jsonDeserializationContext.deserialize(obj.get("machineFuelTypes"), List.class);
         int machineReach = obj.get("machineReach").getAsInt();
         int machineMaxFuel = obj.get("machineMaxFuel").getAsInt();
-        double machineCost = obj.get("machineCost").getAsInt();
         Machine machine = Machinery.getInstance().getMachineManager().getMachineFactory().createMachine(referenceBlockMaterial, machineReach, speed, machineMaxFuel,
                 machineFuelDeficiency,
-                fuelTypes, machineCost,
+                fuelTypes,
                 fuel, machineType, structure,
                 recipe, machineName, machineTotalResourcesGained, null);
         machine.setMachineBlock(new MachineBlock(recipe, machine));
@@ -59,7 +57,6 @@ public class MachineTypeAdapter implements JsonSerializer<Machine>, JsonDeserial
         obj.add("machineFuelTypes", jsonSerializationContext.serialize(machine.getFuelTypes()));
         obj.add("machineReach", new JsonPrimitive(machine.getMachineReach()));
         obj.add("machineMaxFuel", new JsonPrimitive(machine.getMaxFuel()));
-        obj.add("machineCost", new JsonPrimitive(machine.getCost()));
         return obj;
     }
 }

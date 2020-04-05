@@ -13,7 +13,6 @@ public class Block implements Listener {
         try {
             machineBlock = new MachineBlock(e.getItemInHand());
         } catch (MachineNotFoundException ex) {
-            ex.printStackTrace();
             return;
         }
         System.out.println(machineBlock.getMachine());

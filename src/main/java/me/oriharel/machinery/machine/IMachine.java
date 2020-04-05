@@ -21,11 +21,9 @@ interface IMachine {
 
     int getMaxFuel();
 
-    double getCost();
-
     int getFuelDeficiency();
 
-    List<Fuel> getFuelTypes();
+    List<String> getFuelTypes();
 
     List<Fuel> getFuel();
 
@@ -39,7 +37,7 @@ interface IMachine {
 
     Structure getStructure();
 
-    MachineBlock getMachineBlock() throws IOException;
+    MachineBlock getMachineBlock();
 
     String getMachineName();
 }
