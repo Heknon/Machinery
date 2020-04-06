@@ -4,15 +4,18 @@ import me.oriharel.customrecipes.api.CustomRecipesAPI;
 import me.oriharel.machinery.config.FileManager;
 import me.oriharel.machinery.listeners.Block;
 import me.oriharel.machinery.machine.MachineManager;
+import me.oriharel.machinery.structure.StructureManager;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Machinery extends JavaPlugin {
 
+    public final static String STRUCTURE_EXTENSION = ".schem";
     private static Machinery INSTANCE;
     private FileManager fileManager;
     private MachineManager machineManager;
+    private StructureManager structureManager;
 
     public static Machinery getInstance() {
         return INSTANCE;
@@ -27,15 +30,20 @@ public final class Machinery extends JavaPlugin {
     public void onEnable() {
 
         ConsoleCommandSender console = Bukkit.getConsoleSender();
-        console.sendMessage("Starting up CustomRecipes");
+        console.sendMessage("Starting up Machinery");
 
         fileManager = new FileManager(this);
         fileManager.getConfig("config.yml").copyDefaults(true).save();
         fileManager.getConfig("fuels.yml").copyDefaults(true).save();
         fileManager.getConfig("machine_registry.yml").copyDefaults(true).save();
         fileManager.getConfig("machines.yml").copyDefaults(true).save();
-        CustomRecipesAPI.getImplementation().getRecipesManager().registerRecipesDoneCallback(() -> Bukkit.getScheduler().runTask(this, () -> machineManager =
-                new MachineManager(this)));
+//        saveResource("structures/schematic_name" + STRUCTURE_EXTENSION, false);
+//        saveResource("structures/schematic_name_super_machine" + STRUCTURE_EXTENSION, false);
+//        saveResource("structures/miner" + STRUCTURE_EXTENSION, false);
+        CustomRecipesAPI.getImplementation().getRecipesManager().registerRecipesDoneCallback(() -> Bukkit.getScheduler().runTask(this, () -> {
+            structureManager = new StructureManager(this);
+            structureManager.registerOnDoneCallback(() -> machineManager = new MachineManager(this));
+        }));
         Bukkit.getServer().getPluginManager().registerEvents(new Block(), this);
     }
 
@@ -49,5 +57,9 @@ public final class Machinery extends JavaPlugin {
 
     public MachineManager getMachineManager() {
         return machineManager;
+    }
+
+    public StructureManager getStructureManager() {
+        return structureManager;
     }
 }

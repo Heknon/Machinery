@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import me.oriharel.customrecipes.recipe.Recipe;
 import me.oriharel.machinery.exceptions.MachineNotFoundException;
 import me.oriharel.machinery.machine.Machine;
+import me.oriharel.machinery.machine.PlayerMachine;
 import me.oriharel.machinery.serialization.MachineTypeAdapter;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
@@ -45,8 +46,10 @@ public class MachineBlock {
     }
 
     private String applyPlaceholders(String string) {
-        string = string.replaceAll("%resources_gained%", String.valueOf(machine.getTotalResourcesGained().stream().mapToInt(ItemStack::getAmount).sum()));
-        string = string.replaceAll("%energy%", String.valueOf(machine.getFuel().stream().mapToInt(Fuel::getEnergy).sum()));
+        string = string.replaceAll("%resources_gained%",
+                String.valueOf(machine instanceof PlayerMachine ? ((PlayerMachine) machine).getTotalResourcesGained().stream().mapToInt(ItemStack::getAmount).sum() : 0));
+        string = string.replaceAll("%energy%", String.valueOf(machine instanceof PlayerMachine ?
+                ((PlayerMachine) machine).getFuel().stream().mapToInt(Fuel::getEnergy).sum() : 0));
         return string;
     }
 

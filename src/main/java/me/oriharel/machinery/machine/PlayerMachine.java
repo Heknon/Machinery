@@ -3,6 +3,7 @@ package me.oriharel.machinery.machine;
 import me.oriharel.customrecipes.recipe.Recipe;
 import me.oriharel.machinery.items.Fuel;
 import me.oriharel.machinery.items.MachineBlock;
+import me.oriharel.machinery.structure.Structure;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -10,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.List;
 
 public class PlayerMachine extends Machine {
-    private Location location;
+    private final Location location;
     private List<ItemStack> totalResourcesGained;
     private List<Fuel> fuels;
 
@@ -42,5 +43,25 @@ public class PlayerMachine extends Machine {
 
     public Location getLocation() {
         return location;
+    }
+
+    @Override
+    public String toString() {
+        return "PlayerMachine{" +
+                "location=" + location +
+                ", totalResourcesGained=" + totalResourcesGained +
+                ", fuels=" + fuels +
+                ", referenceBlockType=" + referenceBlockType +
+                ", fuelTypes=" + fuelTypes +
+                ", machineType=" + machineType +
+                ", structure=" + structure +
+                ", recipe=" + recipe +
+                ", machineName='" + machineName + '\'' +
+                ", machineBlock=" + machineBlock +
+                ", machineReach=" + machineReach +
+                ", fuelDeficiency=" + fuelDeficiency +
+                ", speed=" + speed +
+                ", maxFuel=" + maxFuel +
+                '}';
     }
 }

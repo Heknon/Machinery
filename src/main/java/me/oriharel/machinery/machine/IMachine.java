@@ -1,6 +1,7 @@
 package me.oriharel.machinery.machine;
 
 import me.oriharel.machinery.items.MachineBlock;
+import me.oriharel.machinery.structure.Structure;
 import org.bukkit.Location;
 import org.bukkit.Material;
 

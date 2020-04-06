@@ -5,14 +5,16 @@ import me.oriharel.customrecipes.api.CustomRecipesAPI;
 import me.oriharel.customrecipes.recipe.Recipe;
 import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.items.Fuel;
-import me.oriharel.machinery.machine.Machine;
 import me.oriharel.machinery.machine.MachineType;
 import me.oriharel.machinery.machine.PlayerMachine;
-import me.oriharel.machinery.machine.Structure;
+import me.oriharel.machinery.structure.Structure;
+import net.islandearth.schematics.extended.Schematic;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import java.io.File;
+import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.List;
 
@@ -42,19 +44,33 @@ public class PlayerMachineTypeAdapter implements JsonSerializer<PlayerMachine>, 
     @Override
     public JsonElement serialize(PlayerMachine machine, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject obj = new JsonObject();
+        Structure struct = machine.getStructure();
+        String schematic;
+
+        Schematic structure = struct.getSchematic();
+
+        try {
+            Field a = structure.getClass().getDeclaredField("schematic");
+            a.setAccessible(true);
+            schematic = ((File) a.get(structure)).getPath();
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+            schematic = "";
+        }
+
         obj.add("machineName", new JsonPrimitive(machine.getMachineName()));
         obj.add("machineType", new JsonPrimitive(machine.getType().toString()));
-        obj.add("machineTotalResourcesGained", jsonSerializationContext.serialize(machine.getTotalResourcesGained()));
-        obj.add("structure", jsonSerializationContext.serialize(machine.getStructure()));
+        obj.add("structure", new JsonPrimitive(schematic));
         obj.add("machineSpeed", new JsonPrimitive(machine.getSpeed()));
         obj.add("machineReferenceBlock", new JsonPrimitive(machine.getReferenceBlockType().toString()));
         obj.add("machineRecipe", new JsonPrimitive(machine.getRecipe().getRecipeKey()));
-        obj.add("machineFuel", jsonSerializationContext.serialize(machine.getFuel()));
         obj.add("machineFuelDeficiency", new JsonPrimitive(machine.getFuelDeficiency()));
         obj.add("machineFuelTypes", jsonSerializationContext.serialize(machine.getFuelTypes()));
         obj.add("machineReach", new JsonPrimitive(machine.getMachineReach()));
-        obj.add("machineLocation", jsonSerializationContext.serialize(machine.getLocation()));
         obj.add("machineMaxFuel", new JsonPrimitive(machine.getMaxFuel()));
+        obj.add("machineTotalResourcesGained", jsonSerializationContext.serialize(machine.getTotalResourcesGained(), List.class));
+        obj.add("machineLocation", jsonSerializationContext.serialize(machine.getLocation(), Location.class));
+        obj.add("machineFuel", jsonSerializationContext.serialize(machine.getFuel(), List.class));
         return obj;
     }
 }
