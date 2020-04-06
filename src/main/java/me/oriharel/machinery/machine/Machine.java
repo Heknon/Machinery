@@ -4,6 +4,7 @@ import me.oriharel.customrecipes.recipe.Recipe;
 import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.api.events.PostMachineBuildEvent;
 import me.oriharel.machinery.api.events.PreMachineBuildEvent;
+import me.oriharel.machinery.exceptions.MachineException;
 import me.oriharel.machinery.items.MachineBlock;
 import me.oriharel.machinery.structure.Structure;
 import org.bukkit.Bukkit;
@@ -148,8 +149,12 @@ public class Machine implements IMachine {
                 return false;
             }
             PlayerMachine playerMachine = Machinery.getInstance().getMachineManager().getMachineFactory().createMachine(this, printResult.getSpecialBlockLocation(),
-                    printResult.getOpenGUIBlockLocation(), 0, new ArrayList<>(), new ArrayList<>(), 0, 0);
-            Machinery.getInstance().getMachineManager().registerNewPlayerMachine(playerUuid, playerMachine);
+                    printResult.getOpenGUIBlockLocation(), 0, new ArrayList<>(), new ArrayList<>(), 0, 0, printResult.getPlacementLocations());
+            try {
+                Machinery.getInstance().getMachineManager().registerNewPlayerMachine(playerUuid, playerMachine);
+            } catch (MachineException e) {
+                e.printStackTrace();
+            }
             PostMachineBuildEvent postMachineBuildEvent = new PostMachineBuildEvent(playerMachine, loc);
             Bukkit.getPluginManager().callEvent(postMachineBuildEvent);
             return true;

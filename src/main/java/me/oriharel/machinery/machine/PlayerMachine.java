@@ -16,19 +16,22 @@ public class PlayerMachine extends Machine {
     private double totalResourcesGained;
     private List<ItemStack> resourcesGained;
     private List<Fuel> fuels;
+    private List<Location> blockLocations;
     private double totalZenCoinsGained;
     private double zenCoinsGained;
 
 
     public PlayerMachine(Material referenceBlockType, int machineReach, int speed, int maxFuel, int fuelDeficiency, List<String> fuelTypes, MachineType machineType,
                          Structure structure, Recipe recipe, String machineName, Material openGUIBlockType, Location referenceBlockLocation,
-                         double totalResourcesGained, List<ItemStack> resourcesGained, List<Fuel> fuels, Location openGUIBlockLocation, double zenCoinsGained,
+                         double totalResourcesGained, List<ItemStack> resourcesGained, List<Fuel> fuels, Location openGUIBlockLocation,
+                         List<Location> blockLocations, double zenCoinsGained,
                          double totalZenCoinsGained) {
         super(referenceBlockType, machineReach, speed, maxFuel, fuelDeficiency, fuelTypes, machineType, structure, recipe, machineName, openGUIBlockType);
         this.referenceBlockLocation = referenceBlockLocation;
         this.totalResourcesGained = totalResourcesGained;
         this.resourcesGained = resourcesGained;
         this.fuels = fuels;
+        this.blockLocations = blockLocations;
         this.openGUIBlockLocation = openGUIBlockLocation;
         this.zenCoinsGained = zenCoinsGained;
         this.totalZenCoinsGained = totalZenCoinsGained;
@@ -114,5 +117,9 @@ public class PlayerMachine extends Machine {
 
     public List<ItemStack> getResourcesGained() {
         return resourcesGained;
+    }
+
+    public List<Location> getBlockLocations() {
+        return blockLocations;
     }
 }

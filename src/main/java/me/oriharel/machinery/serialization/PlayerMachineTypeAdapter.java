@@ -47,12 +47,13 @@ public class PlayerMachineTypeAdapter implements JsonSerializer<PlayerMachine>, 
         Location openGUIBlockLocation = jsonDeserializationContext.deserialize(obj.get("machineOpenGUIBlockLocation"), Location.class);
         int machineFuelDeficiency = obj.get("machineFuelDeficiency").getAsInt();
         List<String> fuelTypes = jsonDeserializationContext.deserialize(obj.get("machineFuelTypes"), List.class);
+        List<Location> machineBlockLocations = jsonDeserializationContext.deserialize(obj.get("machineBlockLocations"), List.class);
         int machineReach = obj.get("machineReach").getAsInt();
         int machineMaxFuel = obj.get("machineMaxFuel").getAsInt();
         return factory.createMachine(referenceBlockMaterial, machineReach, speed, machineMaxFuel,
                 machineFuelDeficiency, fuelTypes, machineType, structure, recipe, machineName, openGUIBlockType, referenceBlockLocation,
                 machineTotalResourcesGained,
-                machineResourcesGained, fuel, openGUIBlockLocation, machineZenCoinsGained, machineTotalZenCoinsGained);
+                machineResourcesGained, fuel, openGUIBlockLocation, machineZenCoinsGained, machineTotalZenCoinsGained, machineBlockLocations);
     }
 
     @Override
@@ -89,6 +90,7 @@ public class PlayerMachineTypeAdapter implements JsonSerializer<PlayerMachine>, 
         obj.add("machineTotalZenCoinsGained", new JsonPrimitive(machine.getTotalZenCoinsGained()));
         obj.add("machineReferenceBlockLocation", jsonSerializationContext.serialize(machine.getReferenceBlockLocation(), Location.class));
         obj.add("machineOpenGUIBlockLocation", jsonSerializationContext.serialize(machine.getOpenGUIBlockLocation(), Location.class));
+        obj.add("machineBlockLocations", jsonSerializationContext.serialize(machine.getBlockLocations(), List.class));
         obj.add("machineFuel", jsonSerializationContext.serialize(machine.getFuels(), List.class));
         return obj;
     }

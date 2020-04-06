@@ -59,10 +59,11 @@ public class MachineManager {
         }
     }
 
-    public void registerNewPlayerMachine(UUID uuid, PlayerMachine playerMachine) {
+    public void registerNewPlayerMachine(UUID uuid, PlayerMachine playerMachine) throws MachineException {
         FileManager.Config config = machinery.getFileManager().getConfig("machine_registry.yml");
         YamlConfiguration configLoad = config.get();
         Location machineLocation = playerMachine.getReferenceBlockLocation();
+        if (machineLocation == null) throw new MachineException("Machine has no reference block in it's schematic!");
         String configKey =
                 machineLocation.getBlockX() + "|" + machineLocation.getBlockY() + "|" + machineLocation.getBlockZ() + "|" + machineLocation.getWorld().getUID().toString();
         ConfigurationSection section = configLoad.createSection(configKey);
@@ -79,6 +80,10 @@ public class MachineManager {
         if (playerMachine == null) throw new MachineNotRegisteredException("This player machine with the uuid given has not been found in the player machine registry " +
                 ".");
         return playerMachine;
+    }
+
+    public HashMap<UUID, PlayerMachine> getPlayerMachines() {
+        return playerMachines;
     }
 
     public void addMachine(Machine machine) {

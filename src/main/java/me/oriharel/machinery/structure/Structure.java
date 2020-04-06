@@ -5,8 +5,10 @@ import net.islandearth.schematics.extended.Schematic;
 import net.islandearth.schematics.extended.SchematicNotLoadedException;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import java.util.List;
 import java.util.function.Function;
 
 public class Structure {
@@ -26,12 +28,52 @@ public class Structure {
         return name;
     }
 
-    public void build(@NotNull Location loc, Player player, Material specialMaterial, Material openGUIBlockMaterial, Function<Schematic.PrintResult, Boolean> callback) {
+    public void build(@NotNull Location loc, Player player, Material specialMaterial, Material openGUIBlockMaterial, Function<PrintResult, Boolean> callback) {
         try {
-            callback.apply(schematic.pasteSchematic(loc, player, 5, specialMaterial, openGUIBlockMaterial, Schematic.Options.REALISTIC));
+            schematic.pasteSchematic(loc, player, 5, (locations) -> {
+                PrintResult printResult = new PrintResult(locations, null, null);
+                locations.forEach(l -> {
+                    Block block = l.getBlock();
+                    if (block.getType().equals(specialMaterial)) printResult.setSpecialBlockLocation(block.getLocation());
+                    else if (block.getType().equals(openGUIBlockMaterial)) printResult.setOpenGUIBlockLocation(block.getLocation());
+                });
+                callback.apply(printResult);
+            }, Schematic.Options.REALISTIC);
         } catch (SchematicNotLoadedException e) {
             e.printStackTrace();
             callback.apply(null);
+        }
+    }
+
+    public static class PrintResult {
+        private List<Location> placementLocations;
+        private Location specialBlockLocation;
+        private Location openGUIBlockLocation;
+
+        public PrintResult(List<Location> placementLocations, Location specialBlockLocation, Location openGUIBlockLocation) {
+            this.placementLocations = placementLocations;
+            this.specialBlockLocation = specialBlockLocation;
+            this.openGUIBlockLocation = openGUIBlockLocation;
+        }
+
+        public List<Location> getPlacementLocations() {
+            return placementLocations;
+        }
+
+        public Location getSpecialBlockLocation() {
+            return specialBlockLocation;
+        }
+
+        public Location getOpenGUIBlockLocation() {
+            return openGUIBlockLocation;
+        }
+
+        public void setSpecialBlockLocation(Location specialBlockLocation) {
+            this.specialBlockLocation = specialBlockLocation;
+        }
+
+        public void setOpenGUIBlockLocation(Location openGUIBlockLocation) {
+            this.openGUIBlockLocation = openGUIBlockLocation;
         }
     }
 }

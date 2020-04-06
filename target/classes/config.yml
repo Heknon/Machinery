@@ -1,1 +1,2 @@
 not_empty_place: "&c&l[!] &eThere are blocks interfering with building the machine! Try placing it in another location."
+open_machine_gui_message: "&b&l[INFO] &7Opening machine GUI"

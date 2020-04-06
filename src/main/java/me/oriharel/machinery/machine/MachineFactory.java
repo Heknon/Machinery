@@ -52,7 +52,7 @@ public class MachineFactory {
         String openGUIBlockMaterialTypeString = section.getString("open_gui_block_type");
         if (openGUIBlockMaterialTypeString == null)
             throw new MaterialNotFoundException("You must give a open_gui_block_type in the machine section of machine " + machineKey);
-        Material openGUIBlockMaterialType = Material.getMaterial(referenceBlockTypeString);
+        Material openGUIBlockMaterialType = Material.getMaterial(openGUIBlockMaterialTypeString);
         if (openGUIBlockMaterialType == null) throw new MaterialNotFoundException("No material named \"" + openGUIBlockMaterialTypeString + "\" was found.");
         int machineReach = section.getInt("mine_radius", 0);
         int speed = section.getInt("speed", 0);
@@ -103,21 +103,20 @@ public class MachineFactory {
                                        Recipe recipe,
                                        String machineKey, Material openGUIBlockMaterialType, Location referenceBlockLocation, double totalResourcesGained,
                                        List<ItemStack> resourcesGained,
-                                       List<Fuel> fuels, Location openGUIBlockLocation, double zenCoinsGained, double totalZenCoinsGained) throws IllegalArgumentException {
+                                       List<Fuel> fuels, Location openGUIBlockLocation, double zenCoinsGained, double totalZenCoinsGained, List<Location> locations) throws IllegalArgumentException {
         if (machineType == null) throw new IllegalArgumentException("Machine type must not be null (MachineFactory)");
         return new PlayerMachine(referenceBlockType, machineReach, speed, maxFuel, fuelDeficiency, fuelTypes, machineType, structure,
                 recipe, machineKey, openGUIBlockMaterialType, referenceBlockLocation, totalResourcesGained, resourcesGained, fuels, openGUIBlockLocation,
-                zenCoinsGained, totalZenCoinsGained);
+                locations, zenCoinsGained, totalZenCoinsGained);
     }
 
-    @Nullable
     public PlayerMachine createMachine(Machine machine, Location referenceBlockLocation, Location openGUIBlockLocation, double totalResourcesGained,
-                                       List<ItemStack> resourcesGained, List<Fuel> fuels, double zenCoinsGained, double totalZenCoinsGained) throws IllegalArgumentException {
+                                       List<ItemStack> resourcesGained, List<Fuel> fuels, double zenCoinsGained, double totalZenCoinsGained, List<Location> locations) throws IllegalArgumentException {
         if (machine == null) throw new IllegalArgumentException("Machine must not be null (MachineFactory)");
         return new PlayerMachine(machine.referenceBlockType, machine.machineReach, machine.speed, machine.maxFuel, machine.fuelDeficiency, machine.fuelTypes,
                 machine.machineType, machine.structure,
                 machine.recipe, machine.machineName, machine.openGUIBlockType, referenceBlockLocation, totalResourcesGained, resourcesGained, fuels,
-                openGUIBlockLocation, zenCoinsGained, totalZenCoinsGained);
+                openGUIBlockLocation, locations, zenCoinsGained, totalZenCoinsGained);
     }
 
     /**
