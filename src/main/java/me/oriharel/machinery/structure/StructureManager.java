@@ -31,7 +31,6 @@ public class StructureManager {
      * @return Schematic or null if not found
      */
     public Structure getSchematicByPath(String path) {
-        System.out.println(structures);
         return structures.getOrDefault(path, null);
     }
 

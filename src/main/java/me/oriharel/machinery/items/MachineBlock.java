@@ -3,6 +3,7 @@ package me.oriharel.machinery.items;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import me.oriharel.customrecipes.recipe.Recipe;
+import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.exceptions.MachineNotFoundException;
 import me.oriharel.machinery.machine.Machine;
 import me.oriharel.machinery.machine.PlayerMachine;
@@ -31,7 +32,8 @@ public class MachineBlock {
         net.minecraft.server.v1_15_R1.ItemStack is = CraftItemStack.asNMSCopy(itemStack);
         if (!is.hasTag() || !is.getTag().hasKey("machine")) throw new MachineNotFoundException("Machine not found in ItemStack passed to MachineBlock constructor.");
         String data = is.getTag().getString("machine");
-        Gson gson = new GsonBuilder().setPrettyPrinting().registerTypeHierarchyAdapter(Machine.class, new MachineTypeAdapter()).create();
+        Gson gson = new GsonBuilder().setPrettyPrinting().registerTypeHierarchyAdapter(Machine.class,
+                new MachineTypeAdapter(Machinery.getInstance().getMachineManager().getMachineFactory())).create();
         this.machine = gson.fromJson(data, Machine.class);
         this.recipe = this.machine.getRecipe();
     }
@@ -46,10 +48,16 @@ public class MachineBlock {
     }
 
     private String applyPlaceholders(String string) {
+        string = string.replaceAll("%total_resources_gained%",
+                String.valueOf(machine instanceof  PlayerMachine ? ((PlayerMachine)machine).getTotalResourcesGained() : 0));
         string = string.replaceAll("%resources_gained%",
-                String.valueOf(machine instanceof PlayerMachine ? ((PlayerMachine) machine).getTotalResourcesGained().stream().mapToInt(ItemStack::getAmount).sum() : 0));
+                String.valueOf(machine instanceof  PlayerMachine ? ((PlayerMachine)machine).getResourcesGained().stream().mapToInt(ItemStack::getAmount).sum() : 0));
+        string = string.replaceAll("%total_zen_coins_gained%",
+                String.valueOf(machine instanceof  PlayerMachine ? ((PlayerMachine)machine).getTotalZenCoinsGained() : 0));
+        string = string.replaceAll("%zen_coins_gained%",
+                String.valueOf(machine instanceof  PlayerMachine ? ((PlayerMachine)machine).getZenCoinsGained() : 0));
         string = string.replaceAll("%energy%", String.valueOf(machine instanceof PlayerMachine ?
-                ((PlayerMachine) machine).getFuel().stream().mapToInt(Fuel::getEnergy).sum() : 0));
+                ((PlayerMachine) machine).getFuels().stream().mapToInt(Fuel::getEnergy).sum() : 0));
         return string;
     }
 

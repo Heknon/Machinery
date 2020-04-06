@@ -5,12 +5,12 @@ import org.bukkit.Location;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class MachineEvent extends Event {
+public class MachineEvent<T extends Machine> extends Event {
     private static final HandlerList HANDLERS = new HandlerList();
-    private final Machine machine;
+    private final T machine;
     private final Location buildLocation;
 
-    public MachineEvent(Machine machine, Location buildLocation) {
+    public MachineEvent(T machine, Location buildLocation) {
         this.machine = machine;
         this.buildLocation = buildLocation;
     }
@@ -23,7 +23,7 @@ public class MachineEvent extends Event {
         return HANDLERS;
     }
 
-    public Machine getMachine() {
+    public T getMachine() {
         return machine;
     }
 

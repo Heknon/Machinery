@@ -4,6 +4,7 @@ import com.sun.istack.internal.NotNull;
 import net.islandearth.schematics.extended.Schematic;
 import net.islandearth.schematics.extended.SchematicNotLoadedException;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import java.util.function.Function;
@@ -25,13 +26,12 @@ public class Structure {
         return name;
     }
 
-    public void build(@NotNull Location loc, Player player, Function<Boolean, Boolean> callback) {
+    public void build(@NotNull Location loc, Player player, Material specialMaterial, Material openGUIBlockMaterial, Function<Schematic.PrintResult, Boolean> callback) {
         try {
-            schematic.pasteSchematic(loc, player, 5, Schematic.Options.REALISTIC);
-            callback.apply(true);
+            callback.apply(schematic.pasteSchematic(loc, player, 5, specialMaterial, openGUIBlockMaterial, Schematic.Options.REALISTIC));
         } catch (SchematicNotLoadedException e) {
             e.printStackTrace();
-            callback.apply(false);
+            callback.apply(null);
         }
     }
 }

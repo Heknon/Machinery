@@ -5,7 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 
-public class PreMachineBuildEvent extends MachineEvent implements Cancellable {
+public class PreMachineBuildEvent extends MachineEvent<Machine> implements Cancellable {
     private static final HandlerList HANDLERS = new HandlerList();
 
     private boolean cancelled;

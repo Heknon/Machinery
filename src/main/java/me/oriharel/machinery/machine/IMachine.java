@@ -12,6 +12,8 @@ interface IMachine {
 
     Material getReferenceBlockType();
 
+    Material getOpenGUIBlockType();
+
     int getMachineReach();
 
     int getSpeed();

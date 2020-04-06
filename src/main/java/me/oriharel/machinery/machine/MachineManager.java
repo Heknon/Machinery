@@ -62,12 +62,12 @@ public class MachineManager {
     public void registerNewPlayerMachine(UUID uuid, PlayerMachine playerMachine) {
         FileManager.Config config = machinery.getFileManager().getConfig("machine_registry.yml");
         YamlConfiguration configLoad = config.get();
-        Location machineLocation = playerMachine.getLocation();
+        Location machineLocation = playerMachine.getReferenceBlockLocation();
         String configKey =
                 machineLocation.getBlockX() + "|" + machineLocation.getBlockY() + "|" + machineLocation.getBlockZ() + "|" + machineLocation.getWorld().getUID().toString();
         ConfigurationSection section = configLoad.createSection(configKey);
         Gson gson =
-                new GsonBuilder().setPrettyPrinting().registerTypeHierarchyAdapter(Location.class, new LocationTypeAdapter()).registerTypeHierarchyAdapter(PlayerMachine.class, new PlayerMachineTypeAdapter()).create();
+                new GsonBuilder().setPrettyPrinting().registerTypeHierarchyAdapter(Location.class, new LocationTypeAdapter()).registerTypeHierarchyAdapter(PlayerMachine.class, new PlayerMachineTypeAdapter(getMachineFactory())).create();
         section.set("machine", gson.toJson(playerMachine, PlayerMachine.class));
         section.set("player", uuid.toString());
         config.save();

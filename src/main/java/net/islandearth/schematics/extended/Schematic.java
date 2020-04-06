@@ -162,6 +162,8 @@ public class Schematic {
                 Material.SPRUCE_FENCE,
                 Material.SPRUCE_FENCE_GATE,
 
+                Material.STONE_BRICK_WALL,
+
                 Material.OAK_DOOR,
                 Material.ACACIA_DOOR,
                 Material.BIRCH_DOOR,
@@ -180,9 +182,11 @@ public class Schematic {
      * @throws SchematicNotLoadedException when schematic has not yet been loaded
      * @see #loadSchematic()
      */
-    public List<Location> pasteSchematic(Location loc,
+    public PrintResult pasteSchematic(Location loc,
                                          Player paster,
                                          int time,
+                                         Material specialMaterial,
+                                         Material openGUIBlockMaterial,
                                          Options... option) throws SchematicNotLoadedException {
         try {
 
@@ -193,6 +197,8 @@ public class Schematic {
                 throw new SchematicNotLoadedException("Data has not been loaded yet");
             }
 
+            Location specialMaterialLocation = null;
+            Location openGUIBlockMaterialLocation = null;
             List<Options> options = Arrays.asList(option);
             Data tracker = new Data();
 
@@ -284,25 +290,26 @@ public class Schematic {
              */
 
             boolean validated = true;
-
+            Set<Block> validatedBlocks = new HashSet<>(); // Stores previous blocks before placing green glass
             for (Location validate : locations) {
                 if ((validate.getBlock().getType() != Material.AIR || validate.clone().subtract(0, 1, 0).getBlock().getType() == Material.WATER) || new Location(validate.getWorld(), validate.getX(), loc.getY() - 1, validate.getZ()).getBlock().getType() == Material.AIR) {
                     /*
                      * Show fake block where block is interfering with schematic
                      */
-
-                    paster.sendBlockChange(validate.getBlock().getLocation(), Material.RED_STAINED_GLASS.createBlockData());
-                    if (!options.contains(Options.PREVIEW)) {
-                        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
-                            if (validate.getBlock().getType() == Material.AIR) paster.sendBlockChange(validate.getBlock().getLocation(), Material.AIR.createBlockData());
-                        }, 60);
-                    }
-                    validated = false;
+                    validatedBlocks.forEach(block -> paster.sendBlockChange(block.getLocation(), block.getBlockData())); // remove validated location blocks
+                    return null;
+//                    paster.sendBlockChange(validate.getBlock().getLocation(), Material.RED_STAINED_GLASS.createBlockData());
+//                    if (!options.contains(Options.PREVIEW)) {
+//                        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
+//                            if (validate.getBlock().getType() == Material.AIR) paster.sendBlockChange(validate.getBlock().getLocation(), Material.AIR.createBlockData());
+//                        }, 60);
+//                    }
+//                    validated = false;
                 } else {
                     /*
                      * Show fake block for air
                      */
-
+                    validatedBlocks.add(validate.getBlock());
                     paster.sendBlockChange(validate.getBlock().getLocation(), Material.GREEN_STAINED_GLASS.createBlockData());
                     if (!options.contains(Options.PREVIEW)) {
                         Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
@@ -312,7 +319,7 @@ public class Schematic {
                 }
             }
 
-            if (options.contains(Options.PREVIEW)) return locations;
+            if (options.contains(Options.PREVIEW)) return new PrintResult(locations, specialMaterialLocation, openGUIBlockMaterialLocation);
             if (!validated) return null;
 
             /*
@@ -365,6 +372,8 @@ public class Schematic {
             List<Block> toUpdate = new ArrayList<>();
             for (int i = 0; i < locations.size(); i++) {
                 Block block = locations.get(i).getBlock();
+                if (block.getType().equals(specialMaterial)) specialMaterialLocation = block.getLocation();
+                else if (block.getType().equals(openGUIBlockMaterial)) openGUIBlockMaterialLocation = block.getLocation();
                 BlockData data = blocks.get((int) blockDatas[indexes.get(i)]);
                 if (Tag.FENCES.getValues().contains(data.getMaterial())) {
                     toUpdate.add(block);
@@ -586,7 +595,7 @@ public class Schematic {
                     toUpdate.forEach(b -> b.getState().update(true, false));
                 }
             }, 0, time));
-            return locations;
+            return new PrintResult(locations, specialMaterialLocation, openGUIBlockMaterialLocation);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -603,8 +612,8 @@ public class Schematic {
      * @throws SchematicNotLoadedException when schematic has not yet been loaded
      * @see #loadSchematic()
      */
-    public List<Location> pasteSchematic(Location location, Player paster, Options... options) throws SchematicNotLoadedException {
-        return pasteSchematic(location, paster, 20, options);
+    public PrintResult pasteSchematic(Location location, Player paster, Material specialMaterial, Material openGUIBlockMaterial, Options... options) throws SchematicNotLoadedException {
+        return pasteSchematic(location, paster, 20, specialMaterial, openGUIBlockMaterial, options);
     }
 
     /**
@@ -751,5 +760,65 @@ public class Schematic {
     protected static class Data {
         int trackCurrentTile;
         int trackCurrentBlock;
+    }
+
+    public static class PrintResult {
+        private final List<Location> placementLocations;
+        private final Location specialBlockLocation;
+        private final Location openGUIBlockLocation;
+
+        public PrintResult(List<Location> placementLocations, Location specialBlockLocation, Location openGUIBlockLocation) {
+            this.placementLocations = placementLocations;
+            this.specialBlockLocation = specialBlockLocation;
+            this.openGUIBlockLocation = openGUIBlockLocation;
+        }
+
+        public List<Location> getPlacementLocations() {
+            return placementLocations;
+        }
+
+        public Location getSpecialBlockLocation() {
+            return specialBlockLocation;
+        }
+
+        public Location getOpenGUIBlockLocation() {
+            return openGUIBlockLocation;
+        }
+    }
+
+    public File getSchematic() {
+        return schematic;
+    }
+
+    public short getWidth() {
+        return width;
+    }
+
+    public short getHeight() {
+        return height;
+    }
+
+    public short getLength() {
+        return length;
+    }
+
+    public byte[] getBlockDatas() {
+        return blockDatas;
+    }
+
+    public Map<Vector, List<String>> getSigns() {
+        return signs;
+    }
+
+    public Map<Vector, Map<Integer, ItemStack>> getChests() {
+        return chests;
+    }
+
+    public Map<Integer, BlockData> getBlocks() {
+        return blocks;
+    }
+
+    public List<Material> getDelayedBlocks() {
+        return delayedBlocks;
     }
 }

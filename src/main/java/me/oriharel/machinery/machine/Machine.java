@@ -7,8 +7,10 @@ import me.oriharel.machinery.api.events.PreMachineBuildEvent;
 import me.oriharel.machinery.items.MachineBlock;
 import me.oriharel.machinery.structure.Structure;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +24,7 @@ public class Machine implements IMachine {
     final protected Structure structure;
     final protected String machineName;
     final protected MachineBlock machineBlock;
+    final protected Material openGUIBlockType;
     protected Recipe recipe;
     protected int machineReach;
     protected int fuelDeficiency;
@@ -38,7 +41,7 @@ public class Machine implements IMachine {
             MachineType machineType,
             Structure structure,
             Recipe recipe,
-            String machineName) {
+            String machineName, Material openGUIBlockType) {
         this.referenceBlockType = referenceBlockType;
         this.machineReach = machineReach;
         this.speed = speed;
@@ -49,12 +52,18 @@ public class Machine implements IMachine {
         this.structure = structure;
         this.recipe = recipe;
         this.machineName = machineName;
+        this.openGUIBlockType = openGUIBlockType;
         this.machineBlock = new MachineBlock(recipe, this);
     }
 
     @Override
     public Material getReferenceBlockType() {
         return referenceBlockType;
+    }
+
+    @Override
+    public Material getOpenGUIBlockType() {
+        return openGUIBlockType;
     }
 
     @Override
@@ -131,11 +140,18 @@ public class Machine implements IMachine {
         PreMachineBuildEvent preMachineBuildEvent = new PreMachineBuildEvent(this, loc);
         Bukkit.getPluginManager().callEvent(preMachineBuildEvent);
         if (preMachineBuildEvent.isCancelled()) return false;
-        structure.build(loc, Bukkit.getPlayer(playerUuid), (success) -> {
-            PostMachineBuildEvent postMachineBuildEvent = new PostMachineBuildEvent(this, loc);
-            Bukkit.getPluginManager().callEvent(postMachineBuildEvent);
-            PlayerMachine playerMachine = Machinery.getInstance().getMachineManager().getMachineFactory().createMachine(this, loc, new ArrayList<>(), new ArrayList<>());
+        Player p = Bukkit.getPlayer(playerUuid);
+        structure.build(loc, p, this.referenceBlockType, this.openGUIBlockType, (printResult) -> {
+            if (printResult.getPlacementLocations() == null) {
+                p.sendMessage(ChatColor.translateAlternateColorCodes('&', Machinery.getInstance().getFileManager().getConfig("config.yml").get().getString(
+                        "not_empty_place")));
+                return false;
+            }
+            PlayerMachine playerMachine = Machinery.getInstance().getMachineManager().getMachineFactory().createMachine(this, printResult.getSpecialBlockLocation(),
+                    printResult.getOpenGUIBlockLocation(), 0, new ArrayList<>(), new ArrayList<>(), 0, 0);
             Machinery.getInstance().getMachineManager().registerNewPlayerMachine(playerUuid, playerMachine);
+            PostMachineBuildEvent postMachineBuildEvent = new PostMachineBuildEvent(playerMachine, loc);
+            Bukkit.getPluginManager().callEvent(postMachineBuildEvent);
             return true;
         });
         return true;
@@ -155,6 +171,7 @@ public class Machine implements IMachine {
                 ", fuelDeficiency=" + fuelDeficiency +
                 ", speed=" + speed +
                 ", maxFuel=" + maxFuel +
+                ", openGUIBlockType=" + openGUIBlockType +
                 '}';
     }
 }

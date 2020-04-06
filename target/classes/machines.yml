@@ -16,6 +16,7 @@ schematic_name:
   speed: 1
   max_fuel: 100
   deficiency: 10
+  open_gui_block_type: "COMMAND_BLOCK"
   fuel_types: ["fuel_type_name", "fuel_type_name2"]
   recipe: "schematic_name_recipe"
   type: MINER
@@ -26,6 +27,7 @@ schematic_name_super_machine:
   speed: 10
   max_fuel: 1000
   deficiency: 50
+  open_gui_block_type: "COMMAND_BLOCK"
   fuel_types: ["fuel_type_name3"]
   recipe: "schematic_name_super_machine_recipe"
   type: MINER

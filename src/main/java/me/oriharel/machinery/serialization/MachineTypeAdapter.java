@@ -5,6 +5,7 @@ import me.oriharel.customrecipes.api.CustomRecipesAPI;
 import me.oriharel.customrecipes.recipe.Recipe;
 import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.machine.Machine;
+import me.oriharel.machinery.machine.MachineFactory;
 import me.oriharel.machinery.machine.MachineType;
 import me.oriharel.machinery.structure.Structure;
 import net.islandearth.schematics.extended.Schematic;
@@ -16,6 +17,12 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 public class MachineTypeAdapter implements JsonSerializer<Machine>, JsonDeserializer<Machine> {
+    private MachineFactory factory;
+
+    public MachineTypeAdapter(MachineFactory factory) {
+        this.factory = factory;
+    }
+
     @Override
     public Machine deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject obj = jsonElement.getAsJsonObject();
@@ -25,6 +32,7 @@ public class MachineTypeAdapter implements JsonSerializer<Machine>, JsonDeserial
                 Machinery.getInstance().getStructureManager().getSchematicByPath(obj.get("structure").getAsString());
         int speed = obj.get("machineSpeed").getAsInt();
         Material referenceBlockMaterial = Material.getMaterial(obj.get("machineReferenceBlock").getAsString());
+        Material openGUIBlockType = Material.getMaterial(obj.get("machineOpenGUIBlockType").getAsString());
         String recipeName = obj.get("machineRecipe").getAsString();
         Recipe recipe =
                 CustomRecipesAPI.getImplementation().getRecipesManager().getRecipes().stream().filter(r -> r.getRecipeKey().equalsIgnoreCase(recipeName)).findAny().orElse(null);
@@ -32,8 +40,8 @@ public class MachineTypeAdapter implements JsonSerializer<Machine>, JsonDeserial
         List<String> fuelTypes = jsonDeserializationContext.deserialize(obj.get("machineFuelTypes"), List.class);
         int machineReach = obj.get("machineReach").getAsInt();
         int machineMaxFuel = obj.get("machineMaxFuel").getAsInt();
-        return Machinery.getInstance().getMachineManager().getMachineFactory().createMachine(referenceBlockMaterial, machineReach, speed, machineMaxFuel,
-                machineFuelDeficiency, fuelTypes, machineType, structure, recipe, machineName);
+        return factory.createMachine(referenceBlockMaterial, machineReach, speed, machineMaxFuel,
+                machineFuelDeficiency, fuelTypes, machineType, structure, recipe, machineName, openGUIBlockType);
     }
 
     @Override
@@ -52,7 +60,6 @@ public class MachineTypeAdapter implements JsonSerializer<Machine>, JsonDeserial
             e.printStackTrace();
             schematic = "";
         }
-
         obj.add("machineName", new JsonPrimitive(machine.getMachineName()));
         obj.add("machineType", new JsonPrimitive(machine.getType().toString()));
         obj.add("structure", new JsonPrimitive(schematic));
@@ -60,9 +67,10 @@ public class MachineTypeAdapter implements JsonSerializer<Machine>, JsonDeserial
         obj.add("machineReferenceBlock", new JsonPrimitive(machine.getReferenceBlockType().toString()));
         obj.add("machineRecipe", new JsonPrimitive(machine.getRecipe().getRecipeKey()));
         obj.add("machineFuelDeficiency", new JsonPrimitive(machine.getFuelDeficiency()));
-        obj.add("machineFuelTypes", jsonSerializationContext.serialize(machine.getFuelTypes()));
+        obj.add("machineFuelTypes", jsonSerializationContext.serialize(machine.getFuelTypes(), List.class));
         obj.add("machineReach", new JsonPrimitive(machine.getMachineReach()));
         obj.add("machineMaxFuel", new JsonPrimitive(machine.getMaxFuel()));
+        obj.add("machineOpenGUIBlockType", new JsonPrimitive(machine.getOpenGUIBlockType().toString()));
         return obj;
     }
 }
