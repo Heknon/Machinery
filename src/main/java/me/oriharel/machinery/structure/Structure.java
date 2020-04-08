@@ -28,9 +28,9 @@ public class Structure {
         return name;
     }
 
-    public void build(@NotNull Location loc, Player player, Material specialMaterial, Material openGUIBlockMaterial, Function<PrintResult, Boolean> callback) {
+    public List<Location> build(@NotNull Location loc, Player player, Material specialMaterial, Material openGUIBlockMaterial, Function<PrintResult, Boolean> callback) {
         try {
-            schematic.pasteSchematic(loc, player, 5, (locations) -> {
+            return schematic.pasteSchematic(loc, player, 5, (locations) -> {
                 PrintResult printResult = new PrintResult(locations, null, null);
                 locations.forEach(l -> {
                     Block block = l.getBlock();
@@ -43,6 +43,7 @@ public class Structure {
             e.printStackTrace();
             callback.apply(null);
         }
+        return null;
     }
 
     public static class PrintResult {

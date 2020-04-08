@@ -142,7 +142,7 @@ public class Machine implements IMachine {
         Bukkit.getPluginManager().callEvent(preMachineBuildEvent);
         if (preMachineBuildEvent.isCancelled()) return false;
         Player p = Bukkit.getPlayer(playerUuid);
-        structure.build(loc, p, this.referenceBlockType, this.openGUIBlockType, (printResult) -> {
+        List<Location> locations = structure.build(loc, p, this.referenceBlockType, this.openGUIBlockType, (printResult) -> {
             if (printResult.getPlacementLocations() == null) {
                 p.sendMessage(ChatColor.translateAlternateColorCodes('&', Machinery.getInstance().getFileManager().getConfig("config.yml").get().getString(
                         "not_empty_place")));
@@ -150,15 +150,13 @@ public class Machine implements IMachine {
             }
             PlayerMachine playerMachine = Machinery.getInstance().getMachineManager().getMachineFactory().createMachine(this, printResult.getSpecialBlockLocation(),
                     printResult.getOpenGUIBlockLocation(), 0, new ArrayList<>(), new ArrayList<>(), 0, 0, printResult.getPlacementLocations());
-            try {
-                Machinery.getInstance().getMachineManager().registerNewPlayerMachine(playerUuid, playerMachine);
-            } catch (MachineException e) {
-                e.printStackTrace();
-            }
+            Machinery.getInstance().getMachineManager().registerNewPlayerMachine(playerUuid, playerMachine);
             PostMachineBuildEvent postMachineBuildEvent = new PostMachineBuildEvent(playerMachine, loc);
             Bukkit.getPluginManager().callEvent(postMachineBuildEvent);
             return true;
         });
+        if (locations == null) return false;
+        Machinery.getInstance().getMachineManager().registerMachineLocations(locations);
         return true;
     }
 

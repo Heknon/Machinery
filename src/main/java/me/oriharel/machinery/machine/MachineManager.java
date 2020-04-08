@@ -2,6 +2,7 @@ package me.oriharel.machinery.machine;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import me.oriharel.machinery.MachinePersistentData;
 import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.config.FileManager;
 import me.oriharel.machinery.exceptions.*;
@@ -9,8 +10,12 @@ import me.oriharel.machinery.serialization.LocationTypeAdapter;
 import me.oriharel.machinery.serialization.PlayerMachineTypeAdapter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
+import org.bukkit.block.Block;
+import org.bukkit.block.TileState;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.persistence.PersistentDataContainer;
 
 import java.util.*;
 
@@ -18,19 +23,23 @@ public class MachineManager {
     private final Machinery machinery;
     private MachineFactory machineFactory;
     private List<Machine> machines;
-    private HashMap<UUID, PlayerMachine> playerMachines;
+    private HashMap<UUID, Set<PlayerMachine>> playerMachines;
+    private HashSet<Location> machineLocations; // used for constant look up for events. This includes every block the machine is made up of
+    private HashMap<Location, PlayerMachine> locationPlayerMachineMap; // used for constant look up for events. Location is the machine gui opener
+    private MachinePersistentData MACHINE_PERSISTENT_DATA;
+    private NamespacedKey NAMESPACED_KEY;
 
     public MachineManager(Machinery machinery) {
         this.machinery = machinery;
         this.machineFactory = new MachineFactory(machinery);
         this.machines = new ArrayList<Machine>();
-        this.playerMachines = new HashMap<>();
+        this.locationPlayerMachineMap = new HashMap<>();
+        this.playerMachines = new HashMap<UUID, Set<PlayerMachine>>();
+        this.machineLocations = new HashSet<Location>();
+        this.MACHINE_PERSISTENT_DATA = new MachinePersistentData(machineFactory);
+        this.NAMESPACED_KEY = new NamespacedKey(machinery, "machine");
         initializeBaseMachines();
         initializePlayerMachines();
-    }
-
-    public PlayerMachine getPlayerMachineByLocation(Location machineLocation) {
-        return machineFactory.createMachine(machineLocation);
     }
 
     private void initializeBaseMachines() {
@@ -46,6 +55,10 @@ public class MachineManager {
         }
     }
 
+    public void registerMachineLocations(List<Location> locations) {
+        Bukkit.getScheduler().runTaskAsynchronously(machinery, () -> this.machineLocations.addAll(locations));
+    }
+
     private void initializePlayerMachines() {
         YamlConfiguration configLoad = machinery.getFileManager().getConfig("machine_registry.yml").get();
         Set<String> machineLocations = configLoad.getKeys(false);
@@ -55,34 +68,71 @@ public class MachineManager {
                     Bukkit.getWorld(UUID.fromString(split[3])), Double.parseDouble(split[0]), Double.parseDouble(split[1]), Double.parseDouble(split[2]));
             PlayerMachine machine = machineFactory.createMachine(location);
             UUID playerUuid = UUID.fromString(configLoad.getString(loc + ".player"));
-            this.playerMachines.put(playerUuid, machine);
+            if (!this.playerMachines.containsKey(playerUuid)) this.playerMachines.put(playerUuid, new HashSet<>());
+            this.playerMachines.get(playerUuid).add(machine);
+            this.machineLocations.addAll(machine.getBlockLocations());
+            this.locationPlayerMachineMap.put(machine.getOpenGUIBlockLocation(), machine);
         }
     }
 
-    public void registerNewPlayerMachine(UUID uuid, PlayerMachine playerMachine) throws MachineException {
-        FileManager.Config config = machinery.getFileManager().getConfig("machine_registry.yml");
-        YamlConfiguration configLoad = config.get();
-        Location machineLocation = playerMachine.getReferenceBlockLocation();
-        if (machineLocation == null) throw new MachineException("Machine has no reference block in it's schematic!");
-        String configKey =
-                machineLocation.getBlockX() + "|" + machineLocation.getBlockY() + "|" + machineLocation.getBlockZ() + "|" + machineLocation.getWorld().getUID().toString();
-        ConfigurationSection section = configLoad.createSection(configKey);
-        Gson gson =
-                new GsonBuilder().setPrettyPrinting().registerTypeHierarchyAdapter(Location.class, new LocationTypeAdapter()).registerTypeHierarchyAdapter(PlayerMachine.class, new PlayerMachineTypeAdapter(getMachineFactory())).create();
-        section.set("machine", gson.toJson(playerMachine, PlayerMachine.class));
-        section.set("player", uuid.toString());
-        config.save();
-        this.playerMachines.put(uuid, playerMachine);
+    public void registerNewPlayerMachine(UUID uuid, PlayerMachine playerMachine) {
+        this.locationPlayerMachineMap.put(playerMachine.getOpenGUIBlockLocation(), playerMachine);
+        Bukkit.getScheduler().runTaskAsynchronously(machinery, () -> {
+            FileManager.Config config = machinery.getFileManager().getConfig("machine_registry.yml");
+            YamlConfiguration configLoad = config.get();
+            Location machineLocation = playerMachine.getReferenceBlockLocation();
+            if (machineLocation == null) try {
+                throw new MachineException("Machine has no reference block in it's schematic!");
+            } catch (MachineException e) {
+                e.printStackTrace();
+            }
+            String configKey =
+                    machineLocation.getBlockX() + "|" + machineLocation.getBlockY() + "|" + machineLocation.getBlockZ() + "|" + machineLocation.getWorld().getUID().toString();
+            ConfigurationSection section = configLoad.createSection(configKey);
+            Gson gson =
+                    new GsonBuilder().registerTypeHierarchyAdapter(Location.class, new LocationTypeAdapter()).registerTypeHierarchyAdapter(PlayerMachine.class,
+                            new PlayerMachineTypeAdapter(getMachineFactory())).create();
+            Block openGUIBlock = playerMachine.getOpenGUIBlockLocation().getBlock();
+            String machineJson = gson.toJson(playerMachine, PlayerMachine.class);
+            setPlayerMachineBlock(openGUIBlock, playerMachine);
+            section.set("machine", machineJson);
+            section.set("player", uuid.toString());
+            config.save();
+            if (!this.playerMachines.containsKey(uuid)) this.playerMachines.put(uuid, new HashSet<>());
+            this.playerMachines.get(uuid).add(playerMachine);
+        });
     }
 
-    public PlayerMachine getPlayerMachine(UUID uuid) throws MachineNotRegisteredException {
-        PlayerMachine playerMachine = this.playerMachines.getOrDefault(uuid, null);
-        if (playerMachine == null) throw new MachineNotRegisteredException("This player machine with the uuid given has not been found in the player machine registry " +
+    public Set<PlayerMachine> getPlayerMachines(UUID uuid) throws MachineNotRegisteredException {
+        Set<PlayerMachine> playerMachines = this.playerMachines.getOrDefault(uuid, null);
+        if (playerMachines == null) throw new MachineNotRegisteredException("This player machine with the uuid given has not been found in the player machine registry " +
                 ".");
-        return playerMachine;
+        return playerMachines;
     }
 
-    public HashMap<UUID, PlayerMachine> getPlayerMachines() {
+    public void setPlayerMachineBlock(Block block, PlayerMachine playerMachine) {
+        Bukkit.getScheduler().runTask(machinery, () -> {
+            TileState tileState = (TileState) block.getState();
+            PersistentDataContainer persistentDataContainer = tileState.getPersistentDataContainer();
+            persistentDataContainer.set(NAMESPACED_KEY, MACHINE_PERSISTENT_DATA, playerMachine);
+        });
+    }
+
+    public Optional<PlayerMachine> getPlayerMachineFromBlock(Block block) {
+        TileState tileState = (TileState) block.getState();
+        PersistentDataContainer persistentDataContainer = tileState.getPersistentDataContainer();
+        return Optional.ofNullable(persistentDataContainer.get(NAMESPACED_KEY, MACHINE_PERSISTENT_DATA));
+    }
+
+    public HashSet<Location> getMachineLocations() {
+        return machineLocations;
+    }
+
+    public HashMap<Location, PlayerMachine> getLocationPlayerMachineMap() {
+        return locationPlayerMachineMap;
+    }
+
+    public HashMap<UUID, Set<PlayerMachine>> getPlayerMachines() {
         return playerMachines;
     }
 

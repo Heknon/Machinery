@@ -164,7 +164,6 @@ public class Schematic {
                 Material.SPRUCE_FENCE,
                 Material.SPRUCE_FENCE_GATE,
 
-                Material.STONE_BRICK_WALL,
 
                 Material.OAK_DOOR,
                 Material.ACACIA_DOOR,
@@ -197,6 +196,8 @@ public class Schematic {
                     || blocks.isEmpty()) {
                 throw new SchematicNotLoadedException("Data has not been loaded yet");
             }
+
+
 
             List<Options> options = Arrays.asList(option);
             Data tracker = new Data();
@@ -358,6 +359,22 @@ public class Schematic {
             validData.add(Material.PURPLE_STAINED_GLASS_PANE);
             validData.add(Material.RED_STAINED_GLASS_PANE);
             validData.add(Material.YELLOW_STAINED_GLASS_PANE);
+            validData.add(Material.DISPENSER);
+            validData.add(Material.DROPPER);
+//            validData.add(Material.STONE_BRICK_WALL);
+//            validData.add(Material.ANDESITE_WALL);
+//            validData.add(Material.BRICK_WALL);
+//            validData.add(Material.COBBLESTONE_WALL);
+//            validData.add(Material.DIORITE_WALL);
+//            validData.add(Material.END_STONE_BRICK_WALL);
+//            validData.add(Material.GRANITE_WALL);
+//            validData.add(Material.MOSSY_COBBLESTONE_WALL);
+//            validData.add(Material.MOSSY_STONE_BRICK_WALL);
+//            validData.add(Material.NETHER_BRICK_WALL);
+//            validData.add(Material.PRISMARINE_WALL);
+//            validData.add(Material.RED_NETHER_BRICK_WALL);
+//            validData.add(Material.RED_SANDSTONE_WALL);
+//            validData.add(Material.SANDSTONE_WALL);
             validData.add(Material.TORCH);
             validData.addAll(ExtraTags.FENCE_GATES.getMaterials());
             validData.addAll(Tag.SIGNS.getValues());

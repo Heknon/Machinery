@@ -4,8 +4,7 @@ import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.exceptions.MachineNotFoundException;
 import me.oriharel.machinery.items.MachineBlock;
 import me.oriharel.machinery.machine.Machine;
-import me.oriharel.machinery.machine.PlayerMachine;
-import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
@@ -30,15 +29,11 @@ public class Block implements Listener {
     @EventHandler
     public void onBlockBreak(BlockBreakEvent e) {
         Location loc = e.getBlock().getLocation();
-        Bukkit.getScheduler().runTaskAsynchronously(Machinery.getInstance(), () -> {
-            for (PlayerMachine playerMachine : Machinery.getInstance().getMachineManager().getPlayerMachines().values()) {
-                for (Location location : playerMachine.getBlockLocations()) {
-                    if (location.equals(loc)) {
-                        e.setCancelled(true);
-                        return;
-                    }
-                }
-            }
-        });
+        if (Machinery.getInstance().getMachineManager().getMachineLocations().contains(loc)) {
+            e.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Machinery.getInstance().getFileManager().getConfig("config.yml").get().getString(
+                    "break_machine_attempt")));
+            e.setCancelled(true);
+        }
+
     }
 }
