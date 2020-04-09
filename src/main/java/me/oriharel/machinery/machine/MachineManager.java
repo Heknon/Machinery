@@ -2,7 +2,7 @@ package me.oriharel.machinery.machine;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import me.oriharel.machinery.MachinePersistentData;
+import me.oriharel.machinery.PlayerMachinePersistentData;
 import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.config.FileManager;
 import me.oriharel.machinery.exceptions.*;
@@ -15,6 +15,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.TileState;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.craftbukkit.v1_15_R1.persistence.CraftPersistentDataContainer;
 import org.bukkit.persistence.PersistentDataContainer;
 
 import java.util.*;
@@ -26,7 +27,7 @@ public class MachineManager {
     private HashMap<UUID, Set<PlayerMachine>> playerMachines;
     private HashSet<Location> machineLocations; // used for constant look up for events. This includes every block the machine is made up of
     private HashMap<Location, PlayerMachine> locationPlayerMachineMap; // used for constant look up for events. Location is the machine gui opener
-    private MachinePersistentData MACHINE_PERSISTENT_DATA;
+    private PlayerMachinePersistentData MACHINE_PERSISTENT_DATA;
     private NamespacedKey NAMESPACED_KEY;
 
     public MachineManager(Machinery machinery) {
@@ -36,7 +37,7 @@ public class MachineManager {
         this.locationPlayerMachineMap = new HashMap<>();
         this.playerMachines = new HashMap<UUID, Set<PlayerMachine>>();
         this.machineLocations = new HashSet<Location>();
-        this.MACHINE_PERSISTENT_DATA = new MachinePersistentData(machineFactory);
+        this.MACHINE_PERSISTENT_DATA = new PlayerMachinePersistentData(machineFactory);
         this.NAMESPACED_KEY = new NamespacedKey(machinery, "machine");
         initializeBaseMachines();
         initializePlayerMachines();
@@ -94,7 +95,11 @@ public class MachineManager {
                             new PlayerMachineTypeAdapter(getMachineFactory())).create();
             Block openGUIBlock = playerMachine.getOpenGUIBlockLocation().getBlock();
             String machineJson = gson.toJson(playerMachine, PlayerMachine.class);
-            setPlayerMachineBlock(openGUIBlock, playerMachine);
+
+            Bukkit.getScheduler().runTask(machinery, () -> {
+                setPlayerMachineBlock(openGUIBlock, playerMachine);
+                System.out.println("DATA: " + getPlayerMachineFromBlock(openGUIBlock));
+            });
             section.set("machine", machineJson);
             section.set("player", uuid.toString());
             config.save();
@@ -111,17 +116,17 @@ public class MachineManager {
     }
 
     public void setPlayerMachineBlock(Block block, PlayerMachine playerMachine) {
-        Bukkit.getScheduler().runTask(machinery, () -> {
-            TileState tileState = (TileState) block.getState();
-            PersistentDataContainer persistentDataContainer = tileState.getPersistentDataContainer();
-            persistentDataContainer.set(NAMESPACED_KEY, MACHINE_PERSISTENT_DATA, playerMachine);
-        });
-    }
-
-    public Optional<PlayerMachine> getPlayerMachineFromBlock(Block block) {
         TileState tileState = (TileState) block.getState();
         PersistentDataContainer persistentDataContainer = tileState.getPersistentDataContainer();
-        return Optional.ofNullable(persistentDataContainer.get(NAMESPACED_KEY, MACHINE_PERSISTENT_DATA));
+        persistentDataContainer.set(NAMESPACED_KEY, MACHINE_PERSISTENT_DATA, playerMachine);
+        tileState.update();
+    }
+
+    public PlayerMachine getPlayerMachineFromBlock(Block block) {
+        TileState tileState = (TileState) block.getState();
+        PersistentDataContainer persistentDataContainer = tileState.getPersistentDataContainer();
+        System.out.println(((CraftPersistentDataContainer) persistentDataContainer).getRaw());
+        return persistentDataContainer.get(NAMESPACED_KEY, MACHINE_PERSISTENT_DATA);
     }
 
     public HashSet<Location> getMachineLocations() {

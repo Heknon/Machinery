@@ -21,7 +21,7 @@ public class Interact implements Listener {
     public void onPlayerInteract(PlayerInteractEvent e) {
         if (!e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) return;
         if (!(e.getClickedBlock().getState() instanceof TileState)) return;
-        System.out.println(machinery.getMachineManager().getPlayerMachineFromBlock(e.getClickedBlock()).get());
+        System.out.println(machinery.getMachineManager().getPlayerMachineFromBlock(e.getClickedBlock()));
         if (machinery.getMachineManager().getMachineLocations().contains(e.getClickedBlock().getLocation())) {
             e.setCancelled(true);
         }
