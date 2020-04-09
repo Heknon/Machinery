@@ -9,32 +9,32 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.UUID;
 
 public class PlayerMachine extends Machine {
     private final Location referenceBlockLocation;
     private final Location openGUIBlockLocation;
+    private final UUID owner;
     private double totalResourcesGained;
     private List<ItemStack> resourcesGained;
     private List<Fuel> fuels;
-    private List<Location> blockLocations;
     private double totalZenCoinsGained;
     private double zenCoinsGained;
 
 
     public PlayerMachine(Material referenceBlockType, int machineReach, int speed, int maxFuel, int fuelDeficiency, List<String> fuelTypes, MachineType machineType,
                          Structure structure, Recipe recipe, String machineName, Material openGUIBlockType, Location referenceBlockLocation,
-                         double totalResourcesGained, List<ItemStack> resourcesGained, List<Fuel> fuels, Location openGUIBlockLocation,
-                         List<Location> blockLocations, double zenCoinsGained,
-                         double totalZenCoinsGained) {
+                         double totalResourcesGained, List<ItemStack> resourcesGained, List<Fuel> fuels, Location openGUIBlockLocation, double zenCoinsGained,
+                         double totalZenCoinsGained, UUID owner) {
         super(referenceBlockType, machineReach, speed, maxFuel, fuelDeficiency, fuelTypes, machineType, structure, recipe, machineName, openGUIBlockType);
         this.referenceBlockLocation = referenceBlockLocation;
         this.totalResourcesGained = totalResourcesGained;
         this.resourcesGained = resourcesGained;
         this.fuels = fuels;
-        this.blockLocations = blockLocations;
         this.openGUIBlockLocation = openGUIBlockLocation;
         this.zenCoinsGained = zenCoinsGained;
         this.totalZenCoinsGained = totalZenCoinsGained;
+        this.owner = owner;
     }
 
 
@@ -50,24 +50,24 @@ public class PlayerMachine extends Machine {
         return fuels;
     }
 
-    public double getTotalResourcesGained() {
-        return totalResourcesGained;
+    public void setFuels(List<Fuel> fuels) {
+        this.fuels = fuels;
     }
 
-    public Location getReferenceBlockLocation() {
-        return referenceBlockLocation;
+    public void addFuel(Fuel fuel) {
+        this.fuels.add(fuel);
+    }
+
+    public double getTotalResourcesGained() {
+        return totalResourcesGained;
     }
 
     public void setTotalResourcesGained(double totalResourcesGained) {
         this.totalResourcesGained = totalResourcesGained;
     }
 
-    public void setResourcesGained(List<ItemStack> resourcesGained) {
-        this.resourcesGained = resourcesGained;
-    }
-
-    public void setFuels(List<Fuel> fuels) {
-        this.fuels = fuels;
+    public Location getReferenceBlockLocation() {
+        return referenceBlockLocation;
     }
 
     public double getTotalZenCoinsGained() {
@@ -86,14 +86,33 @@ public class PlayerMachine extends Machine {
         this.zenCoinsGained = zenCoinsGained;
     }
 
+    public UUID getOwner() {
+        return owner;
+    }
+
+    public Location getOpenGUIBlockLocation() {
+        return openGUIBlockLocation;
+    }
+
+    public List<ItemStack> getResourcesGained() {
+        return resourcesGained;
+    }
+
+    public void setResourcesGained(List<ItemStack> resourcesGained) {
+        this.resourcesGained = resourcesGained;
+    }
+
     @Override
     public String toString() {
         return "PlayerMachine{" +
                 "referenceBlockLocation=" + referenceBlockLocation +
                 ", openGUIBlockLocation=" + openGUIBlockLocation +
+                ", owner=" + owner +
                 ", totalResourcesGained=" + totalResourcesGained +
                 ", resourcesGained=" + resourcesGained +
                 ", fuels=" + fuels +
+                ", totalZenCoinsGained=" + totalZenCoinsGained +
+                ", zenCoinsGained=" + zenCoinsGained +
                 ", referenceBlockType=" + referenceBlockType +
                 ", fuelTypes=" + fuelTypes +
                 ", machineType=" + machineType +
@@ -106,20 +125,6 @@ public class PlayerMachine extends Machine {
                 ", fuelDeficiency=" + fuelDeficiency +
                 ", speed=" + speed +
                 ", maxFuel=" + maxFuel +
-                ", totalZenCoinsGained=" + totalZenCoinsGained +
-                ", zenCoinsGained=" + zenCoinsGained +
                 '}';
-    }
-
-    public Location getOpenGUIBlockLocation() {
-        return openGUIBlockLocation;
-    }
-
-    public List<ItemStack> getResourcesGained() {
-        return resourcesGained;
-    }
-
-    public List<Location> getBlockLocations() {
-        return blockLocations;
     }
 }

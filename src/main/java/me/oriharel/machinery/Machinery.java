@@ -50,7 +50,7 @@ public final class Machinery extends JavaPlugin {
             structureManager = new StructureManager(this);
             structureManager.registerOnDoneCallback(() -> {
                 machineManager = new MachineManager(this);
-                Bukkit.getServer().getPluginManager().registerEvents(new Block(), this);
+                Bukkit.getServer().getPluginManager().registerEvents(new Block(this), this);
                 Bukkit.getServer().getPluginManager().registerEvents(new Interact(this), this);
             });
         }));

@@ -13,6 +13,13 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 
 public class Block implements Listener {
+
+    private Machinery machinery;
+
+    public Block(Machinery machinery) {
+        this.machinery = machinery;
+    }
+
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent e) {
         MachineBlock machineBlock;
@@ -28,8 +35,7 @@ public class Block implements Listener {
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent e) {
-        Location loc = e.getBlock().getLocation();
-        if (Machinery.getInstance().getMachineManager().getMachineLocations().contains(loc)) {
+        if (machinery.getMachineManager().isMachineLocation(e.getBlock())) {
             e.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Machinery.getInstance().getFileManager().getConfig("config.yml").get().getString(
                     "break_machine_attempt")));
             e.setCancelled(true);

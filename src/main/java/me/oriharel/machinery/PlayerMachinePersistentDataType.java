@@ -10,11 +10,11 @@ import org.bukkit.Location;
 import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataType;
 
-public class PlayerMachinePersistentData implements PersistentDataType<String, PlayerMachine> {
+public class PlayerMachinePersistentDataType implements PersistentDataType<String, PlayerMachine> {
 
     private Gson gson;
 
-    public PlayerMachinePersistentData(MachineFactory machineFactory) {
+    public PlayerMachinePersistentDataType(MachineFactory machineFactory) {
         this.gson = new GsonBuilder().registerTypeHierarchyAdapter(PlayerMachine.class,
                 new PlayerMachineTypeAdapter(machineFactory)).registerTypeHierarchyAdapter(Location.class,
                 new LocationTypeAdapter()).create();
