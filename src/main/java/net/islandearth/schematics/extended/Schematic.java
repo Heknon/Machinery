@@ -1,6 +1,5 @@
 package net.islandearth.schematics.extended;
 
-import me.oriharel.machinery.Callback;
 import me.oriharel.machinery.CallbackP;
 import net.islandearth.schematics.extended.NBTUtils.Position;
 import net.minecraft.server.v1_15_R1.NBTCompressedStreamTools;
@@ -196,7 +195,6 @@ public class Schematic {
                     || blocks.isEmpty()) {
                 throw new SchematicNotLoadedException("Data has not been loaded yet");
             }
-
 
 
             List<Options> options = Arrays.asList(option);
@@ -478,7 +476,6 @@ public class Schematic {
                         break;
                     }
                 }
-
                 block.getState().update(true, false);
 
                 if (validData.contains(data.getMaterial())) {
@@ -564,6 +561,7 @@ public class Schematic {
                             break;
                     }
                     block.setBlockData(facing);
+
                 }
 
                 block.getState().update(true, false);

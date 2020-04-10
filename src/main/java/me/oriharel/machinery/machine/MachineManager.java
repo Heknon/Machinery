@@ -2,43 +2,40 @@ package me.oriharel.machinery.machine;
 
 import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.PlayerMachinePersistentDataType;
-import me.oriharel.machinery.config.FileManager;
 import me.oriharel.machinery.exceptions.*;
-import org.bukkit.Bukkit;
+import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.TileState;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.*;
 
 public class MachineManager {
     private final Machinery machinery;
     private MachineFactory machineFactory;
     private List<Machine> machines;
-    private List<Location> registeredPlayerMachines;
+    private HashMap<Location, PlayerMachine> machineCores;
+    private HashSet<Location> machinePartLocations;
+    private HashSet<Location> temporaryPreRegisterMachineLocations;
     private PlayerMachinePersistentDataType MACHINE_PERSISTENT_DATA_TYPE;
     private NamespacedKey MACHINE_NAMESPACE_KEY;
-    private NamespacedKey MACHINE_LOCATION_NAMESPACE_KEY;
+    private NamespacedKey MACHINE_LOCATIONS_NAMESPACE_KEY;
 
     public MachineManager(Machinery machinery) {
         this.machinery = machinery;
         this.machineFactory = new MachineFactory(machinery);
         this.machines = new ArrayList<Machine>();
-        this.registeredPlayerMachines = new ArrayList<>();
+        this.machineCores = new HashMap<>();
+        this.machinePartLocations = new HashSet<>();
+        this.temporaryPreRegisterMachineLocations = new HashSet<>();
         this.MACHINE_PERSISTENT_DATA_TYPE = new PlayerMachinePersistentDataType(machineFactory);
-        this.MACHINE_LOCATION_NAMESPACE_KEY = new NamespacedKey(machinery, "machine_location");
         this.MACHINE_NAMESPACE_KEY = new NamespacedKey(machinery, "machine");
+        this.MACHINE_LOCATIONS_NAMESPACE_KEY = new NamespacedKey(machinery, "machine_locations");
         initializeBaseMachines();
-        initializePlayerMachines();
     }
 
     private void initializeBaseMachines() {
@@ -54,39 +51,26 @@ public class MachineManager {
         }
     }
 
-    private void initializePlayerMachines() {
-        YamlConfiguration configLoad = machinery.getFileManager().getConfig("machine_registry.yml").get();
-        List<String> machinesLocations = configLoad.getStringList("locations");
-        for (String loc : machinesLocations) {
-            String[] split = loc.split("\\|");
-            Location location = locationFromLong(Long.parseLong(split[0]), Bukkit.getWorld(UUID.fromString(split[1])));
-            PlayerMachine machine = getPlayerMachineFromBlock(location.getBlock());
-            registeredPlayerMachines.add(machine.getOpenGUIBlockLocation());
-        }
-    }
-
     public void registerNewPlayerMachine(PlayerMachine playerMachine, Set<Location> machineLocations) {
-        setPlayerMachineBlock(playerMachine.getOpenGUIBlockLocation().getBlock(), playerMachine);
-        setAsMachineLocation((Block[]) machineLocations.stream().map(Location::getBlock).toArray());
-        registeredPlayerMachines.add(playerMachine.getOpenGUIBlockLocation());
-        FileManager.Config config = machinery.getFileManager().getConfig("machine_registry.yml");
-        YamlConfiguration configLoad = config.get();
-        Location machineLocation = playerMachine.getOpenGUIBlockLocation();
-        if (machineLocation == null) try {
-            throw new MachineException("Machine has no open gui block in it's schematic!");
-        } catch (MachineException e) {
+        try {
+            setPlayerMachineBlock(playerMachine.getOpenGUIBlockLocation().getBlock(), playerMachine);
+            Object[] locations = machineLocations.toArray();
+            setPlayerMachineLocations(playerMachine.getOpenGUIBlockLocation().getBlock(), Arrays.copyOf(locations, locations.length, Location[].class));
+            this.machineCores.put(playerMachine.getOpenGUIBlockLocation(), playerMachine);
+            this.machinePartLocations.addAll(machineLocations);
+            Location machineLocation = playerMachine.getOpenGUIBlockLocation();
+            if (machineLocation == null) try {
+                throw new MachineException("Machine has no open gui block in it's schematic!");
+            } catch (MachineException e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        String loc =
-                locationToLong(machineLocation) + "|" + machineLocation.getWorld().getUID().toString();
-        List<String> locations = configLoad.getStringList("locations");
-        locations.add(loc);
-        configLoad.set("locations", locations);
-        config.save();
     }
 
-    public List<PlayerMachine> getRegisteredPlayerMachines() {
-        return this.registeredPlayerMachines.stream().map(loc -> getPlayerMachineFromBlock(loc.getBlock())).collect(Collectors.toList());
+    public HashMap<Location, PlayerMachine> getMachineCores() {
+        return machineCores;
     }
 
     public void setPlayerMachineBlock(Block block, PlayerMachine playerMachine) {
@@ -102,36 +86,34 @@ public class MachineManager {
         return persistentDataContainer.get(MACHINE_NAMESPACE_KEY, MACHINE_PERSISTENT_DATA_TYPE);
     }
 
-    public void setAsMachineLocation(Block[] blocks) {
-        for (Block block : blocks) {
-            TileState tileState = (TileState) block.getState();
-            PersistentDataContainer persistentDataContainer = tileState.getPersistentDataContainer();
-            persistentDataContainer.set(MACHINE_LOCATION_NAMESPACE_KEY, PersistentDataType.STRING, "machine_location");
-            tileState.update();
-        }
-    }
-
-    public boolean isMachineLocation(Block block) {
+    public void setPlayerMachineLocations(Block block, Location[] locations) {
         TileState tileState = (TileState) block.getState();
         PersistentDataContainer persistentDataContainer = tileState.getPersistentDataContainer();
-        String data = persistentDataContainer.get(MACHINE_LOCATION_NAMESPACE_KEY, PersistentDataType.STRING);
-        return data != null && data.equals("machine_locations");
+        long[] arr =
+                ArrayUtils.toPrimitive(Arrays.stream(locations).map(loc -> ((long)loc.getX() & 0x7FFFFFF) | (((long)loc.getZ() & 0x7FFFFFF) << 27) | ((long)loc.getY() << 54)).toArray(Long[]::new));
+        persistentDataContainer.set(MACHINE_LOCATIONS_NAMESPACE_KEY, PersistentDataType.LONG_ARRAY, arr);
+        tileState.update();
     }
 
-    private Location locationFromLong(long packed, World world) {
-        return new Location(world, (int) ((packed << 37) >> 37), (int) (packed >>> 54), (int) ((packed << 10) >> 37));
+    public Location[] getPlayerMachineLocations(Block block) {
+        TileState tileState = (TileState) block.getState();
+        PersistentDataContainer persistentDataContainer = tileState.getPersistentDataContainer();
+        return Arrays.stream(persistentDataContainer.get(MACHINE_LOCATIONS_NAMESPACE_KEY, PersistentDataType.LONG_ARRAY)).mapToObj(packed -> new Location(block.getWorld(),
+                (int) ((packed << 37) >> 37),
+                (int) (packed >>> 54),
+                (int) ((packed << 10) >> 37))).toArray(Location[]::new);
     }
 
-    private long locationToLong(Location loc) {
-        return ((long) loc.getX() & 0x7FFFFFF) | (((long) loc.getZ() & 0x7FFFFFF) << 27) | ((long) loc.getY() << 54);
+    public HashSet<Location> getMachinePartLocations() {
+        return machinePartLocations;
     }
 
-    public void addMachine(Machine machine) {
-        machines.add(machine);
+    public HashSet<Location> getTemporaryPreRegisterMachineLocations() {
+        return temporaryPreRegisterMachineLocations;
     }
 
-    public void removeMachine(Machine machine) {
-        machines.remove(machine);
+    public void addTemporaryPreRegisterMachinePartLocations(List<Location> locations) {
+        temporaryPreRegisterMachineLocations.addAll(locations);
     }
 
     public List<Machine> getMachines() {

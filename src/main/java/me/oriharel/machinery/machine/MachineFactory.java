@@ -27,6 +27,7 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.UUID;
 
 public class MachineFactory {
 
@@ -103,38 +104,20 @@ public class MachineFactory {
                                        Recipe recipe,
                                        String machineKey, Material openGUIBlockMaterialType, Location referenceBlockLocation, double totalResourcesGained,
                                        List<ItemStack> resourcesGained,
-                                       List<Fuel> fuels, Location openGUIBlockLocation, double zenCoinsGained, double totalZenCoinsGained, List<Location> locations) throws IllegalArgumentException {
+                                       List<Fuel> fuels, Location openGUIBlockLocation, double zenCoinsGained, double totalZenCoinsGained, UUID owner) throws IllegalArgumentException {
         if (machineType == null) throw new IllegalArgumentException("Machine type must not be null (MachineFactory)");
         return new PlayerMachine(referenceBlockType, machineReach, speed, maxFuel, fuelDeficiency, fuelTypes, machineType, structure,
                 recipe, machineKey, openGUIBlockMaterialType, referenceBlockLocation, totalResourcesGained, resourcesGained, fuels, openGUIBlockLocation,
-                locations, zenCoinsGained, totalZenCoinsGained);
+                zenCoinsGained, totalZenCoinsGained, owner);
     }
 
     public PlayerMachine createMachine(Machine machine, Location referenceBlockLocation, Location openGUIBlockLocation, double totalResourcesGained,
-                                       List<ItemStack> resourcesGained, List<Fuel> fuels, double zenCoinsGained, double totalZenCoinsGained, List<Location> locations) throws IllegalArgumentException {
+                                       List<ItemStack> resourcesGained, List<Fuel> fuels, double zenCoinsGained, double totalZenCoinsGained, UUID owner) throws IllegalArgumentException {
         if (machine == null) throw new IllegalArgumentException("Machine must not be null (MachineFactory)");
         return new PlayerMachine(machine.referenceBlockType, machine.machineReach, machine.speed, machine.maxFuel, machine.fuelDeficiency, machine.fuelTypes,
                 machine.machineType, machine.structure,
                 machine.recipe, machine.machineName, machine.openGUIBlockType, referenceBlockLocation, totalResourcesGained, resourcesGained, fuels,
-                openGUIBlockLocation, locations, zenCoinsGained, totalZenCoinsGained);
-    }
-
-    /**
-     * create PlayerMachine object from machine registry
-     *
-     * @param machineLocation location of the machine reference block
-     * @return PlayerMachine or null if not found
-     */
-    public PlayerMachine createMachine(Location machineLocation) {
-        String configKey =
-                machineLocation.getBlockX() + "|" + machineLocation.getBlockY() + "|" + machineLocation.getBlockZ() + "|" + machineLocation.getWorld().getUID().toString();
-        YamlConfiguration configLoad = machinery.getFileManager().getConfig("machine_registry.yml").get();
-        String machineJson = configLoad.getString(configKey + ".machine", null);
-        if (machineJson == null) return null;
-        Gson gson =
-                new GsonBuilder().registerTypeHierarchyAdapter(PlayerMachine.class, new PlayerMachineTypeAdapter(this)).registerTypeHierarchyAdapter(Location.class,
-                        new LocationTypeAdapter()).setPrettyPrinting().create();
-        return gson.fromJson(machineJson, PlayerMachine.class);
+                openGUIBlockLocation, zenCoinsGained, totalZenCoinsGained, owner);
     }
 
     private Recipe injectMachineNBTIntoRecipe(Recipe recipe, Machine machine) {

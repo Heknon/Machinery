@@ -4,7 +4,6 @@ import me.oriharel.customrecipes.recipe.Recipe;
 import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.api.events.PostMachineBuildEvent;
 import me.oriharel.machinery.api.events.PreMachineBuildEvent;
-import me.oriharel.machinery.exceptions.MachineException;
 import me.oriharel.machinery.items.MachineBlock;
 import me.oriharel.machinery.structure.Structure;
 import org.bukkit.Bukkit;
@@ -14,6 +13,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -143,20 +143,21 @@ public class Machine implements IMachine {
         if (preMachineBuildEvent.isCancelled()) return false;
         Player p = Bukkit.getPlayer(playerUuid);
         List<Location> locations = structure.build(loc, p, this.referenceBlockType, this.openGUIBlockType, (printResult) -> {
+            System.out.println(printResult.getPlacementLocations());
             if (printResult.getPlacementLocations() == null) {
                 p.sendMessage(ChatColor.translateAlternateColorCodes('&', Machinery.getInstance().getFileManager().getConfig("config.yml").get().getString(
                         "not_empty_place")));
                 return false;
             }
             PlayerMachine playerMachine = Machinery.getInstance().getMachineManager().getMachineFactory().createMachine(this, printResult.getSpecialBlockLocation(),
-                    printResult.getOpenGUIBlockLocation(), 0, new ArrayList<>(), new ArrayList<>(), 0, 0, printResult.getPlacementLocations());
-            Machinery.getInstance().getMachineManager().registerNewPlayerMachine(playerUuid, playerMachine);
+                    printResult.getOpenGUIBlockLocation(), 0, new ArrayList<>(), new ArrayList<>(), 0, 0, playerUuid);
+            Machinery.getInstance().getMachineManager().registerNewPlayerMachine(playerMachine, new HashSet<>(printResult.getPlacementLocations()));
             PostMachineBuildEvent postMachineBuildEvent = new PostMachineBuildEvent(playerMachine, loc);
             Bukkit.getPluginManager().callEvent(postMachineBuildEvent);
             return true;
         });
         if (locations == null) return false;
-        Machinery.getInstance().getMachineManager().registerMachineLocations(locations);
+        Machinery.getInstance().getMachineManager().addTemporaryPreRegisterMachinePartLocations(locations);
         return true;
     }
 
