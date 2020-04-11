@@ -24,12 +24,11 @@ public class PlayerMachineLocationsPersistentDataType implements PersistentDataT
 
     @Override
     public Long[] toPrimitive(Location[] locations, PersistentDataAdapterContext persistentDataAdapterContext) {
-        return Arrays.stream(locations).map(loc -> (long) (loc.getBlockX() << 56 | loc.getBlockZ() << 28 | (loc.getBlockY() & 0xFF))).toArray(Long[]::new);
+        return Arrays.stream(locations).map(Utils::locationToLong).toArray(Long[]::new);
     }
 
     @Override
     public Location[] fromPrimitive(Long[] longs, PersistentDataAdapterContext persistentDataAdapterContext) {
-        return Arrays.stream(longs).map(position -> new Location(null, Math.toIntExact(position >>> 56), Math.toIntExact(position & 0xFF),
-                Math.toIntExact(position << 28 >>> 56))).toArray(Location[]::new);
+        return Arrays.stream(longs).map(Utils::longToLocation).toArray(Location[]::new);
     }
 }

@@ -2,6 +2,7 @@ package me.oriharel.machinery.machine;
 
 import me.oriharel.customrecipes.recipe.Recipe;
 import me.oriharel.machinery.Machinery;
+import me.oriharel.machinery.Utils;
 import me.oriharel.machinery.api.events.PostMachineBuildEvent;
 import me.oriharel.machinery.api.events.PreMachineBuildEvent;
 import me.oriharel.machinery.items.MachineBlock;
@@ -142,8 +143,10 @@ public class Machine implements IMachine {
         Bukkit.getPluginManager().callEvent(preMachineBuildEvent);
         if (preMachineBuildEvent.isCancelled()) return false;
         Player p = Bukkit.getPlayer(playerUuid);
+        System.out.println(p.getLocation());
+        System.out.println(Utils.locationToLong(p.getLocation()));
+        System.out.println(Utils.longToLocation(Utils.locationToLong(p.getLocation()), p.getWorld()));
         List<Location> locations = structure.build(loc, p, this.referenceBlockType, this.openGUIBlockType, (printResult) -> {
-            System.out.println(printResult.getPlacementLocations());
             if (printResult.getPlacementLocations() == null) {
                 p.sendMessage(ChatColor.translateAlternateColorCodes('&', Machinery.getInstance().getFileManager().getConfig("config.yml").get().getString(
                         "not_empty_place")));

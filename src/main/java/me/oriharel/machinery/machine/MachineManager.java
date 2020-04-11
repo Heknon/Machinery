@@ -2,6 +2,7 @@ package me.oriharel.machinery.machine;
 
 import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.PlayerMachinePersistentDataType;
+import me.oriharel.machinery.Utils;
 import me.oriharel.machinery.exceptions.*;
 import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.Location;
@@ -90,7 +91,7 @@ public class MachineManager {
         TileState tileState = (TileState) block.getState();
         PersistentDataContainer persistentDataContainer = tileState.getPersistentDataContainer();
         long[] arr =
-                ArrayUtils.toPrimitive(Arrays.stream(locations).map(loc -> ((long)loc.getX() & 0x7FFFFFF) | (((long)loc.getZ() & 0x7FFFFFF) << 27) | ((long)loc.getY() << 54)).toArray(Long[]::new));
+                ArrayUtils.toPrimitive(Arrays.stream(locations).map(Utils::locationToLong).toArray(Long[]::new));
         persistentDataContainer.set(MACHINE_LOCATIONS_NAMESPACE_KEY, PersistentDataType.LONG_ARRAY, arr);
         tileState.update();
     }
@@ -98,10 +99,7 @@ public class MachineManager {
     public Location[] getPlayerMachineLocations(Block block) {
         TileState tileState = (TileState) block.getState();
         PersistentDataContainer persistentDataContainer = tileState.getPersistentDataContainer();
-        return Arrays.stream(persistentDataContainer.get(MACHINE_LOCATIONS_NAMESPACE_KEY, PersistentDataType.LONG_ARRAY)).mapToObj(packed -> new Location(block.getWorld(),
-                (int) ((packed << 37) >> 37),
-                (int) (packed >>> 54),
-                (int) ((packed << 10) >> 37))).toArray(Location[]::new);
+        return Arrays.stream(persistentDataContainer.get(MACHINE_LOCATIONS_NAMESPACE_KEY, PersistentDataType.LONG_ARRAY)).mapToObj(packed -> Utils.longToLocation(packed, block.getWorld())).toArray(Location[]::new);
     }
 
     public HashSet<Location> getMachinePartLocations() {

@@ -1,6 +1,5 @@
 package me.oriharel.machinery;
 
-import com.google.common.primitives.Longs;
 import me.oriharel.customrecipes.CustomRecipes;
 import me.oriharel.machinery.config.FileManager;
 import me.oriharel.machinery.listeners.Block;
@@ -20,7 +19,10 @@ import java.nio.LongBuffer;
 import java.nio.channels.ByteChannel;
 import java.nio.channels.FileChannel;
 import java.nio.channels.WritableByteChannel;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.logging.Level;
 
@@ -91,16 +93,12 @@ public final class Machinery extends JavaPlugin {
         try (ByteChannel in = Files.newByteChannel(file, StandardOpenOption.READ)) {
             ByteBuffer buffer = ByteBuffer.allocate(128);
             in.read(buffer);
-            byte[] arr = buffer.array();
-            ByteBuffer byteBuffer = ByteBuffer.wrap(arr);
-            LongBuffer longBuffer = byteBuffer.asLongBuffer();
+            buffer.flip();
+            LongBuffer longBuffer = buffer.asLongBuffer();
             for (int i = 0; i < longBuffer.capacity(); i++) {
-                System.out.println(longBuffer.get(i));
                 long position = buffer.getLong(i);
                 if (position == 0) continue;
-                Location loc = new Location(world, Math.toIntExact(position >>> 56),
-                        Math.toIntExact(position & 0xFF),
-                        Math.toIntExact(position << 28 >>> 56));
+                Location loc = Utils.longToLocation(position, world);
                 System.out.println(loc);
                 org.bukkit.block.Block block = loc.getBlock();
                 try {
@@ -136,7 +134,7 @@ public final class Machinery extends JavaPlugin {
             ByteBuffer buffer = ByteBuffer.allocate(machineManager.getMachineCores().size() * 8);
             for (Location key : machineManager.getMachineCores().keySet()) {
                 if (!key.getWorld().equals(world)) return;
-                buffer.putLong(key.getBlockX() << 56 | key.getBlockZ() << 28 | (key.getBlockY() & 0xFF));
+                buffer.put(ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(Utils.locationToLong(key)).array());
             }
             getServer().getLogger().log(Level.INFO, "Writing all machines to machine.dat file for world " + world.getName());
             out.write((ByteBuffer) buffer.flip());
