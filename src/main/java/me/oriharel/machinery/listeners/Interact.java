@@ -19,9 +19,9 @@ public class Interact implements Listener {
         this.machinery = machinery;
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerInteract(PlayerInteractEvent e) {
-        if (!e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) return;
+        if (!e.getAction().equals(Action.RIGHT_CLICK_BLOCK) || e.getClickedBlock() == null) return;
         if (!(e.getClickedBlock().getState() instanceof TileState)) return;
 
         if (machinery.getMachineManager().getMachinePartLocations().contains(e.getClickedBlock().getLocation())) {
@@ -31,8 +31,10 @@ public class Interact implements Listener {
         PlayerMachine machine = machinery.getMachineManager().getMachineCores().get(e.getClickedBlock().getLocation());
         if (machine != null) {
             e.setUseInteractedBlock(Event.Result.DENY);
+            e.setCancelled(true);
             e.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&',
                     machinery.getFileManager().getConfig("config.yml").get().getString("open_machine_gui_message")));
+            e.getPlayer().closeInventory();
             // TODO: Open gui machine management GUI logic
         }
     }

@@ -56,9 +56,6 @@ public final class Machinery extends JavaPlugin {
         fileManager.getConfig("machines.yml").copyDefaults(true).save();
         File file = new File(getDataFolder(), "structures");
         if (!file.exists()) file.mkdir();
-//        saveResource("structures/schematic_name" + STRUCTURE_EXTENSION, false);
-//        saveResource("structures/schematic_name_super_machine" + STRUCTURE_EXTENSION, false);
-//        saveResource("structures/miner" + STRUCTURE_EXTENSION, false);
         getPlugin(CustomRecipes.class).getRecipesManager().registerRecipesDoneCallback(() -> Bukkit.getScheduler().runTask(this, () -> {
             structureManager = new StructureManager(this);
             structureManager.registerOnDoneCallback(() -> {
@@ -96,19 +93,21 @@ public final class Machinery extends JavaPlugin {
             buffer.flip();
             LongBuffer longBuffer = buffer.asLongBuffer();
             for (int i = 0; i < longBuffer.capacity(); i++) {
-                long position = buffer.getLong(i);
+                long position = buffer.getLong(i * 8);
                 if (position == 0) continue;
                 Location loc = Utils.longToLocation(position, world);
-                System.out.println(loc);
                 org.bukkit.block.Block block = loc.getBlock();
                 try {
-                    machineManager.getMachineCores().put(loc, machineManager.getPlayerMachineFromBlock(block));
+                    Bukkit.getScheduler().runTask(this, () -> machineManager.getMachineCores().put(loc, machineManager.getPlayerMachineFromBlock(block)));
                 } catch (ClassCastException ignored) {
-                    System.out.println("ClassCastException at long number " + i + ", byte " + i * 8);
+                    getLogger().info("ClassCastException at long number " + i + ", byte " + i * 8);
                 }
-                Location[] locations = machineManager.getPlayerMachineLocations(block);
-                Arrays.stream(locations).forEach(l -> l.setWorld(world));
-                machineManager.getMachinePartLocations().addAll(Arrays.asList(locations));
+                Bukkit.getScheduler().runTask(this, () -> {
+                    Location[] locations;
+                    locations = machineManager.getPlayerMachineLocations(block);
+                    Arrays.stream(locations).forEach(l -> l.setWorld(world));
+                    machineManager.getMachinePartLocations().addAll(Arrays.asList(locations));
+                });
             }
 
             getServer().getLogger().log(Level.INFO, "Loaded all machines from machine.dat for world " + world.getName());
@@ -129,6 +128,13 @@ public final class Machinery extends JavaPlugin {
 
     public void saveMachineData(World world) {
         Path file = world.getWorldFolder().toPath().resolve("machines.dat");
+        if (!file.toFile().exists()) {
+            try {
+                file.toFile().createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         try (WritableByteChannel out = Files.newByteChannel(file, StandardOpenOption.WRITE)) {
             FileChannel.open(file);
             ByteBuffer buffer = ByteBuffer.allocate(machineManager.getMachineCores().size() * 8);

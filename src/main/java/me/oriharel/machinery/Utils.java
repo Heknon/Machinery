@@ -5,11 +5,17 @@ import org.bukkit.World;
 
 public class Utils {
     public static long locationToLong(Location location) {
-        return ((long) location.getBlockX()) << 38 | (long)location.getBlockZ() << 12 | location.getBlockY();
+        int x = location.getBlockX();
+        int y = location.getBlockY();
+        int z = location.getBlockZ();
+        return ((long)x & 0x7FFFFFF) | (((long)z & 0x7FFFFFF) << 27) | ((long)y << 54);
     }
 
     public static Location longToLocation(long packed) {
-        return new Location(null, packed >> 38, packed & 0xFFF, packed << 26 >> 38);
+        int x = (int) ((packed << 37) >> 37);
+        int y = (int) (packed >>> 54);
+        int z = (int) ((packed << 10) >> 37);
+        return new Location(null, x, y, z);
     }
 
     public static Location longToLocation(long packed, World world) {

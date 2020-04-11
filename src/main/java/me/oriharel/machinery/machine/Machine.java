@@ -143,9 +143,6 @@ public class Machine implements IMachine {
         Bukkit.getPluginManager().callEvent(preMachineBuildEvent);
         if (preMachineBuildEvent.isCancelled()) return false;
         Player p = Bukkit.getPlayer(playerUuid);
-        System.out.println(p.getLocation());
-        System.out.println(Utils.locationToLong(p.getLocation()));
-        System.out.println(Utils.longToLocation(Utils.locationToLong(p.getLocation()), p.getWorld()));
         List<Location> locations = structure.build(loc, p, this.referenceBlockType, this.openGUIBlockType, (printResult) -> {
             if (printResult.getPlacementLocations() == null) {
                 p.sendMessage(ChatColor.translateAlternateColorCodes('&', Machinery.getInstance().getFileManager().getConfig("config.yml").get().getString(
