@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import me.oriharel.customrecipes.recipe.Recipe;
 import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.exceptions.MachineNotFoundException;
+import me.oriharel.machinery.fuel.Fuel;
 import me.oriharel.machinery.machine.Machine;
 import me.oriharel.machinery.machine.PlayerMachine;
 import me.oriharel.machinery.serialization.MachineTypeAdapter;

@@ -4,7 +4,7 @@ import com.google.gson.*;
 import me.oriharel.customrecipes.api.CustomRecipesAPI;
 import me.oriharel.customrecipes.recipe.Recipe;
 import me.oriharel.machinery.Machinery;
-import me.oriharel.machinery.items.Fuel;
+import me.oriharel.machinery.fuel.Fuel;
 import me.oriharel.machinery.machine.MachineFactory;
 import me.oriharel.machinery.machine.MachineType;
 import me.oriharel.machinery.machine.PlayerMachine;

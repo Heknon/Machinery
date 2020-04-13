@@ -11,5 +11,6 @@ fuel_type_name2:
   energy: 30
 
 fuel_type_name3:
-  nbt: "if_it_has_this_nbt_key_it_is_fuel"
+  material: "OBSIDIAN"
+  nbt: "use the custom recipes command /customrecipes shownbt to get the nbt of an item and place it here"
   energy: 5

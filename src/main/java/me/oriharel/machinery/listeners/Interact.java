@@ -1,6 +1,8 @@
 package me.oriharel.machinery.listeners;
 
 import me.oriharel.machinery.Machinery;
+import me.oriharel.machinery.inventory.Inventory;
+import me.oriharel.machinery.inventory.InventoryPage;
 import me.oriharel.machinery.machine.PlayerMachine;
 import org.bukkit.ChatColor;
 import org.bukkit.block.TileState;
@@ -10,6 +12,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Interact implements Listener {
 
@@ -36,6 +41,10 @@ public class Interact implements Listener {
                     machinery.getFileManager().getConfig("config.yml").get().getString("open_machine_gui_message")));
             e.getPlayer().closeInventory();
             // TODO: Open gui machine management GUI logic
+
+            Map<String, InventoryPage> routes = new HashMap<>();
+            routes.put("start", )
+            Inventory inventory = new Inventory(routes, e.getPlayer());
         }
     }
 }

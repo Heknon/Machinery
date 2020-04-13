@@ -2,6 +2,7 @@ package me.oriharel.machinery;
 
 import me.oriharel.customrecipes.CustomRecipes;
 import me.oriharel.machinery.config.FileManager;
+import me.oriharel.machinery.inventory.Listeners;
 import me.oriharel.machinery.listeners.Block;
 import me.oriharel.machinery.listeners.Interact;
 import me.oriharel.machinery.machine.MachineManager;
@@ -56,6 +57,7 @@ public final class Machinery extends JavaPlugin {
         fileManager.getConfig("machines.yml").copyDefaults(true).save();
         File file = new File(getDataFolder(), "structures");
         if (!file.exists()) file.mkdir();
+        Bukkit.getPluginManager().registerEvents(new Listeners(), this);
         getPlugin(CustomRecipes.class).getRecipesManager().registerRecipesDoneCallback(() -> Bukkit.getScheduler().runTask(this, () -> {
             structureManager = new StructureManager(this);
             structureManager.registerOnDoneCallback(() -> {
