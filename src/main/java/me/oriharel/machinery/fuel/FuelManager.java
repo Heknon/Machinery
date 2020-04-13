@@ -1,7 +1,6 @@
 package me.oriharel.machinery.fuel;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.utilities.NMS;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
@@ -48,5 +47,9 @@ public class FuelManager {
                     "There is no way to recognize the fuel made. You must set material or material and nbt"
                             + " in fuels.yml");
         return new Fuel(material, nbt, energy);
+    }
+
+    public Set<Fuel> getFuels() {
+        return fuels;
     }
 }

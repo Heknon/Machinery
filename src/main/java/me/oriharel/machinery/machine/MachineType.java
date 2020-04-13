@@ -26,4 +26,20 @@ public enum MachineType {
                 throw new NotMachineTypeException("The given machine type string is not a machine type. (" + machineType + ")");
         }
     }
+
+    public String toTitle() {
+        switch (this) {
+            case LUMBERJACK:
+                return "Lumberjack";
+            case EXCAVATOR:
+                return "Excavator";
+            case MINER:
+                return "Miner";
+            case FARMER:
+                return "Farmer";
+            case ALL:
+                return "All Miner";
+        }
+        return "Miner";
+    }
 }

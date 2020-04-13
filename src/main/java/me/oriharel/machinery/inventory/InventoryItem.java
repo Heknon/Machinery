@@ -31,6 +31,14 @@ public class InventoryItem {
         this.indexInInventory = -1;
     }
 
+    public InventoryItem(Material material, int amount, String displayName) {
+        this.itemStack = new ItemStack(material, amount);
+        ItemMeta meta = this.itemStack.getItemMeta();
+        meta.setDisplayName(displayName);
+        this.itemStack.setItemMeta(meta);
+        this.indexInInventory = -1;
+    }
+
     public InventoryItem setOnClick(CallbackR<Boolean> onClick) {
         this.onClick = onClick;
         return this;

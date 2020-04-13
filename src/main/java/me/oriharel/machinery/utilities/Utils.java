@@ -1,4 +1,4 @@
-package me.oriharel.machinery;
+package me.oriharel.machinery.utilities;
 
 import org.bukkit.Location;
 import org.bukkit.World;

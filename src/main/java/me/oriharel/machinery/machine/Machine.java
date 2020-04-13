@@ -2,7 +2,6 @@ package me.oriharel.machinery.machine;
 
 import me.oriharel.customrecipes.recipe.Recipe;
 import me.oriharel.machinery.Machinery;
-import me.oriharel.machinery.Utils;
 import me.oriharel.machinery.api.events.PostMachineBuildEvent;
 import me.oriharel.machinery.api.events.PreMachineBuildEvent;
 import me.oriharel.machinery.items.MachineBlock;

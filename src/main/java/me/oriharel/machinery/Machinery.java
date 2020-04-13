@@ -2,11 +2,13 @@ package me.oriharel.machinery;
 
 import me.oriharel.customrecipes.CustomRecipes;
 import me.oriharel.machinery.config.FileManager;
+import me.oriharel.machinery.fuel.FuelManager;
 import me.oriharel.machinery.inventory.Listeners;
 import me.oriharel.machinery.listeners.Block;
 import me.oriharel.machinery.listeners.Interact;
 import me.oriharel.machinery.machine.MachineManager;
 import me.oriharel.machinery.structure.StructureManager;
+import me.oriharel.machinery.utilities.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -34,6 +36,7 @@ public final class Machinery extends JavaPlugin {
     private FileManager fileManager;
     private MachineManager machineManager;
     private StructureManager structureManager;
+    private FuelManager fuelManager;
 
     public static Machinery getInstance() {
         return INSTANCE;
@@ -58,6 +61,7 @@ public final class Machinery extends JavaPlugin {
         File file = new File(getDataFolder(), "structures");
         if (!file.exists()) file.mkdir();
         Bukkit.getPluginManager().registerEvents(new Listeners(), this);
+        Bukkit.getScheduler().runTaskAsynchronously(this, () -> fuelManager = new FuelManager(this));
         getPlugin(CustomRecipes.class).getRecipesManager().registerRecipesDoneCallback(() -> Bukkit.getScheduler().runTask(this, () -> {
             structureManager = new StructureManager(this);
             structureManager.registerOnDoneCallback(() -> {
@@ -149,5 +153,9 @@ public final class Machinery extends JavaPlugin {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+    }
+
+    public FuelManager getFuelManager() {
+        return fuelManager;
     }
 }

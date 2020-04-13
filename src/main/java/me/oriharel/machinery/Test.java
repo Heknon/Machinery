@@ -1,5 +1,6 @@
 package me.oriharel.machinery;
 
+import me.oriharel.machinery.utilities.Utils;
 import org.bukkit.Location;
 
 public class Test {
