@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.libs.org.apache.commons.codec.binary.Base64;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -25,6 +26,15 @@ public class FuelManager {
         this.gson = new Gson();
         this.fuels = new HashSet<>();
         initializeFuels();
+    }
+
+    public Fuel getFuelByName(String name) {
+        return fuels.stream().filter(f -> f.getName().equalsIgnoreCase(name)).findAny().get();
+    }
+
+    public ItemStack getFuelItem(String fuelName, int amount) {
+        Fuel fuel = getFuelByName(fuelName).clone();
+        return new PlayerFuel(fuel.getName(), fuel.getMaterial(), fuel.getNbt(), fuel.getEnergy(), amount).getItem();
     }
 
     private void initializeFuels() {

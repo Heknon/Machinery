@@ -57,23 +57,6 @@ public final class Machinery extends JavaPlugin {
         ConsoleCommandSender console = Bukkit.getConsoleSender();
         console.sendMessage("Starting up Machinery");
 
-        try {
-            Method a = Blocks.class.getDeclaredMethod("a", String.class, net.minecraft.server.v1_15_R1.Block.class);
-            a.setAccessible(true);
-            net.minecraft.server.v1_15_R1.Block block = (net.minecraft.server.v1_15_R1.Block) a.invoke(null, "machine",
-                    new BlockOre(net.minecraft.server.v1_15_R1.Block.Info.a(Material.STONE).a(3.0F, 3.0F)));
-            for (IBlockData blockData : block.getStates().a()) {
-                blockData.c();
-                net.minecraft.server.v1_15_R1.Block.REGISTRY_ID.b(blockData);
-            }
-            block.g();
-            System.out.println();
-            System.out.println(Blocks.BLACK_SHULKER_BOX.getItem());
-            System.out.println(block.getItem().getName());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
         fileManager = new FileManager(this);
         fileManager.getConfig("config.yml").copyDefaults(true).save();
         fileManager.getConfig("fuels.yml").copyDefaults(true).save();

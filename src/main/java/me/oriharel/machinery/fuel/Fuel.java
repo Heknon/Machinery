@@ -24,6 +24,7 @@ class Fuel {
     public ItemStack getItem(int amount) {
         ItemStack itemStack = new ItemStack(material, amount);
         net.minecraft.server.v1_15_R1.ItemStack is = CraftItemStack.asNMSCopy(itemStack);
+        nbt.setInt("energy", energy);
         is.setTag(nbt);
         return CraftItemStack.asBukkitCopy(is);
     }
@@ -38,5 +39,13 @@ class Fuel {
 
     public int getEnergy() {
         return energy;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    protected Fuel clone() {
+        return new Fuel(name, material, nbt.clone(), energy);
     }
 }
