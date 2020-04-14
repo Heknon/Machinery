@@ -5,7 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 
-public class PlayerFuel extends Fuel {
+public class PlayerFuel extends Fuel implements Cloneable {
 
     private int amount;
 

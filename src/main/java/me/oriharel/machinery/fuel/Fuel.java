@@ -7,7 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 
-class Fuel {
+class Fuel implements Cloneable {
     private final String name;
     private final Material material;
     @JsonAdapter(NBTTagCompoundTypeAdapter.class)
