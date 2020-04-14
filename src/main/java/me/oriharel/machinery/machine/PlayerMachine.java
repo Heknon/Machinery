@@ -1,7 +1,7 @@
 package me.oriharel.machinery.machine;
 
 import me.oriharel.customrecipes.recipe.Recipe;
-import me.oriharel.machinery.fuel.Fuel;
+import me.oriharel.machinery.fuel.PlayerFuel;
 import me.oriharel.machinery.items.MachineBlock;
 import me.oriharel.machinery.structure.Structure;
 import org.bukkit.Location;
@@ -17,14 +17,14 @@ public class PlayerMachine extends Machine {
     private final UUID owner;
     private double totalResourcesGained;
     private List<ItemStack> resourcesGained;
-    private List<Fuel> fuels;
+    private List<PlayerFuel> fuels;
     private double totalZenCoinsGained;
     private double zenCoinsGained;
 
 
     public PlayerMachine(Material referenceBlockType, int machineReach, int speed, int maxFuel, int fuelDeficiency, List<String> fuelTypes, MachineType machineType,
                          Structure structure, Recipe recipe, String machineName, Material openGUIBlockType, Location referenceBlockLocation,
-                         double totalResourcesGained, List<ItemStack> resourcesGained, List<Fuel> fuels, Location openGUIBlockLocation, double zenCoinsGained,
+                         double totalResourcesGained, List<ItemStack> resourcesGained, List<PlayerFuel> fuels, Location openGUIBlockLocation, double zenCoinsGained,
                          double totalZenCoinsGained, UUID owner) {
         super(referenceBlockType, machineReach, speed, maxFuel, fuelDeficiency, fuelTypes, machineType, structure, recipe, machineName, openGUIBlockType);
         this.referenceBlockLocation = referenceBlockLocation;
@@ -46,15 +46,15 @@ public class PlayerMachine extends Machine {
         return null;
     }
 
-    public List<Fuel> getFuels() {
+    public List<PlayerFuel> getFuels() {
         return fuels;
     }
 
-    public void setFuels(List<Fuel> fuels) {
+    public void setFuels(List<PlayerFuel> fuels) {
         this.fuels = fuels;
     }
 
-    public void addFuel(Fuel fuel) {
+    public void addFuel(PlayerFuel fuel) {
         this.fuels.add(fuel);
     }
 

@@ -4,7 +4,7 @@ import com.google.gson.*;
 import me.oriharel.customrecipes.api.CustomRecipesAPI;
 import me.oriharel.customrecipes.recipe.Recipe;
 import me.oriharel.machinery.Machinery;
-import me.oriharel.machinery.fuel.Fuel;
+import me.oriharel.machinery.fuel.PlayerFuel;
 import me.oriharel.machinery.machine.MachineFactory;
 import me.oriharel.machinery.machine.MachineType;
 import me.oriharel.machinery.machine.PlayerMachine;
@@ -43,7 +43,7 @@ public class PlayerMachineTypeAdapter implements JsonSerializer<PlayerMachine>, 
         Material openGUIBlockType = Material.getMaterial(obj.get("machineOpenGUIBlockType").getAsString());
         Recipe recipe =
                 CustomRecipesAPI.getImplementation().getRecipesManager().getRecipes().stream().filter(r -> r.getRecipeKey().equalsIgnoreCase(recipeName)).findAny().orElse(null);
-        List<Fuel> fuel = jsonDeserializationContext.deserialize(obj.get("machineFuel"), List.class);
+        List<PlayerFuel> fuel = jsonDeserializationContext.deserialize(obj.get("machineFuel"), List.class);
         Location referenceBlockLocation = jsonDeserializationContext.deserialize(obj.get("machineReferenceBlockLocation"), Location.class);
         Location openGUIBlockLocation = jsonDeserializationContext.deserialize(obj.get("machineOpenGUIBlockLocation"), Location.class);
         int machineFuelDeficiency = obj.get("machineFuelDeficiency").getAsInt();

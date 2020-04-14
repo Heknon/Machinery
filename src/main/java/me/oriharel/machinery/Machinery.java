@@ -1,5 +1,6 @@
 package me.oriharel.machinery;
 
+import com.google.common.collect.UnmodifiableIterator;
 import me.oriharel.customrecipes.CustomRecipes;
 import me.oriharel.machinery.config.FileManager;
 import me.oriharel.machinery.fuel.FuelManager;
@@ -9,6 +10,7 @@ import me.oriharel.machinery.listeners.Interact;
 import me.oriharel.machinery.machine.MachineManager;
 import me.oriharel.machinery.structure.StructureManager;
 import me.oriharel.machinery.utilities.Utils;
+import net.minecraft.server.v1_15_R1.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -17,6 +19,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.LongBuffer;
 import java.nio.channels.ByteChannel;
@@ -27,6 +30,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.logging.Level;
 
 public final class Machinery extends JavaPlugin {
@@ -52,6 +56,23 @@ public final class Machinery extends JavaPlugin {
 
         ConsoleCommandSender console = Bukkit.getConsoleSender();
         console.sendMessage("Starting up Machinery");
+
+        try {
+            Method a = Blocks.class.getDeclaredMethod("a", String.class, net.minecraft.server.v1_15_R1.Block.class);
+            a.setAccessible(true);
+            net.minecraft.server.v1_15_R1.Block block = (net.minecraft.server.v1_15_R1.Block) a.invoke(null, "machine",
+                    new BlockOre(net.minecraft.server.v1_15_R1.Block.Info.a(Material.STONE).a(3.0F, 3.0F)));
+            for (IBlockData blockData : block.getStates().a()) {
+                blockData.c();
+                net.minecraft.server.v1_15_R1.Block.REGISTRY_ID.b(blockData);
+            }
+            block.g();
+            System.out.println();
+            System.out.println(Blocks.BLACK_SHULKER_BOX.getItem());
+            System.out.println(block.getItem().getName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         fileManager = new FileManager(this);
         fileManager.getConfig("config.yml").copyDefaults(true).save();

@@ -50,7 +50,7 @@ public class InventoryPage implements InventoryHolder {
         ItemStack[] items = inventory.getContents();
         for (int i = 0; i < items.length; i++) {
             ItemStack item = items[i];
-            if (item == null || item.getType().equals(Material.AIR)) {
+            if (fillment != null &&  (item == null || item.getType().equals(Material.AIR))) {
                 items[i] = fillment.itemStack;
             }
         }

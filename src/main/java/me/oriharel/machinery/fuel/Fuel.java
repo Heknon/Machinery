@@ -1,13 +1,16 @@
 package me.oriharel.machinery.fuel;
 
+import com.google.gson.annotations.JsonAdapter;
+import me.oriharel.machinery.serialization.NBTTagCompoundTypeAdapter;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 
-public class Fuel {
+class Fuel {
 
     private final Material material;
+    @JsonAdapter(NBTTagCompoundTypeAdapter.class)
     private final NBTTagCompound nbt;
     private int energy;
 

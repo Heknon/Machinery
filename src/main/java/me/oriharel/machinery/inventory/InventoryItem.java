@@ -22,6 +22,10 @@ public class InventoryItem {
         this.indexInInventory = indexInInventory;
     }
 
+    public InventoryItem(ItemStack itemStack) {
+        this.itemStack = itemStack;
+    }
+
     public InventoryItem(Material material, int amount, String displayName, String ...lore) {
         this.itemStack = new ItemStack(material, amount);
         ItemMeta meta = this.itemStack.getItemMeta();

@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import me.oriharel.customrecipes.recipe.Recipe;
 import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.exceptions.MachineNotFoundException;
-import me.oriharel.machinery.fuel.Fuel;
+import me.oriharel.machinery.fuel.PlayerFuel;
 import me.oriharel.machinery.machine.Machine;
 import me.oriharel.machinery.machine.PlayerMachine;
 import me.oriharel.machinery.serialization.MachineTypeAdapter;
@@ -50,15 +50,15 @@ public class MachineBlock {
 
     private String applyPlaceholders(String string) {
         string = string.replaceAll("%total_resources_gained%",
-                String.valueOf(machine instanceof  PlayerMachine ? ((PlayerMachine)machine).getTotalResourcesGained() : 0));
+                String.valueOf(machine instanceof PlayerMachine ? ((PlayerMachine) machine).getTotalResourcesGained() : 0));
         string = string.replaceAll("%resources_gained%",
-                String.valueOf(machine instanceof  PlayerMachine ? ((PlayerMachine)machine).getResourcesGained().stream().mapToInt(ItemStack::getAmount).sum() : 0));
+                String.valueOf(machine instanceof PlayerMachine ? ((PlayerMachine) machine).getResourcesGained().stream().mapToInt(ItemStack::getAmount).sum() : 0));
         string = string.replaceAll("%total_zen_coins_gained%",
-                String.valueOf(machine instanceof  PlayerMachine ? ((PlayerMachine)machine).getTotalZenCoinsGained() : 0));
+                String.valueOf(machine instanceof PlayerMachine ? ((PlayerMachine) machine).getTotalZenCoinsGained() : 0));
         string = string.replaceAll("%zen_coins_gained%",
-                String.valueOf(machine instanceof  PlayerMachine ? ((PlayerMachine)machine).getZenCoinsGained() : 0));
+                String.valueOf(machine instanceof PlayerMachine ? ((PlayerMachine) machine).getZenCoinsGained() : 0));
         string = string.replaceAll("%energy%", String.valueOf(machine instanceof PlayerMachine ?
-                ((PlayerMachine) machine).getFuels().stream().mapToInt(Fuel::getEnergy).sum() : 0));
+                ((PlayerMachine) machine).getFuels().stream().mapToInt(PlayerFuel::getEnergy).sum() : 0));
         return string;
     }
 

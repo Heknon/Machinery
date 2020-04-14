@@ -5,15 +5,15 @@ import com.google.gson.GsonBuilder;
 import me.oriharel.customrecipes.api.CustomRecipesAPI;
 import me.oriharel.customrecipes.recipe.Recipe;
 import me.oriharel.customrecipes.recipe.item.RecipeResultReference;
-import me.oriharel.customrecipes.serialize.NBTTagCompound;
 import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.exceptions.MachineNotFoundException;
 import me.oriharel.machinery.exceptions.MaterialNotFoundException;
 import me.oriharel.machinery.exceptions.NotMachineTypeException;
 import me.oriharel.machinery.exceptions.RecipeNotFoundException;
-import me.oriharel.machinery.fuel.Fuel;
+import me.oriharel.machinery.fuel.PlayerFuel;
 import me.oriharel.machinery.serialization.MachineTypeAdapter;
 import me.oriharel.machinery.structure.Structure;
+import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -102,7 +102,7 @@ public class MachineFactory {
                                        Recipe recipe,
                                        String machineKey, Material openGUIBlockMaterialType, Location referenceBlockLocation, double totalResourcesGained,
                                        List<ItemStack> resourcesGained,
-                                       List<Fuel> fuels, Location openGUIBlockLocation, double zenCoinsGained, double totalZenCoinsGained, UUID owner) throws IllegalArgumentException {
+                                       List<PlayerFuel> fuels, Location openGUIBlockLocation, double zenCoinsGained, double totalZenCoinsGained, UUID owner) throws IllegalArgumentException {
         if (machineType == null) throw new IllegalArgumentException("Machine type must not be null (MachineFactory)");
         return new PlayerMachine(referenceBlockType, machineReach, speed, maxFuel, fuelDeficiency, fuelTypes, machineType, structure,
                 recipe, machineKey, openGUIBlockMaterialType, referenceBlockLocation, totalResourcesGained, resourcesGained, fuels, openGUIBlockLocation,
@@ -110,7 +110,7 @@ public class MachineFactory {
     }
 
     public PlayerMachine createMachine(Machine machine, Location referenceBlockLocation, Location openGUIBlockLocation, double totalResourcesGained,
-                                       List<ItemStack> resourcesGained, List<Fuel> fuels, double zenCoinsGained, double totalZenCoinsGained, UUID owner) throws IllegalArgumentException {
+                                       List<ItemStack> resourcesGained, List<PlayerFuel> fuels, double zenCoinsGained, double totalZenCoinsGained, UUID owner) throws IllegalArgumentException {
         if (machine == null) throw new IllegalArgumentException("Machine must not be null (MachineFactory)");
         return new PlayerMachine(machine.referenceBlockType, machine.machineReach, machine.speed, machine.maxFuel, machine.fuelDeficiency, machine.fuelTypes,
                 machine.machineType, machine.structure,

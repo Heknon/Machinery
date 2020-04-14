@@ -2,7 +2,7 @@ package me.oriharel.machinery.listeners;
 
 import com.google.common.collect.Sets;
 import me.oriharel.machinery.Machinery;
-import me.oriharel.machinery.fuel.Fuel;
+import me.oriharel.machinery.fuel.PlayerFuel;
 import me.oriharel.machinery.inventory.Inventory;
 import me.oriharel.machinery.inventory.InventoryItem;
 import me.oriharel.machinery.inventory.InventoryPage;
@@ -18,9 +18,9 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Interact implements Listener {
 
@@ -55,20 +55,20 @@ public class Interact implements Listener {
             routes.put("start", new InventoryPage(54, machine.getType().toTitle(), new InventoryItem(Material.GRAY_STAINED_GLASS_PANE, 1, ""), Sets.newHashSet(
                     new InventoryItem(20, Material.GHAST_TEAR, 1, "Bank", "§9Click to open the withdrawal menu",
                             "§bThere are currently §e" + decimalFormat.format(machine.getZenCoinsGained()) + " §bZen Coins stored in the machine").setOnClick(() -> {
-                                inventory.navigateToNamedRoute("bank");
-                                return true;
+                        inventory.navigateToNamedRoute("bank");
+                        return true;
                     }),
                     new InventoryItem(24, Material.PAPER, 1, "Storage", "§9Click to open open the storage of the machine",
                             "§bThere are currently §e" + decimalFormat.format(machine.getResourcesGained()) + " §bresources stored in the machine").setOnClick(() -> {
-                                inventory.navigateToNamedRoute("resources");
-                                return true;
+                        inventory.navigateToNamedRoute("resources");
+                        return true;
                     }),
                     new InventoryItem(45, Material.REPEATER, 1, "Statistics", "§9Statistics:", "§bTotal resources gained: §e" + machine.getTotalResourcesGained(),
                             "§bTotal Zen Coins gained: §e" + machine.getTotalZenCoinsGained()).setOnClick(() -> true),
                     new InventoryItem(48, Material.OBSIDIAN, 1, "Fuel", "§9Fuel up your machine.",
-                            machine.getFuels().stream().mapToInt(Fuel::getEnergy).sum() + "/" + machine.getMaxFuel()).setOnClick(() -> {
-                                inventory.navigateToNamedRoute("fuels");
-                                return true;
+                            machine.getFuels().stream().mapToInt(PlayerFuel::getEnergy).sum() + "/" + machine.getMaxFuel()).setOnClick(() -> {
+                        inventory.navigateToNamedRoute("fuels");
+                        return true;
                     }),
                     new InventoryItem(50, Material.HOPPER, 1, "Upgrades", "§9Upgrade your machine").setOnClick(() -> {
                         inventory.navigateToNamedRoute("upgrades");
@@ -79,6 +79,14 @@ public class Interact implements Listener {
                         return true;
                     })
             )));
+
+            routes.put("resources", new InventoryPage(9, "Resources", null, machine.getResourcesGained().stream().map(InventoryItem::new).collect(Collectors.toSet())));
+            routes.put("fuels", new InventoryPage(5, "Fuels", null,
+                    machine.getFuels().stream().map(f -> new InventoryItem(f.getItem(f.getAmount()))).collect(Collectors.toSet())));
+            routes.put("bank", new InventoryPage(9, "Withdrawal", new InventoryItem(Material.GRAY_STAINED_GLASS_PANE, 1, ""), Sets.newHashSet(
+                    new InventoryItem(0, Material.MAGMA_CREAM, 1, "§61,000 Zen Coins")
+            )));
+
 
         }
     }

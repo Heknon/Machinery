@@ -1,10 +1,12 @@
 package me.oriharel.machinery.machine;
 
+import com.google.gson.annotations.JsonAdapter;
 import me.oriharel.customrecipes.recipe.Recipe;
 import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.api.events.PostMachineBuildEvent;
 import me.oriharel.machinery.api.events.PreMachineBuildEvent;
 import me.oriharel.machinery.items.MachineBlock;
+import me.oriharel.machinery.serialization.MachineTypeAdapter;
 import me.oriharel.machinery.structure.Structure;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -17,6 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
+@JsonAdapter(MachineTypeAdapter.class)
 public class Machine implements IMachine {
 
     final protected Material referenceBlockType;
