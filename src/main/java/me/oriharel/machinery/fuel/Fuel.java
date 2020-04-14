@@ -8,16 +8,17 @@ import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 
 class Fuel {
-
+    private final String name;
     private final Material material;
     @JsonAdapter(NBTTagCompoundTypeAdapter.class)
     private final NBTTagCompound nbt;
     private int energy;
 
-    public Fuel(Material material, NBTTagCompound nbt, int energy) {
+    public Fuel(String name, Material material, NBTTagCompound nbt, int energy) {
         this.material = material;
         this.nbt = nbt;
         this.energy = energy;
+        this.name = name;
     }
 
     public ItemStack getItem(int amount) {

@@ -54,7 +54,7 @@ public class FuelManager {
         if (energy <= 0)
             throw new RuntimeException(
                     "Invalid energy for fuel amount. Fuel energy most be above 0. Check config to see if you defined energy.");
-        return new Fuel(material, nbt, energy);
+        return new Fuel(fuelName, material, nbt, energy);
     }
 
     public Set<Fuel> getFuels() {

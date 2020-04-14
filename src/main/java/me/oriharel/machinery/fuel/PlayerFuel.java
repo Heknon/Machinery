@@ -7,8 +7,8 @@ public class PlayerFuel extends Fuel {
 
     private int amount;
 
-    public PlayerFuel(Material material, NBTTagCompound nbt, int energy, int amount) {
-        super(material, nbt, energy);
+    public PlayerFuel(String name, Material material, NBTTagCompound nbt, int energy, int amount) {
+        super(name, material, nbt, energy);
         this.amount = amount;
     }
 
