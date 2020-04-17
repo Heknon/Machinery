@@ -3,12 +3,12 @@ package me.oriharel.machinery.utilities;
 import org.bukkit.Location;
 import org.bukkit.World;
 
-public class Utils {
+public final class Utils {
     public static long locationToLong(Location location) {
         int x = location.getBlockX();
         int y = location.getBlockY();
         int z = location.getBlockZ();
-        return ((long)x & 0x7FFFFFF) | (((long)z & 0x7FFFFFF) << 27) | ((long)y << 54);
+        return ((long) x & 0x7FFFFFF) | (((long) z & 0x7FFFFFF) << 27) | ((long) y << 54);
     }
 
     public static Location longToLocation(long packed) {

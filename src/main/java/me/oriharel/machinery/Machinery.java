@@ -1,6 +1,6 @@
 package me.oriharel.machinery;
 
-import com.google.common.collect.UnmodifiableIterator;
+import com.tchristofferson.pagedinventories.PagedInventoryAPI;
 import me.oriharel.customrecipes.CustomRecipes;
 import me.oriharel.machinery.config.FileManager;
 import me.oriharel.machinery.fuel.FuelManager;
@@ -10,7 +10,6 @@ import me.oriharel.machinery.listeners.Interact;
 import me.oriharel.machinery.machine.MachineManager;
 import me.oriharel.machinery.structure.StructureManager;
 import me.oriharel.machinery.utilities.Utils;
-import net.minecraft.server.v1_15_R1.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -19,7 +18,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.LongBuffer;
 import java.nio.channels.ByteChannel;
@@ -30,7 +28,6 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.logging.Level;
 
 public final class Machinery extends JavaPlugin {
@@ -41,6 +38,7 @@ public final class Machinery extends JavaPlugin {
     private MachineManager machineManager;
     private StructureManager structureManager;
     private FuelManager fuelManager;
+    private PagedInventoryAPI pagedInventoryAPI;
 
     public static Machinery getInstance() {
         return INSTANCE;
@@ -57,6 +55,7 @@ public final class Machinery extends JavaPlugin {
         ConsoleCommandSender console = Bukkit.getConsoleSender();
         console.sendMessage("Starting up Machinery");
 
+
         fileManager = new FileManager(this);
         fileManager.getConfig("config.yml").copyDefaults(true).save();
         fileManager.getConfig("fuels.yml").copyDefaults(true).save();
@@ -64,6 +63,7 @@ public final class Machinery extends JavaPlugin {
         fileManager.getConfig("machines.yml").copyDefaults(true).save();
         File file = new File(getDataFolder(), "structures");
         if (!file.exists()) file.mkdir();
+        this.pagedInventoryAPI = new PagedInventoryAPI(this);
         Bukkit.getPluginManager().registerEvents(new Listeners(), this);
         Bukkit.getScheduler().runTaskAsynchronously(this, () -> fuelManager = new FuelManager(this));
         getPlugin(CustomRecipes.class).getRecipesManager().registerRecipesDoneCallback(() -> Bukkit.getScheduler().runTask(this, () -> {
@@ -161,5 +161,9 @@ public final class Machinery extends JavaPlugin {
 
     public FuelManager getFuelManager() {
         return fuelManager;
+    }
+
+    public PagedInventoryAPI getPagedInventoryAPI() {
+        return pagedInventoryAPI;
     }
 }

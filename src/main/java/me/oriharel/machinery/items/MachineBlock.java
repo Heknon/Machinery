@@ -40,7 +40,7 @@ public class MachineBlock {
     }
 
     public ItemStack getItemStackWithAppliedPlaceholders() {
-        ItemStack is = recipe.getResult().getItemStackWithNBT();
+        ItemStack is = recipe.getResult();
         ItemMeta meta = is.getItemMeta();
         meta.setDisplayName(applyPlaceholders(meta.getDisplayName()));
         meta.setLore(meta.getLore().stream().map(this::applyPlaceholders).collect(Collectors.toList()));

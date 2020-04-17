@@ -65,12 +65,12 @@ public class Structure {
             return specialBlockLocation;
         }
 
-        public Location getOpenGUIBlockLocation() {
-            return openGUIBlockLocation;
-        }
-
         public void setSpecialBlockLocation(Location specialBlockLocation) {
             this.specialBlockLocation = specialBlockLocation;
+        }
+
+        public Location getOpenGUIBlockLocation() {
+            return openGUIBlockLocation;
         }
 
         public void setOpenGUIBlockLocation(Location openGUIBlockLocation) {

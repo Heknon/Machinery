@@ -10,14 +10,21 @@ public class Listeners implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
         if (e.getInventory().getHolder() == null) return;
-        if (!(e.getInventory().getHolder() instanceof Inventory)) return;
-        Inventory inventory = (Inventory) e.getInventory().getHolder();
+        if (!(e.getInventory().getHolder() instanceof InventoryPage)) return;
+        InventoryPage inventory = (InventoryPage) e.getInventory().getHolder();
         ItemStack clicked = e.getCurrentItem();
         if (clicked == null) return;
-        for (InventoryItem item : inventory.currentPage.inventoryItems) {
-            if (!item.equals(clicked, e.getSlot())) return;
-            boolean cancel = item.onClick.apply();
-            e.setCancelled(cancel);
+        for (InventoryItem item : inventory.inventoryItems) {
+            if (item.indexInInventory == e.getSlot()) {
+                if (item instanceof InventoryNavigationItem) {
+                    InventoryNavigationItem inventoryNavigationItem = (InventoryNavigationItem) item;
+                    inventoryNavigationItem.runOnClick();
+                    inventoryNavigationItem.navigate();
+                } else {
+                    item.runOnClick();
+                }
+                e.setCancelled(item.cancelOnClick);
+            }
         }
     }
 }

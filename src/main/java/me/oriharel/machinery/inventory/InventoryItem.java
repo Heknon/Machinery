@@ -1,6 +1,7 @@
 package me.oriharel.machinery.inventory;
 
-import me.oriharel.machinery.CallbackR;
+import me.oriharel.machinery.Callback;
+import me.oriharel.machinery.utilities.NMS;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -8,42 +9,44 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class InventoryItem {
-    protected final ItemStack itemStack;
+public class InventoryItem extends ItemStack {
     protected int indexInInventory;
-    protected CallbackR<Boolean> onClick;
+    protected Callback onClick = null;
+    protected boolean cancelOnClick = true;
 
-    public InventoryItem(int indexInInventory, Material material, int amount, String displayName, String ...lore) {
-        this.itemStack = new ItemStack(material, amount);
-        ItemMeta meta = this.itemStack.getItemMeta();
+    public InventoryItem(int indexInInventory, Material material, int amount, String displayName, String... lore) {
+        super(material, amount);
+        ItemMeta meta = NMS.getItemStackMetaReference(this);
         meta.setDisplayName(displayName);
         meta.setLore(Arrays.asList(lore));
-        this.itemStack.setItemMeta(meta);
+        this.indexInInventory = indexInInventory;
+
+    }
+
+    public InventoryItem(int indexInInventory, ItemStack itemStack) {
+        super(itemStack);
         this.indexInInventory = indexInInventory;
     }
 
-    public InventoryItem(ItemStack itemStack) {
-        this.itemStack = itemStack;
-    }
-
-    public InventoryItem(Material material, int amount, String displayName, String ...lore) {
-        this.itemStack = new ItemStack(material, amount);
-        ItemMeta meta = this.itemStack.getItemMeta();
+    public InventoryItem(int indexInInventory, Material material, int amount, String displayName) {
+        super(material, amount);
+        ItemMeta meta = NMS.getItemStackMetaReference(this);
         meta.setDisplayName(displayName);
-        meta.setLore(Arrays.asList(lore));
-        this.itemStack.setItemMeta(meta);
-        this.indexInInventory = -1;
+        this.indexInInventory = indexInInventory;
     }
 
-    public InventoryItem(Material material, int amount, String displayName) {
-        this.itemStack = new ItemStack(material, amount);
-        ItemMeta meta = this.itemStack.getItemMeta();
-        meta.setDisplayName(displayName);
-        this.itemStack.setItemMeta(meta);
-        this.indexInInventory = -1;
+    public InventoryItem setCancelOnClick(boolean cancel) {
+        cancelOnClick = cancel;
+        return this;
     }
 
-    public InventoryItem setOnClick(CallbackR<Boolean> onClick) {
+    public InventoryItem runOnClick() {
+        if (onClick == null) return this;
+        onClick.apply();
+        return this;
+    }
+
+    public InventoryItem setOnClick(Callback onClick) {
         this.onClick = onClick;
         return this;
     }
@@ -52,19 +55,20 @@ public class InventoryItem {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
         InventoryItem that = (InventoryItem) o;
         return indexInInventory == that.indexInInventory &&
-                Objects.equals(itemStack, that.itemStack) &&
+                cancelOnClick == that.cancelOnClick &&
                 Objects.equals(onClick, that.onClick);
     }
 
     public boolean equals(ItemStack itemStack, int indexInInventory) {
         if (itemStack == null) return false;
-        return itemStack.equals(this.itemStack) && indexInInventory == this.indexInInventory;
+        return itemStack.equals(this) && indexInInventory == this.indexInInventory;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(itemStack, indexInInventory, onClick);
+        return Objects.hash(super.hashCode(), indexInInventory, onClick, cancelOnClick);
     }
 }

@@ -10,6 +10,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
+
+import java.util.List;
 
 public class Block implements Listener {
 
@@ -38,6 +41,16 @@ public class Block implements Listener {
             e.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Machinery.getInstance().getFileManager().getConfig("config.yml").get().getString(
                     "break_machine_attempt")));
             e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onEntityExplosion(EntityExplodeEvent e) {
+        List<org.bukkit.block.Block> blocks = e.blockList();
+        for (org.bukkit.block.Block block : blocks) {
+            if (machinery.getMachineManager().getTemporaryPreRegisterMachineLocations().contains(block.getLocation()) || machinery.getMachineManager().getMachinePartLocations().contains(block.getLocation())) {
+                e.setCancelled(true);
+            }
         }
     }
 }

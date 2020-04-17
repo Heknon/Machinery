@@ -6,9 +6,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class InventoryPage implements InventoryHolder {
     protected final int size;
@@ -28,33 +26,15 @@ public class InventoryPage implements InventoryHolder {
     }
 
     private void populateItems() {
-        Set<Integer> populatedIndices = new HashSet<>();
-        AtomicInteger indexOfUnspecified = new AtomicInteger();
-        inventoryItems.forEach(item -> {
-            int index = item.indexInInventory;
-            if (index == -1) {
-                index = indexOfUnspecified.getAndIncrement();
-                if (populatedIndices.contains(index)) {
-                    for (int i = index + 1; i < size; i++) {
-                        if (!populatedIndices.contains(i)) {
-                            index = i;
-                            item.indexInInventory = i;
-                            break;
-                        }
-                    }
-                }
-            }
-            inventory.setItem(index, item.itemStack);
-            populatedIndices.add(index);
-        });
-        ItemStack[] items = inventory.getContents();
-        for (int i = 0; i < items.length; i++) {
-            ItemStack item = items[i];
-            if (fillment != null &&  (item == null || item.getType().equals(Material.AIR))) {
-                items[i] = fillment.itemStack;
+        ItemStack[] contents = inventory.getContents();
+        inventoryItems.forEach(item -> contents[item.indexInInventory] = item);
+        for (int i = 0; i < contents.length; i++) {
+            ItemStack item = contents[i];
+            if (item == null || item.getType() == Material.AIR) {
+                contents[i] = fillment.clone();
             }
         }
-        inventory.setContents(items);
+        inventory.setContents(contents);
     }
 
 

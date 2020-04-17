@@ -3,24 +3,26 @@ package me.oriharel.machinery.listeners;
 import com.google.common.collect.Sets;
 import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.fuel.PlayerFuel;
-import me.oriharel.machinery.inventory.Inventory;
-import me.oriharel.machinery.inventory.InventoryItem;
-import me.oriharel.machinery.inventory.InventoryPage;
+import me.oriharel.machinery.inventory.*;
 import me.oriharel.machinery.machine.PlayerMachine;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.TileState;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Interact implements Listener {
 
@@ -48,46 +50,49 @@ public class Interact implements Listener {
             e.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&',
                     machinery.getFileManager().getConfig("config.yml").get().getString("open_machine_gui_message")));
             e.getPlayer().closeInventory();
-            // TODO: Open gui machine management GUI logic
 
-            Map<String, InventoryPage> routes = new HashMap<>();
-            Inventory inventory = new Inventory(routes, e.getPlayer());
-            routes.put("start", new InventoryPage(54, machine.getType().toTitle(), new InventoryItem(Material.GRAY_STAINED_GLASS_PANE, 1, ""), Sets.newHashSet(
-                    new InventoryItem(20, Material.GHAST_TEAR, 1, "Bank", "§9Click to open the withdrawal menu",
-                            "§bThere are currently §e" + decimalFormat.format(machine.getZenCoinsGained()) + " §bZen Coins stored in the machine").setOnClick(() -> {
-                        inventory.navigateToNamedRoute("bank");
-                        return true;
-                    }),
-                    new InventoryItem(24, Material.PAPER, 1, "Storage", "§9Click to open open the storage of the machine",
-                            "§bThere are currently §e" + decimalFormat.format(machine.getResourcesGained()) + " §bresources stored in the machine").setOnClick(() -> {
-                        inventory.navigateToNamedRoute("resources");
-                        return true;
-                    }),
-                    new InventoryItem(45, Material.REPEATER, 1, "Statistics", "§9Statistics:", "§bTotal resources gained: §e" + machine.getTotalResourcesGained(),
-                            "§bTotal Zen Coins gained: §e" + machine.getTotalZenCoinsGained()).setOnClick(() -> true),
-                    new InventoryItem(48, Material.OBSIDIAN, 1, "Fuel", "§9Fuel up your machine.",
-                            machine.getFuels().stream().mapToInt(PlayerFuel::getEnergy).sum() + "/" + machine.getMaxFuel()).setOnClick(() -> {
-                        inventory.navigateToNamedRoute("fuels");
-                        return true;
-                    }),
-                    new InventoryItem(50, Material.HOPPER, 1, "Upgrades", "§9Upgrade your machine").setOnClick(() -> {
-                        inventory.navigateToNamedRoute("upgrades");
-                        return true;
-                    }),
-                    new InventoryItem(53, Material.BARRIER, 1, "Back", "§cExit the Machine GUI").setOnClick(() -> {
-                        e.getPlayer().closeInventory();
-                        return true;
-                    })
-            )));
-
-            routes.put("resources", new InventoryPage(9, "Resources", null, machine.getResourcesGained().stream().map(InventoryItem::new).collect(Collectors.toSet())));
-            routes.put("fuels", new InventoryPage(5, "Fuels", null,
-                    machine.getFuels().stream().map(f -> new InventoryItem(f.getItem(f.getAmount()))).collect(Collectors.toSet())));
-            routes.put("bank", new InventoryPage(9, "Withdrawal", new InventoryItem(Material.GRAY_STAINED_GLASS_PANE, 1, ""), Sets.newHashSet(
-                    new InventoryItem(0, Material.MAGMA_CREAM, 1, "§61,000 Zen Coins")
-            )));
+            e.getPlayer().openInventory(craftInventory(machine, e.getPlayer()).getInventory());
 
 
         }
+    }
+
+    private Inventory craftInventory(PlayerMachine machine, Player player) {
+        Map<String, InventoryPage> routes = new HashMap<>();
+        InventoryItem fillment = new InventoryFillmentItem(Material.GRAY_STAINED_GLASS_PANE, 1, "");
+        Inventory inventory = new Inventory(routes, player);
+        routes.put("start", new InventoryPage(54, machine.getType().toTitle(), fillment, Sets.newHashSet(
+                new InventoryNavigationItem("bank", inventory, 20, Material.GHAST_TEAR, 1, "Bank", "§9Click to open the withdrawal menu",
+                        "§bThere are currently §e" + decimalFormat.format(machine.getZenCoinsGained()) + " §bZen Coins stored in the machine"),
+                new InventoryNavigationItem("resources", inventory, 24, Material.PAPER, 1, "Storage", "§9Click to open open the storage of the machine",
+                        "§bThere are currently §e" + decimalFormat.format(machine.getResourcesGained().stream().mapToInt(ItemStack::getAmount).sum()) + " " +
+                                "§bresources " +
+                                "stored in the " +
+                                "machine"),
+                new InventoryItem(45, Material.REPEATER, 1, "Statistics", "§9Statistics:",
+                        "§bTotal resources gained: §e" + decimalFormat.format(machine.getTotalResourcesGained()),
+                        "§bTotal Zen Coins gained: §e" + decimalFormat.format(machine.getTotalZenCoinsGained())),
+                new InventoryNavigationItem("fuels", inventory, 48, Material.OBSIDIAN, 1, "Fuel", "§9Fuel up your machine.",
+                        decimalFormat.format(machine.getFuels().stream().mapToInt(PlayerFuel::getEnergy).sum()) + "/" + decimalFormat.format(machine.getMaxFuel())),
+                new InventoryNavigationItem("upgrades", inventory, 50, Material.HOPPER, 1, "Upgrades", "§9Upgrade your machine"),
+                new InventoryItem(53, Material.BARRIER, 1, "Back", "§cExit the Machine GUI").setOnClick(player::closeInventory)
+        )));
+
+        List<ItemStack> resourcesGained = machine.getResourcesGained();
+        List<PlayerFuel> fuels = machine.getFuels();
+        routes.put("resources", new InventoryPage(9, "Resources", null,
+                IntStream.range(0, resourcesGained.size()).mapToObj(i -> new InventoryItem(i, resourcesGained.get(i))).collect(Collectors.toSet())));
+        routes.put("fuels", new InventoryPage(9, "Fuels", null,
+                IntStream.range(0, fuels.size()).mapToObj(i -> {
+                    PlayerFuel fuel = fuels.get(i);
+                    return new InventoryItem(i, fuel.getItem(fuel.getAmount()));
+                }).collect(Collectors.toSet())));
+        routes.put("bank", new InventoryPage(9, "Withdrawal", fillment, Sets.newHashSet(
+                new InventoryItem(4, Material.MAGMA_CREAM, 1, "§6" + decimalFormat.format(machine.getZenCoinsGained()) + " Zen Coins")
+        )));
+        routes.put("upgrades", new InventoryPage(18, "Upgrades", fillment, Sets.newHashSet(
+                IntStream.range(0, machine.getSpeed()).mapToObj(i -> new InventoryItem(i, Material.LIME_STAINED_GLASS_PANE, 1, "")).toArray(InventoryItem[]::new)
+        )));
+        return inventory;
     }
 }

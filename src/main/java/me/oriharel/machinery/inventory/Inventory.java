@@ -3,9 +3,7 @@ package me.oriharel.machinery.inventory;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class Inventory implements InventoryHolder {
 
