@@ -70,6 +70,12 @@ public class MachineManager {
         }
     }
 
+    protected void unregisterPlayerMachine(PlayerMachine machine) {
+        machineCores.remove(machine.getOpenGUIBlockLocation());
+        Location[] playerMachinePartLocations = getPlayerMachineLocations(machine.getOpenGUIBlockLocation().getBlock());
+        machinePartLocations.removeAll(Arrays.asList(playerMachinePartLocations));
+    }
+
     public HashMap<Location, PlayerMachine> getMachineCores() {
         return machineCores;
     }
@@ -100,6 +106,13 @@ public class MachineManager {
         TileState tileState = (TileState) block.getState();
         PersistentDataContainer persistentDataContainer = tileState.getPersistentDataContainer();
         return Arrays.stream(persistentDataContainer.get(MACHINE_LOCATIONS_NAMESPACE_KEY, PersistentDataType.LONG_ARRAY)).mapToObj(packed -> Utils.longToLocation(packed, block.getWorld())).toArray(Location[]::new);
+    }
+
+    protected void clearMachineTileStateDataFromBlock(Block block) {
+        TileState tileState = (TileState) block.getState();
+        PersistentDataContainer persistentDataContainer = tileState.getPersistentDataContainer();
+        persistentDataContainer.remove(MACHINE_LOCATIONS_NAMESPACE_KEY);
+        persistentDataContainer.remove(MACHINE_NAMESPACE_KEY);
     }
 
     public HashSet<Location> getMachinePartLocations() {

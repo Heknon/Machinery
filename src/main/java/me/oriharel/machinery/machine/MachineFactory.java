@@ -13,6 +13,7 @@ import me.oriharel.machinery.exceptions.RecipeNotFoundException;
 import me.oriharel.machinery.fuel.PlayerFuel;
 import me.oriharel.machinery.serialization.MachineTypeAdapter;
 import me.oriharel.machinery.structure.Structure;
+import me.oriharel.machinery.upgrades.AbstractUpgrade;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -66,7 +67,7 @@ public class MachineFactory {
         MachineType machineType = MachineType.getMachine(section.getString("type", null));
         Structure structure =
                 machinery.getStructureManager().getSchematicByPath(new File(machinery.getDataFolder(), "structures/" + machineKey + Machinery.STRUCTURE_EXTENSION).getPath());
-        Machine machine = new Machine(referenceBlockType, machineReach, speed, maxFuel, fuelDeficiency, fuelTypes, machineType, structure, recipe, machineKey,
+        Machine machine = new Machine(referenceBlockType, machineReach, maxFuel, fuelDeficiency, fuelTypes, machineType, structure, recipe, machineKey,
                 openGUIBlockMaterialType);
         machine.setRecipe(injectMachineNBTIntoRecipe(machine.getRecipe(), machine));
         return machine;
@@ -75,7 +76,6 @@ public class MachineFactory {
     @Nullable
     public Machine createMachine(Material referenceBlockType,
                                  int machineReach,
-                                 int speed,
                                  int maxFuel,
                                  int fuelDeficiency,
                                  List<String> fuelTypes,
@@ -84,7 +84,7 @@ public class MachineFactory {
                                  Recipe recipe,
                                  String machineKey, Material openGUIBlockMaterialType) throws IllegalArgumentException {
         if (machineType == null) throw new IllegalArgumentException("Machine type must not be null (MachineFactory)");
-        Machine machine = new Machine(referenceBlockType, machineReach, speed, maxFuel, fuelDeficiency, fuelTypes, machineType, structure,
+        Machine machine = new Machine(referenceBlockType, machineReach, maxFuel, fuelDeficiency, fuelTypes, machineType, structure,
                 recipe, machineKey, openGUIBlockMaterialType);
         machine.setRecipe(injectMachineNBTIntoRecipe(machine.getRecipe(), machine));
         return machine;
@@ -93,7 +93,6 @@ public class MachineFactory {
     @Nullable
     public PlayerMachine createMachine(Material referenceBlockType,
                                        int machineReach,
-                                       int speed,
                                        int maxFuel,
                                        int fuelDeficiency,
                                        List<String> fuelTypes,
@@ -102,20 +101,22 @@ public class MachineFactory {
                                        Recipe recipe,
                                        String machineKey, Material openGUIBlockMaterialType, Location referenceBlockLocation, double totalResourcesGained,
                                        List<ItemStack> resourcesGained,
-                                       List<PlayerFuel> fuels, Location openGUIBlockLocation, double zenCoinsGained, double totalZenCoinsGained, UUID owner) throws IllegalArgumentException {
+                                       List<PlayerFuel> fuels, Location openGUIBlockLocation, double zenCoinsGained, double totalZenCoinsGained, UUID owner,
+                                       List<AbstractUpgrade> upgrades) throws IllegalArgumentException {
         if (machineType == null) throw new IllegalArgumentException("Machine type must not be null (MachineFactory)");
-        return new PlayerMachine(referenceBlockType, machineReach, speed, maxFuel, fuelDeficiency, fuelTypes, machineType, structure,
+        return new PlayerMachine(referenceBlockType, machineReach, maxFuel, fuelDeficiency, fuelTypes, machineType, structure,
                 recipe, machineKey, openGUIBlockMaterialType, referenceBlockLocation, totalResourcesGained, resourcesGained, fuels, openGUIBlockLocation,
-                zenCoinsGained, totalZenCoinsGained, owner);
+                zenCoinsGained, totalZenCoinsGained, owner, upgrades);
     }
 
     public PlayerMachine createMachine(Machine machine, Location referenceBlockLocation, Location openGUIBlockLocation, double totalResourcesGained,
-                                       List<ItemStack> resourcesGained, List<PlayerFuel> fuels, double zenCoinsGained, double totalZenCoinsGained, UUID owner) throws IllegalArgumentException {
+                                       List<ItemStack> resourcesGained, List<PlayerFuel> fuels, double zenCoinsGained, double totalZenCoinsGained, UUID owner,
+                                       List<AbstractUpgrade> upgrades) throws IllegalArgumentException {
         if (machine == null) throw new IllegalArgumentException("Machine must not be null (MachineFactory)");
-        return new PlayerMachine(machine.referenceBlockType, machine.machineReach, machine.speed, machine.maxFuel, machine.fuelDeficiency, machine.fuelTypes,
+        return new PlayerMachine(machine.referenceBlockType, machine.machineReach, machine.maxFuel, machine.fuelDeficiency, machine.fuelTypes,
                 machine.machineType, machine.structure,
                 machine.recipe, machine.machineName, machine.openGUIBlockType, referenceBlockLocation, totalResourcesGained, resourcesGained, fuels,
-                openGUIBlockLocation, zenCoinsGained, totalZenCoinsGained, owner);
+                openGUIBlockLocation, zenCoinsGained, totalZenCoinsGained, owner, upgrades);
     }
 
     private Recipe injectMachineNBTIntoRecipe(Recipe recipe, Machine machine) {

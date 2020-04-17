@@ -8,19 +8,19 @@ import me.oriharel.machinery.api.events.PreMachineBuildEvent;
 import me.oriharel.machinery.items.MachineBlock;
 import me.oriharel.machinery.serialization.MachineTypeAdapter;
 import me.oriharel.machinery.structure.Structure;
+import me.oriharel.machinery.upgrades.LootBonusUpgrade;
+import me.oriharel.machinery.upgrades.SellModifierUpgrade;
+import me.oriharel.machinery.upgrades.SpeedUpgrade;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @JsonAdapter(MachineTypeAdapter.class)
-public class Machine implements IMachine {
+public class Machine {
 
     final protected Material referenceBlockType;
     final protected List<String> fuelTypes;
@@ -32,13 +32,11 @@ public class Machine implements IMachine {
     protected Recipe recipe;
     protected int machineReach;
     protected int fuelDeficiency;
-    protected int speed;
     protected int maxFuel;
 
     public Machine(
             Material referenceBlockType,
             int machineReach,
-            int speed,
             int maxFuel,
             int fuelDeficiency,
             List<String> fuelTypes,
@@ -48,7 +46,6 @@ public class Machine implements IMachine {
             String machineName, Material openGUIBlockType) {
         this.referenceBlockType = referenceBlockType;
         this.machineReach = machineReach;
-        this.speed = speed;
         this.maxFuel = maxFuel;
         this.fuelDeficiency = fuelDeficiency;
         this.fuelTypes = fuelTypes;
@@ -60,17 +57,17 @@ public class Machine implements IMachine {
         this.machineBlock = new MachineBlock(recipe, this);
     }
 
-    @Override
+
     public Material getReferenceBlockType() {
         return referenceBlockType;
     }
 
-    @Override
+
     public Material getOpenGUIBlockType() {
         return openGUIBlockType;
     }
 
-    @Override
+
     public int getMachineReach() {
         return machineReach;
     }
@@ -79,16 +76,7 @@ public class Machine implements IMachine {
         this.machineReach = machineReach;
     }
 
-    @Override
-    public int getSpeed() {
-        return speed;
-    }
 
-    public void setSpeed(int speed) {
-        this.speed = speed;
-    }
-
-    @Override
     public int getMaxFuel() {
         return maxFuel;
     }
@@ -97,7 +85,7 @@ public class Machine implements IMachine {
         this.maxFuel = maxFuel;
     }
 
-    @Override
+
     public int getFuelDeficiency() {
         return fuelDeficiency;
     }
@@ -106,12 +94,12 @@ public class Machine implements IMachine {
         this.fuelDeficiency = fuelDeficiency;
     }
 
-    @Override
+
     public List<String> getFuelTypes() {
         return fuelTypes;
     }
 
-    @Override
+
     public MachineBlock getMachineBlock() {
         return machineBlock;
     }
@@ -124,22 +112,22 @@ public class Machine implements IMachine {
         this.recipe = recipe;
     }
 
-    @Override
+
     public MachineType getType() {
         return machineType;
     }
 
-    @Override
+
     public Structure getStructure() {
         return structure;
     }
 
-    @Override
+
     public String getMachineName() {
         return machineName;
     }
 
-    @Override
+
     public boolean build(UUID playerUuid, Location loc) {
         PreMachineBuildEvent preMachineBuildEvent = new PreMachineBuildEvent(this, loc);
         Bukkit.getPluginManager().callEvent(preMachineBuildEvent);
@@ -152,7 +140,11 @@ public class Machine implements IMachine {
                 return false;
             }
             PlayerMachine playerMachine = Machinery.getInstance().getMachineManager().getMachineFactory().createMachine(this, printResult.getSpecialBlockLocation(),
-                    printResult.getOpenGUIBlockLocation(), 0, new ArrayList<>(), new ArrayList<>(), 0, 0, playerUuid);
+                    printResult.getOpenGUIBlockLocation(), 0, new ArrayList<>(), new ArrayList<>(), 0, 0, playerUuid, Arrays.asList(
+                            new SellModifierUpgrade(1),
+                            new LootBonusUpgrade(1),
+                            new SpeedUpgrade(1)
+                    ));
             Machinery.getInstance().getMachineManager().registerNewPlayerMachine(playerMachine, new HashSet<>(printResult.getPlacementLocations()));
             PostMachineBuildEvent postMachineBuildEvent = new PostMachineBuildEvent(playerMachine, loc);
             Bukkit.getPluginManager().callEvent(postMachineBuildEvent);
@@ -163,7 +155,7 @@ public class Machine implements IMachine {
         return true;
     }
 
-    @Override
+
     public String toString() {
         return "Machine{" +
                 "referenceBlockType=" + referenceBlockType +
@@ -175,7 +167,6 @@ public class Machine implements IMachine {
                 ", machineBlock=" + machineBlock +
                 ", machineReach=" + machineReach +
                 ", fuelDeficiency=" + fuelDeficiency +
-                ", speed=" + speed +
                 ", maxFuel=" + maxFuel +
                 ", openGUIBlockType=" + openGUIBlockType +
                 '}';

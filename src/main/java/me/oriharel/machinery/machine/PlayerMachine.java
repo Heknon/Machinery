@@ -1,11 +1,14 @@
 package me.oriharel.machinery.machine;
 
 import me.oriharel.customrecipes.recipe.Recipe;
+import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.fuel.PlayerFuel;
 import me.oriharel.machinery.items.MachineBlock;
 import me.oriharel.machinery.structure.Structure;
+import me.oriharel.machinery.upgrades.AbstractUpgrade;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -15,6 +18,7 @@ public class PlayerMachine extends Machine {
     private final Location referenceBlockLocation;
     private final Location openGUIBlockLocation;
     private final UUID owner;
+    private final List<AbstractUpgrade> upgrades;
     private double totalResourcesGained;
     private List<ItemStack> resourcesGained;
     private List<PlayerFuel> fuels;
@@ -22,11 +26,11 @@ public class PlayerMachine extends Machine {
     private double zenCoinsGained;
 
 
-    public PlayerMachine(Material referenceBlockType, int machineReach, int speed, int maxFuel, int fuelDeficiency, List<String> fuelTypes, MachineType machineType,
+    public PlayerMachine(Material referenceBlockType, int machineReach, int maxFuel, int fuelDeficiency, List<String> fuelTypes, MachineType machineType,
                          Structure structure, Recipe recipe, String machineName, Material openGUIBlockType, Location referenceBlockLocation,
                          double totalResourcesGained, List<ItemStack> resourcesGained, List<PlayerFuel> fuels, Location openGUIBlockLocation, double zenCoinsGained,
-                         double totalZenCoinsGained, UUID owner) {
-        super(referenceBlockType, machineReach, speed, maxFuel, fuelDeficiency, fuelTypes, machineType, structure, recipe, machineName, openGUIBlockType);
+                         double totalZenCoinsGained, UUID owner, List<AbstractUpgrade> upgrades) {
+        super(referenceBlockType, machineReach, maxFuel, fuelDeficiency, fuelTypes, machineType, structure, recipe, machineName, openGUIBlockType);
         this.referenceBlockLocation = referenceBlockLocation;
         this.totalResourcesGained = totalResourcesGained;
         this.resourcesGained = resourcesGained;
@@ -35,14 +39,23 @@ public class PlayerMachine extends Machine {
         this.zenCoinsGained = zenCoinsGained;
         this.totalZenCoinsGained = totalZenCoinsGained;
         this.owner = owner;
+        this.upgrades = upgrades;
     }
 
 
     public MachineBlock deconstruct() {
-        return null;
+        MachineManager machineManager = Machinery.getInstance().getMachineManager();
+        Location[] machinePartLocations = machineManager.getPlayerMachineLocations(openGUIBlockLocation.getBlock());
+        for (Location loc : machinePartLocations) {
+            Block block = loc.getBlock();
+            machineManager.clearMachineTileStateDataFromBlock(block);
+            block.setType(Material.AIR);
+        }
+        Machinery.getInstance().getMachineManager().unregisterPlayerMachine(this);
+        return new MachineBlock(this.recipe, this);
     }
 
-    public List<ItemStack> run() {
+    public MachineResourceGetProcess run() {
         return null;
     }
 
@@ -102,29 +115,10 @@ public class PlayerMachine extends Machine {
         this.resourcesGained = resourcesGained;
     }
 
-    @Override
-    public String toString() {
-        return "PlayerMachine{" +
-                "referenceBlockLocation=" + referenceBlockLocation +
-                ", openGUIBlockLocation=" + openGUIBlockLocation +
-                ", owner=" + owner +
-                ", totalResourcesGained=" + totalResourcesGained +
-                ", resourcesGained=" + resourcesGained +
-                ", fuels=" + fuels +
-                ", totalZenCoinsGained=" + totalZenCoinsGained +
-                ", zenCoinsGained=" + zenCoinsGained +
-                ", referenceBlockType=" + referenceBlockType +
-                ", fuelTypes=" + fuelTypes +
-                ", machineType=" + machineType +
-                ", structure=" + structure +
-                ", machineName='" + machineName + '\'' +
-                ", machineBlock=" + machineBlock +
-                ", openGUIBlockType=" + openGUIBlockType +
-                ", recipe=" + recipe +
-                ", machineReach=" + machineReach +
-                ", fuelDeficiency=" + fuelDeficiency +
-                ", speed=" + speed +
-                ", maxFuel=" + maxFuel +
-                '}';
+
+
+
+    public List<AbstractUpgrade> getUpgrades() {
+        return upgrades;
     }
 }
