@@ -1,6 +1,5 @@
 package me.oriharel.machinery;
 
-import com.tchristofferson.pagedinventories.PagedInventoryAPI;
 import me.oriharel.customrecipes.CustomRecipes;
 import me.oriharel.machinery.config.FileManager;
 import me.oriharel.machinery.fuel.FuelManager;
@@ -107,7 +106,7 @@ public final class Machinery extends JavaPlugin {
                 Location loc = Utils.longToLocation(position, world);
                 org.bukkit.block.Block block = loc.getBlock();
                 try {
-                    Bukkit.getScheduler().runTask(this, () ->{
+                    Bukkit.getScheduler().runTask(this, () -> {
                         PlayerMachine machine = machineManager.getPlayerMachineFromBlock(block);
                         System.out.println(machine);
                         machineManager.getMachineCores().put(loc, machine);

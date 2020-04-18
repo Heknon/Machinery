@@ -1,19 +1,12 @@
 package me.oriharel.machinery.upgrades;
 
 import me.oriharel.machinery.machine.MachineResourceGetProcess;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.Random;
-import java.util.stream.Collectors;
 
 public class LootBonusUpgrade extends AbstractUpgrade {
-
-    private Random random;
 
     public LootBonusUpgrade(int level) {
         super(level);
         this.runOnlyOnProcessStart = true;
-        this.random = new Random();
     }
 
     @Override

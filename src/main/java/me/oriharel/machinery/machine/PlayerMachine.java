@@ -1,11 +1,9 @@
 package me.oriharel.machinery.machine;
 
-import com.google.gson.annotations.JsonAdapter;
 import me.oriharel.customrecipes.recipe.Recipe;
 import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.fuel.PlayerFuel;
 import me.oriharel.machinery.items.MachineBlock;
-import me.oriharel.machinery.serialization.AbstractUpgradeTypeAdapter;
 import me.oriharel.machinery.structure.Structure;
 import me.oriharel.machinery.upgrades.AbstractUpgrade;
 import org.bukkit.Location;
