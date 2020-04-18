@@ -81,8 +81,19 @@ public class Interact implements Listener {
 
         List<ItemStack> resourcesGained = machine.getResourcesGained();
         List<PlayerFuel> fuels = machine.getFuels();
+        HashMap<Material, ItemStack> resourcesGainedMap = new HashMap<>();
+        System.out.println("LIST : " + resourcesGained);
+        resourcesGained.forEach(i -> {
+            if (resourcesGainedMap.containsKey(i.getType())) {
+                ItemStack is = resourcesGainedMap.get(i.getType());
+                is.setAmount(is.getAmount() + i.getAmount());
+                return;
+            }
+            resourcesGainedMap.put(i.getType(), i);
+        });
+        List<ItemStack> resourcesGainedMerged = new ArrayList<>(resourcesGainedMap.values());
         routes.put("resources", new InventoryPage(9, "Resources", null,
-                IntStream.range(0, resourcesGained.size()).mapToObj(i -> new InventoryItem(i, resourcesGained.get(i))).collect(Collectors.toSet())));
+                IntStream.range(0, Math.min(resourcesGainedMerged.size(), 9)).mapToObj(i -> new InventoryItem(i, resourcesGainedMerged.get(i))).collect(Collectors.toSet())));
         routes.put("fuels", new InventoryPage(9, "Fuels", null,
                 IntStream.range(0, fuels.size()).mapToObj(i -> {
                     PlayerFuel fuel = fuels.get(i);

@@ -8,6 +8,7 @@ import me.oriharel.machinery.inventory.Listeners;
 import me.oriharel.machinery.listeners.Block;
 import me.oriharel.machinery.listeners.Interact;
 import me.oriharel.machinery.machine.MachineManager;
+import me.oriharel.machinery.machine.PlayerMachine;
 import me.oriharel.machinery.structure.StructureManager;
 import me.oriharel.machinery.utilities.Utils;
 import org.bukkit.Bukkit;
@@ -38,7 +39,6 @@ public final class Machinery extends JavaPlugin {
     private MachineManager machineManager;
     private StructureManager structureManager;
     private FuelManager fuelManager;
-    private PagedInventoryAPI pagedInventoryAPI;
 
     public static Machinery getInstance() {
         return INSTANCE;
@@ -63,7 +63,6 @@ public final class Machinery extends JavaPlugin {
         fileManager.getConfig("machines.yml").copyDefaults(true).save();
         File file = new File(getDataFolder(), "structures");
         if (!file.exists()) file.mkdir();
-        this.pagedInventoryAPI = new PagedInventoryAPI(this);
         Bukkit.getPluginManager().registerEvents(new Listeners(), this);
         Bukkit.getScheduler().runTaskAsynchronously(this, () -> fuelManager = new FuelManager(this));
         getPlugin(CustomRecipes.class).getRecipesManager().registerRecipesDoneCallback(() -> Bukkit.getScheduler().runTask(this, () -> {
@@ -108,7 +107,12 @@ public final class Machinery extends JavaPlugin {
                 Location loc = Utils.longToLocation(position, world);
                 org.bukkit.block.Block block = loc.getBlock();
                 try {
-                    Bukkit.getScheduler().runTask(this, () -> machineManager.getMachineCores().put(loc, machineManager.getPlayerMachineFromBlock(block)));
+                    Bukkit.getScheduler().runTask(this, () ->{
+                        PlayerMachine machine = machineManager.getPlayerMachineFromBlock(block);
+                        System.out.println(machine);
+                        machineManager.getMachineCores().put(loc, machine);
+                        machine.run().startProcess();
+                    });
                 } catch (ClassCastException ignored) {
                     getLogger().info("ClassCastException at long number " + i + ", byte " + i * 8);
                 }
@@ -149,6 +153,8 @@ public final class Machinery extends JavaPlugin {
             FileChannel.open(file);
             ByteBuffer buffer = ByteBuffer.allocate(machineManager.getMachineCores().size() * 8);
             for (Location key : machineManager.getMachineCores().keySet()) {
+                org.bukkit.block.Block block = key.getBlock();
+                machineManager.setPlayerMachineBlock(block, machineManager.getMachineCores().get(key));
                 if (!key.getWorld().equals(world)) return;
                 buffer.put(ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(Utils.locationToLong(key)).array());
             }
@@ -163,7 +169,4 @@ public final class Machinery extends JavaPlugin {
         return fuelManager;
     }
 
-    public PagedInventoryAPI getPagedInventoryAPI() {
-        return pagedInventoryAPI;
-    }
 }

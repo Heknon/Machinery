@@ -1,9 +1,11 @@
 package me.oriharel.machinery.machine;
 
+import com.google.gson.annotations.JsonAdapter;
 import me.oriharel.customrecipes.recipe.Recipe;
 import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.fuel.PlayerFuel;
 import me.oriharel.machinery.items.MachineBlock;
+import me.oriharel.machinery.serialization.AbstractUpgradeTypeAdapter;
 import me.oriharel.machinery.structure.Structure;
 import me.oriharel.machinery.upgrades.AbstractUpgrade;
 import org.bukkit.Location;
@@ -24,6 +26,7 @@ public class PlayerMachine extends Machine {
     private List<PlayerFuel> fuels;
     private double totalZenCoinsGained;
     private double zenCoinsGained;
+    private MachineResourceGetProcess machineResourceGetProcess;
 
 
     public PlayerMachine(Material referenceBlockType, int machineReach, int maxFuel, int fuelDeficiency, List<String> fuelTypes, MachineType machineType,
@@ -56,7 +59,9 @@ public class PlayerMachine extends Machine {
     }
 
     public MachineResourceGetProcess run() {
-        return null;
+        if (machineResourceGetProcess == null)
+            machineResourceGetProcess = new MachineResourceGetProcess(this);
+        return machineResourceGetProcess;
     }
 
     public List<PlayerFuel> getFuels() {
@@ -115,10 +120,23 @@ public class PlayerMachine extends Machine {
         this.resourcesGained = resourcesGained;
     }
 
-
-
-
     public List<AbstractUpgrade> getUpgrades() {
         return upgrades;
+    }
+
+    @Override
+    public String toString() {
+        return "PlayerMachine{" +
+                "referenceBlockLocation=" + referenceBlockLocation +
+                ", openGUIBlockLocation=" + openGUIBlockLocation +
+                ", owner=" + owner +
+                ", upgrades=" + upgrades +
+                ", totalResourcesGained=" + totalResourcesGained +
+                ", resourcesGained=" + resourcesGained +
+                ", fuels=" + fuels +
+                ", totalZenCoinsGained=" + totalZenCoinsGained +
+                ", zenCoinsGained=" + zenCoinsGained +
+                ", machineResourceGetProcess=" + machineResourceGetProcess +
+                '}';
     }
 }

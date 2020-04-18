@@ -33,7 +33,7 @@ public class MachineBlock {
         net.minecraft.server.v1_15_R1.ItemStack is = CraftItemStack.asNMSCopy(itemStack);
         if (!is.hasTag() || !is.getTag().hasKey("machine")) throw new MachineNotFoundException("Machine not found in ItemStack passed to MachineBlock constructor.");
         String data = is.getTag().getString("machine");
-        Gson gson = new GsonBuilder().setPrettyPrinting().registerTypeHierarchyAdapter(Machine.class,
+        Gson gson = new GsonBuilder().registerTypeHierarchyAdapter(Machine.class,
                 new MachineTypeAdapter(Machinery.getInstance().getMachineManager().getMachineFactory())).create();
         this.machine = gson.fromJson(data, Machine.class);
         this.recipe = this.machine.getRecipe();

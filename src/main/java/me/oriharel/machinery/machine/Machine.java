@@ -9,7 +9,6 @@ import me.oriharel.machinery.items.MachineBlock;
 import me.oriharel.machinery.serialization.MachineTypeAdapter;
 import me.oriharel.machinery.structure.Structure;
 import me.oriharel.machinery.upgrades.LootBonusUpgrade;
-import me.oriharel.machinery.upgrades.SellModifierUpgrade;
 import me.oriharel.machinery.upgrades.SpeedUpgrade;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -141,7 +140,6 @@ public class Machine {
             }
             PlayerMachine playerMachine = Machinery.getInstance().getMachineManager().getMachineFactory().createMachine(this, printResult.getSpecialBlockLocation(),
                     printResult.getOpenGUIBlockLocation(), 0, new ArrayList<>(), new ArrayList<>(), 0, 0, playerUuid, Arrays.asList(
-                            new SellModifierUpgrade(1),
                             new LootBonusUpgrade(1),
                             new SpeedUpgrade(1)
                     ));

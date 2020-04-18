@@ -4,8 +4,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import me.oriharel.machinery.machine.MachineFactory;
 import me.oriharel.machinery.machine.PlayerMachine;
+import me.oriharel.machinery.serialization.AbstractUpgradeTypeAdapter;
 import me.oriharel.machinery.serialization.LocationTypeAdapter;
 import me.oriharel.machinery.serialization.PlayerMachineTypeAdapter;
+import me.oriharel.machinery.upgrades.AbstractUpgrade;
 import org.bukkit.Location;
 import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataType;
@@ -17,7 +19,7 @@ public class PlayerMachinePersistentDataType implements PersistentDataType<Strin
     public PlayerMachinePersistentDataType(MachineFactory machineFactory) {
         this.gson = new GsonBuilder().registerTypeHierarchyAdapter(PlayerMachine.class,
                 new PlayerMachineTypeAdapter(machineFactory)).registerTypeHierarchyAdapter(Location.class,
-                new LocationTypeAdapter()).create();
+                new LocationTypeAdapter()).registerTypeHierarchyAdapter(AbstractUpgrade.class, new AbstractUpgradeTypeAdapter()).create();
     }
 
     @Override

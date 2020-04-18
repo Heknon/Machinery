@@ -10,11 +10,20 @@ public class SpeedUpgrade extends AbstractUpgrade {
 
     @Override
     public void applyUpgradeModifier(MachineResourceGetProcess mineProcess) {
-
+        mineProcess.setMinePeriod(200 / level);
+        runOnlyOnProcessStart = true;
     }
 
     @Override
     public String getUpgradeName() {
         return "Speed Upgrade";
+    }
+
+    @Override
+    public String toString() {
+        return "SpeedUpgrade{" +
+                "level=" + level +
+                ", runOnlyOnProcessStart=" + runOnlyOnProcessStart +
+                '}';
     }
 }

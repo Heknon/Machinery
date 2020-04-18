@@ -131,7 +131,7 @@ public class MachineFactory {
         nbtTagField.setAccessible(true);
         NBTTagCompound nbtTagCompound = recipeResultReference.getNBTTagCompound();
         if (nbtTagCompound == null) nbtTagCompound = new NBTTagCompound();
-        Gson gson = new GsonBuilder().setPrettyPrinting().registerTypeHierarchyAdapter(Machine.class, new MachineTypeAdapter(this)).create();
+        Gson gson = new GsonBuilder().registerTypeHierarchyAdapter(Machine.class, new MachineTypeAdapter(this)).create();
         nbtTagCompound.setString("machine", gson.toJson(machine));
         try {
             nbtTagField.set(recipeResultReference, nbtTagCompound);

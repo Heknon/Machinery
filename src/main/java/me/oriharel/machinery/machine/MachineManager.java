@@ -65,6 +65,7 @@ public class MachineManager {
             } catch (MachineException e) {
                 e.printStackTrace();
             }
+            playerMachine.run().startProcess();
         } catch (Exception e) {
             e.printStackTrace();
         }

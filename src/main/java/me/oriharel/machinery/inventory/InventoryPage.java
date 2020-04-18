@@ -30,7 +30,7 @@ public class InventoryPage implements InventoryHolder {
         inventoryItems.forEach(item -> contents[item.indexInInventory] = item);
         for (int i = 0; i < contents.length; i++) {
             ItemStack item = contents[i];
-            if (item == null || item.getType() == Material.AIR) {
+            if ((item == null || item.getType() == Material.AIR) && fillment != null) {
                 contents[i] = fillment.clone();
             }
         }

@@ -5,9 +5,11 @@ import me.oriharel.machinery.machine.MachineResourceGetProcess;
 
 public abstract class AbstractUpgrade {
     protected int level;
+    protected boolean runOnlyOnProcessStart;
 
     public AbstractUpgrade(int level) {
         this.level = level;
+        this.runOnlyOnProcessStart = false;
     }
 
     protected AbstractUpgrade() {
@@ -30,6 +32,10 @@ public abstract class AbstractUpgrade {
     public abstract void applyUpgradeModifier(MachineResourceGetProcess mineProcess);
 
     public abstract String getUpgradeName();
+
+    public boolean isRunOnlyOnProcessStart() {
+        return runOnlyOnProcessStart;
+    }
 
     @Override
     public String toString() {
