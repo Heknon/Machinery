@@ -9,6 +9,7 @@ import me.oriharel.machinery.upgrades.AbstractUpgrade;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -46,13 +47,46 @@ public class PlayerMachine extends Machine {
 
     public MachineBlock deconstruct() {
         MachineManager machineManager = Machinery.getInstance().getMachineManager();
+        machineManager.clearMachineTileStateDataFromBlock(openGUIBlockLocation.getBlock());
         Location[] machinePartLocations = machineManager.getPlayerMachineLocations(openGUIBlockLocation.getBlock());
+        machineManager.unregisterPlayerMachine(this);
+
+
         for (Location loc : machinePartLocations) {
             Block block = loc.getBlock();
-            machineManager.clearMachineTileStateDataFromBlock(block);
+            block.setBlockData(new BlockData() {
+                @Override
+                public Material getMaterial() {
+                    return null;
+                }
+
+                @Override
+                public String getAsString() {
+                    return null;
+                }
+
+                @Override
+                public String getAsString(boolean b) {
+                    return null;
+                }
+
+                @Override
+                public BlockData merge(BlockData blockData) {
+                    return null;
+                }
+
+                @Override
+                public boolean matches(BlockData blockData) {
+                    return false;
+                }
+
+                @Override
+                public BlockData clone() {
+                    return null;
+                }
+            });
             block.setType(Material.AIR);
         }
-        Machinery.getInstance().getMachineManager().unregisterPlayerMachine(this);
         return new MachineBlock(this.recipe, this);
     }
 

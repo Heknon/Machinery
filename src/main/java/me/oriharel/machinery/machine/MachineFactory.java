@@ -139,6 +139,7 @@ public class MachineFactory {
             e.printStackTrace();
             return null;
         }
+        recipe.getResult().buildItemStack();
         recipe.setRecipe(recipe.constructRecipe());
         Bukkit.getScheduler().runTask(machinery, () -> CustomRecipesAPI.getImplementation().getRecipesManager().replaceRecipeNamed(recipe.getRecipeKey(), recipe));
         return recipe;

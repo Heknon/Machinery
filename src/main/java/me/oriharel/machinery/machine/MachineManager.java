@@ -65,6 +65,7 @@ public class MachineManager {
             } catch (MachineException e) {
                 e.printStackTrace();
             }
+            machinery.getMachineDataManager().addMachineCoreLocation(machineLocation);
             playerMachine.run().startProcess();
         } catch (Exception e) {
             e.printStackTrace();
@@ -75,6 +76,7 @@ public class MachineManager {
         machineCores.remove(machine.getOpenGUIBlockLocation());
         Location[] playerMachinePartLocations = getPlayerMachineLocations(machine.getOpenGUIBlockLocation().getBlock());
         machinePartLocations.removeAll(Arrays.asList(playerMachinePartLocations));
+        machinery.getMachineDataManager().removeMachineCoreLocation(machine.getOpenGUIBlockLocation());
     }
 
     public HashMap<Location, PlayerMachine> getMachineCores() {
