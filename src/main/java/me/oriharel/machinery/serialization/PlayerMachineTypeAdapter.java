@@ -2,107 +2,67 @@ package me.oriharel.machinery.serialization;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
-import me.oriharel.customrecipes.api.CustomRecipesAPI;
-import me.oriharel.customrecipes.recipe.Recipe;
-import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.fuel.PlayerFuel;
+import me.oriharel.machinery.machine.Machine;
 import me.oriharel.machinery.machine.MachineFactory;
-import me.oriharel.machinery.machine.MachineType;
 import me.oriharel.machinery.machine.PlayerMachine;
-import me.oriharel.machinery.structure.Structure;
 import me.oriharel.machinery.upgrades.AbstractUpgrade;
-import net.islandearth.schematics.extended.Schematic;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import java.io.File;
-import java.lang.reflect.Field;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class PlayerMachineTypeAdapter implements JsonSerializer<PlayerMachine>, JsonDeserializer<PlayerMachine> {
-    private MachineFactory factory;
+public class PlayerMachineTypeAdapter extends MachineTypeAdapter<PlayerMachine> implements JsonSerializer<PlayerMachine>, JsonDeserializer<PlayerMachine> {
 
     public PlayerMachineTypeAdapter(MachineFactory factory) {
-        this.factory = factory;
+        super(factory);
     }
 
     @Override
-    public PlayerMachine deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-        JsonObject obj = jsonElement.getAsJsonObject();
-        String machineName = obj.get("Name").getAsString();
-        MachineType machineType = MachineType.valueOf(obj.get("Type").getAsString());
-        double machineTotalResourcesGained = obj.get("TotalResourcesGained").getAsDouble();
-        double machineTotalZenCoinsGained = obj.get("TotalZenCoinsGained").getAsDouble();
-        double machineZenCoinsGained = obj.get("ZenCoinsGained").getAsDouble();
-        List<ItemStack> machineResourcesGained = jsonDeserializationContext.deserialize(obj.get("ResourcesGained"), new TypeToken<ArrayList<ItemStack>>() {
+    protected PlayerMachine getDeserializedMachine(JsonObject machineJsonObject, JsonDeserializationContext context) {
+        Machine baseMachine = super.getDeserializedMachine(machineJsonObject, context);
+
+        double zenCoinsGained = machineJsonObject.get("zenCoinsGained").getAsDouble();
+        double totalZenCoinsGained = machineJsonObject.get("totalZenCoinsGained").getAsDouble();
+        double totalResourcesGained = machineJsonObject.get("totalResourcesGained").getAsDouble();
+
+        Location machineCoreBlockLocation = context.deserialize(machineJsonObject.get("coreBlockLocation"), Location.class);
+
+        UUID ownerUuid = new UUID(machineJsonObject.get("ownerUuidMost").getAsLong(), machineJsonObject.get("ownerUuidLeast").getAsLong());
+
+        List<PlayerFuel> fuels = context.deserialize(machineJsonObject.get("resourcesGained"), new TypeToken<List<PlayerFuel>>() {
         }.getType());
-        Structure structure = Machinery.getInstance().getStructureManager().getSchematicByPath(obj.get("structure").getAsString());
-        Material referenceBlockMaterial = Material.getMaterial(obj.get("ReferenceBlock").getAsString());
-        String recipeName = obj.get("Recipe").getAsString();
-        Material openGUIBlockType = Material.getMaterial(obj.get("OpenGUIBlockType").getAsString());
-        Recipe recipe =
-                CustomRecipesAPI.getImplementation().getRecipesManager().getRecipes().stream().filter(r -> r.getRecipeKey().equalsIgnoreCase(recipeName)).findAny().orElse(null);
-        List<PlayerFuel> fuel = jsonDeserializationContext.deserialize(obj.get("Fuel"), new TypeToken<ArrayList<PlayerFuel>>() {
+        List<AbstractUpgrade> upgrades = context.deserialize(machineJsonObject.get("resourcesGained"), new TypeToken<List<AbstractUpgrade>>() {
         }.getType());
-        Location referenceBlockLocation = jsonDeserializationContext.deserialize(obj.get("ReferenceBlockLocation"), Location.class);
-        Location openGUIBlockLocation = jsonDeserializationContext.deserialize(obj.get("OpenGUIBlockLocation"), Location.class);
-        int machineFuelDeficiency = obj.get("FuelDeficiency").getAsInt();
-        List<String> fuelTypes = jsonDeserializationContext.deserialize(obj.get("FuelTypes"), List.class);
-        UUID owner = new UUID(obj.get("OwnerMost").getAsLong(), obj.get("OwnerLeast").getAsLong());
-        int machineReach = obj.get("Reach").getAsInt();
-        int machineMaxFuel = obj.get("MaxFuel").getAsInt();
-        List<AbstractUpgrade> upgrades = jsonDeserializationContext.deserialize(obj.get("upgrades"), new TypeToken<ArrayList<AbstractUpgrade>>() {
+        List<ItemStack> resourcesGained = context.deserialize(machineJsonObject.get("resourcesGained"), new TypeToken<List<ItemStack>>() {
         }.getType());
-        return factory.createMachine(referenceBlockMaterial, machineReach, machineMaxFuel,
-                machineFuelDeficiency, fuelTypes, machineType, structure, recipe, machineName, openGUIBlockType, referenceBlockLocation,
-                machineTotalResourcesGained,
-                machineResourcesGained, fuel, openGUIBlockLocation, machineZenCoinsGained, machineTotalZenCoinsGained, owner, upgrades);
+
+
+        return factory.createMachine(baseMachine, machineCoreBlockLocation, totalResourcesGained, fuels, zenCoinsGained, totalZenCoinsGained, ownerUuid, upgrades,
+                resourcesGained);
     }
 
     @Override
-    public JsonElement serialize(PlayerMachine machine, Type type, JsonSerializationContext jsonSerializationContext) {
-        JsonObject obj = new JsonObject();
-        Structure struct = machine.getStructure();
-        String schematic;
+    protected JsonObject getSerializedMachine(PlayerMachine machine, JsonSerializationContext context) {
+        JsonObject baseMachineSerialized = super.getSerializedMachine(machine, context);
 
-        Schematic structure = struct.getSchematic();
+        baseMachineSerialized.add("zenCoinsGained", new JsonPrimitive(machine.getZenCoinsGained()));
+        baseMachineSerialized.add("totalZenCoinsGained", new JsonPrimitive(machine.getTotalZenCoinsGained()));
+        baseMachineSerialized.add("totalResourcesGained", new JsonPrimitive(machine.getTotalResourcesGained()));
 
-        try {
-            Field a = structure.getClass().getDeclaredField("schematic");
-            a.setAccessible(true);
-            schematic = ((File) a.get(structure)).getPath();
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-            schematic = "";
-        }
+        baseMachineSerialized.add("ownerUuidMost", new JsonPrimitive(machine.getOwner().getMostSignificantBits()));
+        baseMachineSerialized.add("ownerUuidLeast", new JsonPrimitive(machine.getOwner().getLeastSignificantBits()));
 
-        obj.add("Name", new JsonPrimitive(machine.getMachineName()));
-        obj.add("Type", new JsonPrimitive(machine.getType().toString()));
-        obj.add("structure", new JsonPrimitive(schematic));
-        obj.add("ReferenceBlock", new JsonPrimitive(machine.getReferenceBlockType().toString()));
-        obj.add("Recipe", new JsonPrimitive(machine.getRecipe().getRecipeKey()));
-        obj.add("FuelDeficiency", new JsonPrimitive(machine.getFuelDeficiency()));
-        obj.add("FuelTypes", jsonSerializationContext.serialize(machine.getFuelTypes()));
-        obj.add("Reach", new JsonPrimitive(machine.getMachineReach()));
-        obj.add("MaxFuel", new JsonPrimitive(machine.getMaxFuel()));
-        obj.add("OpenGUIBlockType", new JsonPrimitive(machine.getOpenGUIBlockType().toString()));
-        obj.add("TotalResourcesGained", new JsonPrimitive(machine.getTotalResourcesGained()));
-        obj.add("ResourcesGained", jsonSerializationContext.serialize(machine.getResourcesGained(), new TypeToken<ArrayList<ItemStack>>() {
+        baseMachineSerialized.add("coreBlockLocation", context.serialize(machine, Location.class));
+
+        baseMachineSerialized.add("resourcesGained", context.serialize(machine.getResourcesGained(), new TypeToken<List<ItemStack>>() {
         }.getType()));
-        obj.add("ZenCoinsGained", new JsonPrimitive(machine.getZenCoinsGained()));
-        obj.add("TotalZenCoinsGained", new JsonPrimitive(machine.getTotalZenCoinsGained()));
-        obj.add("ReferenceBlockLocation", jsonSerializationContext.serialize(machine.getReferenceBlockLocation(), Location.class));
-        obj.add("OpenGUIBlockLocation", jsonSerializationContext.serialize(machine.getOpenGUIBlockLocation(), Location.class));
-        obj.add("OwnerLeast", new JsonPrimitive(machine.getOwner().getLeastSignificantBits()));
-        obj.add("OwnerMost", new JsonPrimitive(machine.getOwner().getMostSignificantBits()));
-        obj.add("Fuel", jsonSerializationContext.serialize(machine.getFuels(), new TypeToken<ArrayList<PlayerFuel>>() {
+        baseMachineSerialized.add("upgrades", context.serialize(machine.getUpgrades(), new TypeToken<List<AbstractUpgrade>>() {
         }.getType()));
-        obj.add("upgrades", jsonSerializationContext.serialize(machine.getUpgrades(), new TypeToken<ArrayList<AbstractUpgrade>>() {
+        baseMachineSerialized.add("fuels", context.serialize(machine.getFuels(), new TypeToken<List<PlayerFuel>>() {
         }.getType()));
-        return obj;
+
+        return baseMachineSerialized;
     }
 }

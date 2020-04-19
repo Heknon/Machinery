@@ -28,14 +28,13 @@ public class Structure {
         return name;
     }
 
-    public List<Location> build(@NotNull Location loc, Player player, Material specialMaterial, Material openGUIBlockMaterial, Function<PrintResult, Boolean> callback) {
+    public List<Location> build(@NotNull Location loc, Player player, Material openGUIBlockMaterial, Function<PrintResult, Boolean> callback) {
         try {
             return schematic.pasteSchematic(loc, player, 5, (locations) -> {
-                PrintResult printResult = new PrintResult(locations, null, null);
+                PrintResult printResult = new PrintResult(locations, null);
                 locations.forEach(l -> {
                     Block block = l.getBlock();
-                    if (block.getType().equals(specialMaterial)) printResult.setSpecialBlockLocation(block.getLocation());
-                    else if (block.getType().equals(openGUIBlockMaterial)) printResult.setOpenGUIBlockLocation(block.getLocation());
+                    if (block.getType().equals(openGUIBlockMaterial)) printResult.setOpenGUIBlockLocation(block.getLocation());
                 });
                 callback.apply(printResult);
             }, Schematic.Options.REALISTIC);
@@ -48,25 +47,15 @@ public class Structure {
 
     public static class PrintResult {
         private List<Location> placementLocations;
-        private Location specialBlockLocation;
         private Location openGUIBlockLocation;
 
-        public PrintResult(List<Location> placementLocations, Location specialBlockLocation, Location openGUIBlockLocation) {
+        public PrintResult(List<Location> placementLocations, Location openGUIBlockLocation) {
             this.placementLocations = placementLocations;
-            this.specialBlockLocation = specialBlockLocation;
             this.openGUIBlockLocation = openGUIBlockLocation;
         }
 
         public List<Location> getPlacementLocations() {
             return placementLocations;
-        }
-
-        public Location getSpecialBlockLocation() {
-            return specialBlockLocation;
-        }
-
-        public void setSpecialBlockLocation(Location specialBlockLocation) {
-            this.specialBlockLocation = specialBlockLocation;
         }
 
         public Location getOpenGUIBlockLocation() {

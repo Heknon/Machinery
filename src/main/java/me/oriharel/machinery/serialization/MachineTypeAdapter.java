@@ -16,37 +16,66 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.List;
 
-public class MachineTypeAdapter implements JsonSerializer<Machine>, JsonDeserializer<Machine> {
-    private MachineFactory factory;
+public class MachineTypeAdapter<T extends Machine> implements JsonSerializer<T>, JsonDeserializer<T> {
+    protected MachineFactory factory;
 
     public MachineTypeAdapter(MachineFactory factory) {
         this.factory = factory;
     }
 
     @Override
-    public Machine deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-        JsonObject obj = jsonElement.getAsJsonObject();
-        String machineName = obj.get("machineName").getAsString();
-        MachineType machineType = MachineType.valueOf(obj.get("machineType").getAsString());
-        Structure structure =
-                Machinery.getInstance().getStructureManager().getSchematicByPath(obj.get("structure").getAsString());
-        Material referenceBlockMaterial = Material.getMaterial(obj.get("machineReferenceBlock").getAsString());
-        Material openGUIBlockType = Material.getMaterial(obj.get("machineOpenGUIBlockType").getAsString());
-        String recipeName = obj.get("machineRecipe").getAsString();
-        Recipe recipe =
-                CustomRecipesAPI.getImplementation().getRecipesManager().getRecipes().stream().filter(r -> r.getRecipeKey().equalsIgnoreCase(recipeName)).findAny().orElse(null);
-        int machineFuelDeficiency = obj.get("machineFuelDeficiency").getAsInt();
-        List<String> fuelTypes = jsonDeserializationContext.deserialize(obj.get("machineFuelTypes"), List.class);
-        int machineReach = obj.get("machineReach").getAsInt();
-        int machineMaxFuel = obj.get("machineMaxFuel").getAsInt();
-        return factory.createMachine(referenceBlockMaterial, machineReach, machineMaxFuel,
-                machineFuelDeficiency, fuelTypes, machineType, structure, recipe, machineName, openGUIBlockType);
+    public T deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+        return getDeserializedMachine(jsonElement.getAsJsonObject(), jsonDeserializationContext);
     }
 
     @Override
-    public JsonElement serialize(Machine machine, Type type, JsonSerializationContext jsonSerializationContext) {
+    public JsonElement serialize(T machine, Type type, JsonSerializationContext jsonSerializationContext) {
+        return getSerializedMachine(machine, jsonSerializationContext);
+    }
+
+    protected T getDeserializedMachine(JsonObject machineJsonObject, JsonDeserializationContext context) {
+
+        String machineName = machineJsonObject.get("name").getAsString();
+        String recipeName = machineJsonObject.get("recipe").getAsString();
+
+
+        int machineReach = machineJsonObject.get("reach").getAsInt();
+        int machineMaxFuel = machineJsonObject.get("maxFuel").getAsInt();
+        int machineFuelDeficiency = machineJsonObject.get("fuelDeficiency").getAsInt();
+
+        List<String> fuelTypes = context.deserialize(machineJsonObject.get("fuelTypes"), List.class);
+
+        MachineType machineType = MachineType.valueOf(machineJsonObject.get("type").getAsString());
+        Material machineCoreBlockType = Material.getMaterial(machineJsonObject.get("coreBlockType").getAsString());
+
+        Structure structure =
+                Machinery.getInstance().getStructureManager().getSchematicByPath(machineJsonObject.get("structure").getAsString());
+
+        Recipe recipe =
+                CustomRecipesAPI.getImplementation().getRecipesManager().getRecipes().stream().filter(r -> r.getRecipeKey().equalsIgnoreCase(recipeName)).findAny().orElse(null);
+
+        return (T) factory.createMachine(machineReach, machineMaxFuel,
+                machineFuelDeficiency, fuelTypes, machineType, structure, recipe, machineName, machineCoreBlockType);
+    }
+
+    protected JsonObject getSerializedMachine(T machine, JsonSerializationContext context) {
         JsonObject obj = new JsonObject();
-        Structure struct = machine.getStructure();
+
+        obj.add("name", new JsonPrimitive(machine.getMachineName()));
+        obj.add("type", new JsonPrimitive(machine.getType().toString()));
+        obj.add("structure", new JsonPrimitive(getSchematicPath(machine.getStructure())));
+        obj.add("recipe", new JsonPrimitive(machine.getRecipe().getRecipeKey()));
+        obj.add("fuelDeficiency", new JsonPrimitive(machine.getFuelDeficiency()));
+        obj.add("reach", new JsonPrimitive(machine.getMachineReach()));
+        obj.add("maxFuel", new JsonPrimitive(machine.getMaxFuel()));
+        obj.add("coreBlockType", new JsonPrimitive(machine.getMachineCoreBlockType().toString()));
+
+        obj.add("fuelTypes", context.serialize(machine.getFuelTypes(), List.class));
+
+        return obj;
+    }
+
+    private String getSchematicPath(Structure struct) {
         String schematic;
 
         Schematic structure = struct.getSchematic();
@@ -59,16 +88,6 @@ public class MachineTypeAdapter implements JsonSerializer<Machine>, JsonDeserial
             e.printStackTrace();
             schematic = "";
         }
-        obj.add("machineName", new JsonPrimitive(machine.getMachineName()));
-        obj.add("machineType", new JsonPrimitive(machine.getType().toString()));
-        obj.add("structure", new JsonPrimitive(schematic));
-        obj.add("machineReferenceBlock", new JsonPrimitive(machine.getReferenceBlockType().toString()));
-        obj.add("machineRecipe", new JsonPrimitive(machine.getRecipe().getRecipeKey()));
-        obj.add("machineFuelDeficiency", new JsonPrimitive(machine.getFuelDeficiency()));
-        obj.add("machineFuelTypes", jsonSerializationContext.serialize(machine.getFuelTypes(), List.class));
-        obj.add("machineReach", new JsonPrimitive(machine.getMachineReach()));
-        obj.add("machineMaxFuel", new JsonPrimitive(machine.getMaxFuel()));
-        obj.add("machineOpenGUIBlockType", new JsonPrimitive(machine.getOpenGUIBlockType().toString()));
-        return obj;
+        return schematic;
     }
 }

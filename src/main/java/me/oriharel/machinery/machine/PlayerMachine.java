@@ -16,8 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class PlayerMachine extends Machine {
-    private final Location referenceBlockLocation;
-    private final Location openGUIBlockLocation;
+    private final Location machineCore;
     private final UUID owner;
     private final List<AbstractUpgrade> upgrades;
     private double totalResourcesGained;
@@ -28,16 +27,15 @@ public class PlayerMachine extends Machine {
     private MachineResourceGetProcess machineResourceGetProcess;
 
 
-    public PlayerMachine(Material referenceBlockType, int machineReach, int maxFuel, int fuelDeficiency, List<String> fuelTypes, MachineType machineType,
-                         Structure structure, Recipe recipe, String machineName, Material openGUIBlockType, Location referenceBlockLocation,
-                         double totalResourcesGained, List<ItemStack> resourcesGained, List<PlayerFuel> fuels, Location openGUIBlockLocation, double zenCoinsGained,
+    public PlayerMachine(int machineReach, int maxFuel, int fuelDeficiency, List<String> fuelTypes, MachineType machineType,
+                         Structure structure, Recipe recipe, String machineName, Material openGUIBlockType,
+                         double totalResourcesGained, List<ItemStack> resourcesGained, List<PlayerFuel> fuels, Location machineCore, double zenCoinsGained,
                          double totalZenCoinsGained, UUID owner, List<AbstractUpgrade> upgrades) {
-        super(referenceBlockType, machineReach, maxFuel, fuelDeficiency, fuelTypes, machineType, structure, recipe, machineName, openGUIBlockType);
-        this.referenceBlockLocation = referenceBlockLocation;
+        super(machineReach, maxFuel, fuelDeficiency, fuelTypes, machineType, structure, recipe, machineName, openGUIBlockType);
         this.totalResourcesGained = totalResourcesGained;
         this.resourcesGained = resourcesGained;
         this.fuels = fuels;
-        this.openGUIBlockLocation = openGUIBlockLocation;
+        this.machineCore = machineCore;
         this.zenCoinsGained = zenCoinsGained;
         this.totalZenCoinsGained = totalZenCoinsGained;
         this.owner = owner;
@@ -47,8 +45,8 @@ public class PlayerMachine extends Machine {
 
     public MachineBlock deconstruct() {
         MachineManager machineManager = Machinery.getInstance().getMachineManager();
-        machineManager.clearMachineTileStateDataFromBlock(openGUIBlockLocation.getBlock());
-        Location[] machinePartLocations = machineManager.getPlayerMachineLocations(openGUIBlockLocation.getBlock());
+        machineManager.clearMachineTileStateDataFromBlock(machineCore.getBlock());
+        Location[] machinePartLocations = machineManager.getPlayerMachineLocations(machineCore.getBlock());
         machineManager.unregisterPlayerMachine(this);
 
 
@@ -116,10 +114,6 @@ public class PlayerMachine extends Machine {
         this.totalResourcesGained = totalResourcesGained;
     }
 
-    public Location getReferenceBlockLocation() {
-        return referenceBlockLocation;
-    }
-
     public double getTotalZenCoinsGained() {
         return totalZenCoinsGained;
     }
@@ -140,8 +134,8 @@ public class PlayerMachine extends Machine {
         return owner;
     }
 
-    public Location getOpenGUIBlockLocation() {
-        return openGUIBlockLocation;
+    public Location getMachineCore() {
+        return machineCore;
     }
 
     public List<ItemStack> getResourcesGained() {
@@ -156,19 +150,4 @@ public class PlayerMachine extends Machine {
         return upgrades;
     }
 
-    @Override
-    public String toString() {
-        return "PlayerMachine{" +
-                "referenceBlockLocation=" + referenceBlockLocation +
-                ", openGUIBlockLocation=" + openGUIBlockLocation +
-                ", owner=" + owner +
-                ", upgrades=" + upgrades +
-                ", totalResourcesGained=" + totalResourcesGained +
-                ", resourcesGained=" + resourcesGained +
-                ", fuels=" + fuels +
-                ", totalZenCoinsGained=" + totalZenCoinsGained +
-                ", zenCoinsGained=" + zenCoinsGained +
-                ", machineResourceGetProcess=" + machineResourceGetProcess +
-                '}';
-    }
 }

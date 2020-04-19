@@ -1,15 +1,22 @@
 package me.oriharel.machinery.machine;
 
 import me.oriharel.machinery.Machinery;
+import me.oriharel.machinery.api.events.PostMachineBuildEvent;
+import me.oriharel.machinery.api.events.PreMachineBuildEvent;
 import me.oriharel.machinery.data.PlayerMachinePersistentDataType;
 import me.oriharel.machinery.exceptions.*;
+import me.oriharel.machinery.upgrades.LootBonusUpgrade;
+import me.oriharel.machinery.upgrades.SpeedUpgrade;
 import me.oriharel.machinery.utilities.Utils;
 import org.apache.commons.lang.ArrayUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.TileState;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -54,12 +61,12 @@ public class MachineManager {
 
     public void registerNewPlayerMachine(PlayerMachine playerMachine, Set<Location> machineLocations) {
         try {
-            setPlayerMachineBlock(playerMachine.getOpenGUIBlockLocation().getBlock(), playerMachine);
+            setPlayerMachineBlock(playerMachine.getMachineCore().getBlock(), playerMachine);
             Object[] locations = machineLocations.toArray();
-            setPlayerMachineLocations(playerMachine.getOpenGUIBlockLocation().getBlock(), Arrays.copyOf(locations, locations.length, Location[].class));
-            this.machineCores.put(playerMachine.getOpenGUIBlockLocation(), playerMachine);
+            setPlayerMachineLocations(playerMachine.getMachineCore().getBlock(), Arrays.copyOf(locations, locations.length, Location[].class));
+            this.machineCores.put(playerMachine.getMachineCore(), playerMachine);
             this.machinePartLocations.addAll(machineLocations);
-            Location machineLocation = playerMachine.getOpenGUIBlockLocation();
+            Location machineLocation = playerMachine.getMachineCore();
             if (machineLocation == null) try {
                 throw new MachineException("Machine has no open gui block in it's schematic!");
             } catch (MachineException e) {
@@ -73,10 +80,10 @@ public class MachineManager {
     }
 
     protected void unregisterPlayerMachine(PlayerMachine machine) {
-        machineCores.remove(machine.getOpenGUIBlockLocation());
-        Location[] playerMachinePartLocations = getPlayerMachineLocations(machine.getOpenGUIBlockLocation().getBlock());
+        machineCores.remove(machine.getMachineCore());
+        Location[] playerMachinePartLocations = getPlayerMachineLocations(machine.getMachineCore().getBlock());
         machinePartLocations.removeAll(Arrays.asList(playerMachinePartLocations));
-        machinery.getMachineDataManager().removeMachineCoreLocation(machine.getOpenGUIBlockLocation());
+        machinery.getMachineDataManager().removeMachineCoreLocation(machine.getMachineCore());
     }
 
     public HashMap<Location, PlayerMachine> getMachineCores() {
@@ -116,6 +123,32 @@ public class MachineManager {
         PersistentDataContainer persistentDataContainer = tileState.getPersistentDataContainer();
         persistentDataContainer.remove(MACHINE_LOCATIONS_NAMESPACE_KEY);
         persistentDataContainer.remove(MACHINE_NAMESPACE_KEY);
+    }
+
+    public boolean buildMachine(UUID playerUuid, Machine machine, Location buildLocation) {
+        PreMachineBuildEvent preMachineBuildEvent = new PreMachineBuildEvent(machine, buildLocation);
+        Bukkit.getPluginManager().callEvent(preMachineBuildEvent);
+        if (preMachineBuildEvent.isCancelled()) return false;
+        Player p = Bukkit.getPlayer(playerUuid);
+        List<Location> locations = machine.structure.build(buildLocation, p, machine.machineCoreBlockType, (printResult) -> {
+            if (printResult.getPlacementLocations() == null) {
+                p.sendMessage(ChatColor.translateAlternateColorCodes('&', Machinery.getInstance().getFileManager().getConfig("config.yml").get().getString(
+                        "not_empty_place")));
+                return false;
+            }
+            PlayerMachine playerMachine = Machinery.getInstance().getMachineManager().getMachineFactory().createMachine(machine,
+                    printResult.getOpenGUIBlockLocation(), 0, new ArrayList<>(), 0, 0, playerUuid, Arrays.asList(
+                            new LootBonusUpgrade(1),
+                            new SpeedUpgrade(1)
+                    ), new ArrayList<>());
+            Machinery.getInstance().getMachineManager().registerNewPlayerMachine(playerMachine, new HashSet<>(printResult.getPlacementLocations()));
+            PostMachineBuildEvent postMachineBuildEvent = new PostMachineBuildEvent(playerMachine, buildLocation);
+            Bukkit.getPluginManager().callEvent(postMachineBuildEvent);
+            return true;
+        });
+        if (locations == null) return false;
+        Machinery.getInstance().getMachineManager().addTemporaryPreRegisterMachinePartLocations(locations);
+        return true;
     }
 
     public HashSet<Location> getMachinePartLocations() {

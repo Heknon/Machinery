@@ -49,13 +49,12 @@ public class MachineFactory {
         if (referenceBlockTypeString == null) throw new MaterialNotFoundException("You must give a reference_block_type in the machine section of machine " + machineKey);
         Material referenceBlockType = Material.getMaterial(referenceBlockTypeString);
         if (referenceBlockType == null) throw new MaterialNotFoundException("No material named \"" + referenceBlockTypeString + "\" was found.");
-        String openGUIBlockMaterialTypeString = section.getString("open_gui_block_type");
-        if (openGUIBlockMaterialTypeString == null)
+        String machineCoreBlockTypeString = section.getString("open_gui_block_type");
+        if (machineCoreBlockTypeString == null)
             throw new MaterialNotFoundException("You must give a open_gui_block_type in the machine section of machine " + machineKey);
-        Material openGUIBlockMaterialType = Material.getMaterial(openGUIBlockMaterialTypeString);
-        if (openGUIBlockMaterialType == null) throw new MaterialNotFoundException("No material named \"" + openGUIBlockMaterialTypeString + "\" was found.");
+        Material machineCoreBlockType = Material.getMaterial(machineCoreBlockTypeString);
+        if (machineCoreBlockType == null) throw new MaterialNotFoundException("No material named \"" + machineCoreBlockTypeString + "\" was found.");
         int machineReach = section.getInt("mine_radius", 0);
-        int speed = section.getInt("speed", 0);
         int maxFuel = section.getInt("max_fuel", 0);
         int fuelDeficiency = section.getInt("deficiency", 0);
         List<String> fuelTypes = section.getStringList("fuel_types");
@@ -67,56 +66,54 @@ public class MachineFactory {
         MachineType machineType = MachineType.getMachine(section.getString("type", null));
         Structure structure =
                 machinery.getStructureManager().getSchematicByPath(new File(machinery.getDataFolder(), "structures/" + machineKey + Machinery.STRUCTURE_EXTENSION).getPath());
-        Machine machine = new Machine(referenceBlockType, machineReach, maxFuel, fuelDeficiency, fuelTypes, machineType, structure, recipe, machineKey,
-                openGUIBlockMaterialType);
+        Machine machine = new Machine(machineReach, maxFuel, fuelDeficiency, fuelTypes, machineType, structure, recipe, machineKey,
+                machineCoreBlockType);
         machine.setRecipe(injectMachineNBTIntoRecipe(machine.getRecipe(), machine));
         return machine;
     }
 
     @Nullable
-    public Machine createMachine(Material referenceBlockType,
-                                 int machineReach,
+    public Machine createMachine(int machineReach,
                                  int maxFuel,
                                  int fuelDeficiency,
                                  List<String> fuelTypes,
                                  MachineType machineType,
                                  Structure structure,
                                  Recipe recipe,
-                                 String machineKey, Material openGUIBlockMaterialType) throws IllegalArgumentException {
+                                 String machineKey, Material machineCoreBlockType) throws IllegalArgumentException {
         if (machineType == null) throw new IllegalArgumentException("Machine type must not be null (MachineFactory)");
-        Machine machine = new Machine(referenceBlockType, machineReach, maxFuel, fuelDeficiency, fuelTypes, machineType, structure,
-                recipe, machineKey, openGUIBlockMaterialType);
+        Machine machine = new Machine(machineReach, maxFuel, fuelDeficiency, fuelTypes, machineType, structure,
+                recipe, machineKey, machineCoreBlockType);
         machine.setRecipe(injectMachineNBTIntoRecipe(machine.getRecipe(), machine));
         return machine;
     }
 
     @Nullable
-    public PlayerMachine createMachine(Material referenceBlockType,
-                                       int machineReach,
+    public PlayerMachine createMachine(int machineReach,
                                        int maxFuel,
                                        int fuelDeficiency,
                                        List<String> fuelTypes,
                                        MachineType machineType,
                                        Structure structure,
                                        Recipe recipe,
-                                       String machineKey, Material openGUIBlockMaterialType, Location referenceBlockLocation, double totalResourcesGained,
+                                       String machineKey, Material machineCoreBlockType, double totalResourcesGained,
                                        List<ItemStack> resourcesGained,
-                                       List<PlayerFuel> fuels, Location openGUIBlockLocation, double zenCoinsGained, double totalZenCoinsGained, UUID owner,
+                                       List<PlayerFuel> fuels, Location machineCoreBlockLocation, double zenCoinsGained, double totalZenCoinsGained, UUID owner,
                                        List<AbstractUpgrade> upgrades) throws IllegalArgumentException {
         if (machineType == null) throw new IllegalArgumentException("Machine type must not be null (MachineFactory)");
-        return new PlayerMachine(referenceBlockType, machineReach, maxFuel, fuelDeficiency, fuelTypes, machineType, structure,
-                recipe, machineKey, openGUIBlockMaterialType, referenceBlockLocation, totalResourcesGained, resourcesGained, fuels, openGUIBlockLocation,
+        return new PlayerMachine(machineReach, maxFuel, fuelDeficiency, fuelTypes, machineType, structure,
+                recipe, machineKey, machineCoreBlockType, totalResourcesGained, resourcesGained, fuels, machineCoreBlockLocation,
                 zenCoinsGained, totalZenCoinsGained, owner, upgrades);
     }
 
-    public PlayerMachine createMachine(Machine machine, Location referenceBlockLocation, Location openGUIBlockLocation, double totalResourcesGained,
-                                       List<ItemStack> resourcesGained, List<PlayerFuel> fuels, double zenCoinsGained, double totalZenCoinsGained, UUID owner,
-                                       List<AbstractUpgrade> upgrades) throws IllegalArgumentException {
+    public PlayerMachine createMachine(Machine machine, Location machineCoreBlockLocation, double totalResourcesGained,
+                                       List<PlayerFuel> fuels, double zenCoinsGained, double totalZenCoinsGained, UUID owner,
+                                       List<AbstractUpgrade> upgrades, List<ItemStack> resourcesGained) throws IllegalArgumentException {
         if (machine == null) throw new IllegalArgumentException("Machine must not be null (MachineFactory)");
-        return new PlayerMachine(machine.referenceBlockType, machine.machineReach, machine.maxFuel, machine.fuelDeficiency, machine.fuelTypes,
+        return new PlayerMachine(machine.machineReach, machine.maxFuel, machine.fuelDeficiency, machine.fuelTypes,
                 machine.machineType, machine.structure,
-                machine.recipe, machine.machineName, machine.openGUIBlockType, referenceBlockLocation, totalResourcesGained, resourcesGained, fuels,
-                openGUIBlockLocation, zenCoinsGained, totalZenCoinsGained, owner, upgrades);
+                machine.recipe, machine.machineName, machine.machineCoreBlockType, totalResourcesGained, resourcesGained, fuels,
+                machineCoreBlockLocation, zenCoinsGained, totalZenCoinsGained, owner, upgrades);
     }
 
     private Recipe injectMachineNBTIntoRecipe(Recipe recipe, Machine machine) {
@@ -131,7 +128,7 @@ public class MachineFactory {
         nbtTagField.setAccessible(true);
         NBTTagCompound nbtTagCompound = recipeResultReference.getNBTTagCompound();
         if (nbtTagCompound == null) nbtTagCompound = new NBTTagCompound();
-        Gson gson = new GsonBuilder().registerTypeHierarchyAdapter(Machine.class, new MachineTypeAdapter(this)).create();
+        Gson gson = new GsonBuilder().registerTypeHierarchyAdapter(Machine.class, new MachineTypeAdapter<>(this)).create();
         nbtTagCompound.setString("machine", gson.toJson(machine));
         try {
             nbtTagField.set(recipeResultReference, nbtTagCompound);
