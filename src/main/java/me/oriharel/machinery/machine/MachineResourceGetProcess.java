@@ -2,8 +2,8 @@ package me.oriharel.machinery.machine;
 
 import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.MaterialChance;
-import me.oriharel.machinery.RandomCollection;
 import me.oriharel.machinery.upgrades.AbstractUpgrade;
+import me.oriharel.machinery.utilities.RandomCollection;
 import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.inventory.ItemStack;

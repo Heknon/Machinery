@@ -1,6 +1,6 @@
 package me.oriharel.machinery.inventory;
 
-import me.oriharel.machinery.Callback;
+import me.oriharel.machinery.utilities.Callback;
 import me.oriharel.machinery.utilities.NMS;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;

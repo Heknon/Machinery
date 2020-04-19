@@ -1,4 +1,4 @@
-package me.oriharel.machinery;
+package me.oriharel.machinery.data;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

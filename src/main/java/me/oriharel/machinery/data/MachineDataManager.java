@@ -1,7 +1,9 @@
-package me.oriharel.machinery;
+package me.oriharel.machinery.data;
 
+import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.machine.MachineManager;
 import me.oriharel.machinery.machine.PlayerMachine;
+import me.oriharel.machinery.utilities.Callback;
 import me.oriharel.machinery.utilities.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

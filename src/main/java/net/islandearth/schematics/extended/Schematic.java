@@ -1,6 +1,6 @@
 package net.islandearth.schematics.extended;
 
-import me.oriharel.machinery.CallbackP;
+import me.oriharel.machinery.utilities.CallbackP;
 import net.islandearth.schematics.extended.NBTUtils.Position;
 import net.minecraft.server.v1_15_R1.NBTCompressedStreamTools;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;

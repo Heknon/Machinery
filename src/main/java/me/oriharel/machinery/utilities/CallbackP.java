@@ -1,4 +1,4 @@
-package me.oriharel.machinery;
+package me.oriharel.machinery.utilities;
 
 @FunctionalInterface
 public interface CallbackP<P> {

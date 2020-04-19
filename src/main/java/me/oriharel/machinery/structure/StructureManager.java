@@ -1,7 +1,7 @@
 package me.oriharel.machinery.structure;
 
-import me.oriharel.machinery.Callback;
 import me.oriharel.machinery.Machinery;
+import me.oriharel.machinery.utilities.Callback;
 import net.islandearth.schematics.extended.Schematic;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;

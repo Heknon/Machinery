@@ -1,4 +1,4 @@
-package me.oriharel.machinery;
+package me.oriharel.machinery.utilities;
 
 import java.util.NavigableMap;
 import java.util.Random;

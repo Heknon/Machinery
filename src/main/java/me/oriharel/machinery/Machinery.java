@@ -2,6 +2,7 @@ package me.oriharel.machinery;
 
 import me.oriharel.customrecipes.CustomRecipes;
 import me.oriharel.machinery.config.FileManager;
+import me.oriharel.machinery.data.MachineDataManager;
 import me.oriharel.machinery.fuel.FuelManager;
 import me.oriharel.machinery.inventory.Listeners;
 import me.oriharel.machinery.listeners.Block;

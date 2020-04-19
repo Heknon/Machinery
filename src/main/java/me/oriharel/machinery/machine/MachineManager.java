@@ -1,7 +1,7 @@
 package me.oriharel.machinery.machine;
 
 import me.oriharel.machinery.Machinery;
-import me.oriharel.machinery.PlayerMachinePersistentDataType;
+import me.oriharel.machinery.data.PlayerMachinePersistentDataType;
 import me.oriharel.machinery.exceptions.*;
 import me.oriharel.machinery.utilities.Utils;
 import org.apache.commons.lang.ArrayUtils;
