@@ -31,7 +31,7 @@ public class Block implements Listener {
             return;
         }
         Machine machine = machineBlock.getMachine();
-        machine.build(e.getPlayer().getUniqueId(), e.getBlock().getLocation());
+        machinery.getMachineManager().buildMachine(e.getPlayer().getUniqueId(), machine, e.getBlock().getLocation());
         e.getBlock().setType(Material.AIR);
     }
 

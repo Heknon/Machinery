@@ -290,7 +290,7 @@ public class Schematic {
             boolean validated = true;
             Set<Block> validatedBlocks = new HashSet<>(); // Stores previous blocks before placing green glass
             for (Location validate : locations) {
-                if ((validate.getBlock().getType() != Material.AIR || validate.clone().subtract(0, 1, 0).getBlock().getType() == Material.WATER) || new Location(validate.getWorld(), validate.getX(), loc.getY() - 1, validate.getZ()).getBlock().getType() == Material.AIR) {
+                if ((validate.getBlock().getType() != Material.AIR || validate.getBlock().getType() != Material.GRASS || validate.clone().subtract(0, 1, 0).getBlock().getType() == Material.WATER) || new Location(validate.getWorld(), validate.getX(), loc.getY() - 1, validate.getZ()).getBlock().getType() == Material.AIR) {
                     /*
                      * Show fake block where block is interfering with schematic
                      */
