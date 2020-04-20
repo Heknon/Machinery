@@ -108,6 +108,10 @@ public class Interact implements Listener {
                             resource.setAmount(resource.getAmount() - num);
                             ItemStack givenItemStack = resource.clone();
                             givenItemStack.setAmount(num);
+                            if (!hasSpaceForItemAdd(p.getInventory(), givenItemStack)) {
+                                p.sendMessage("§c§lYou don't have enough inventory space to store " + decimalFormat.format(num) + " " + resourceName + ".");
+                                return false;
+                            }
                             p.getInventory().addItem(givenItemStack);
                         } catch (NumberFormatException e) {
                             p.sendMessage("§c§lInvalid number!");
@@ -144,5 +148,13 @@ public class Interact implements Listener {
         }
         routes.put("upgrades", new InventoryPage(machine.getUpgrades().size() * 9, "Upgrades", upgradeFillment, upgradeItems, machine));
         return inventory;
+    }
+
+    private boolean hasSpaceForItemAdd(org.bukkit.inventory.Inventory inventory, ItemStack toAdd) {
+        for (ItemStack itemStack : inventory) {
+            if (itemStack == null || itemStack.getType() == Material.AIR) return true;
+            if (itemStack.getType() == toAdd.getType() && itemStack.getAmount() + toAdd.getAmount() <= 64) return true;
+        }
+        return false;
     }
 }
