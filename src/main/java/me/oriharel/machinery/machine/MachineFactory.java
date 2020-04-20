@@ -25,7 +25,9 @@ import org.bukkit.inventory.ItemStack;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class MachineFactory {
@@ -97,7 +99,7 @@ public class MachineFactory {
                                        Structure structure,
                                        Recipe recipe,
                                        String machineKey, Material machineCoreBlockType, double totalResourcesGained,
-                                       List<ItemStack> resourcesGained,
+                                       HashMap<Material, ItemStack> resourcesGained,
                                        List<PlayerFuel> fuels, Location machineCoreBlockLocation, double zenCoinsGained, double totalZenCoinsGained, UUID owner,
                                        List<AbstractUpgrade> upgrades) throws IllegalArgumentException {
         if (machineType == null) throw new IllegalArgumentException("Machine type must not be null (MachineFactory)");
@@ -108,7 +110,7 @@ public class MachineFactory {
 
     public PlayerMachine createMachine(Machine machine, Location machineCoreBlockLocation, double totalResourcesGained,
                                        List<PlayerFuel> fuels, double zenCoinsGained, double totalZenCoinsGained, UUID owner,
-                                       List<AbstractUpgrade> upgrades, List<ItemStack> resourcesGained) throws IllegalArgumentException {
+                                       List<AbstractUpgrade> upgrades, HashMap<Material, ItemStack> resourcesGained) throws IllegalArgumentException {
         if (machine == null) throw new IllegalArgumentException("Machine must not be null (MachineFactory)");
         return new PlayerMachine(machine.machineReach, machine.maxFuel, machine.fuelDeficiency, machine.fuelTypes,
                 machine.machineType, machine.structure,

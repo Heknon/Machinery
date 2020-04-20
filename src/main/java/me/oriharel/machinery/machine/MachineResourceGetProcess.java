@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
@@ -73,7 +74,17 @@ public class MachineResourceGetProcess {
     }
 
     protected void insertResources() {
-        machine.getResourcesGained().addAll(itemsGained);
+        HashMap<Material, ItemStack> resourcesGained = machine.getResourcesGained();
+        itemsGained.forEach(
+                item -> {
+                    if (resourcesGained.containsKey(item.getType())) {
+                        ItemStack prev = resourcesGained.get(item.getType());
+                        prev.setAmount(prev.getAmount() + item.getAmount());
+                        return;
+                    }
+                    resourcesGained.put(item.getType(), item.clone());
+                }
+        );
     }
 
     /**

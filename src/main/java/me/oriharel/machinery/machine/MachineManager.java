@@ -5,6 +5,7 @@ import me.oriharel.machinery.api.events.PostMachineBuildEvent;
 import me.oriharel.machinery.api.events.PreMachineBuildEvent;
 import me.oriharel.machinery.data.PlayerMachinePersistentDataType;
 import me.oriharel.machinery.exceptions.*;
+import me.oriharel.machinery.items.MachineBlock;
 import me.oriharel.machinery.upgrades.LootBonusUpgrade;
 import me.oriharel.machinery.upgrades.SpeedUpgrade;
 import me.oriharel.machinery.utilities.Utils;
@@ -16,7 +17,10 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.TileState;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.craftbukkit.libs.jline.internal.Nullable;
+import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -73,7 +77,7 @@ public class MachineManager {
                 e.printStackTrace();
             }
             machinery.getMachineDataManager().addMachineCoreLocation(machineLocation);
-            playerMachine.run().startProcess();
+            playerMachine.getMinerProcess().startProcess();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -97,10 +101,15 @@ public class MachineManager {
         tileState.update();
     }
 
+    @Nullable
     public PlayerMachine getPlayerMachineFromBlock(Block block) {
-        TileState tileState = (TileState) block.getState();
-        PersistentDataContainer persistentDataContainer = tileState.getPersistentDataContainer();
-        return persistentDataContainer.get(MACHINE_NAMESPACE_KEY, MACHINE_PERSISTENT_DATA_TYPE);
+        try {
+            TileState tileState = (TileState) block.getState();
+            PersistentDataContainer persistentDataContainer = tileState.getPersistentDataContainer();
+            return persistentDataContainer.get(MACHINE_NAMESPACE_KEY, MACHINE_PERSISTENT_DATA_TYPE);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public void setPlayerMachineLocations(Block block, Location[] locations) {
@@ -126,29 +135,34 @@ public class MachineManager {
     }
 
     public boolean buildMachine(UUID playerUuid, Machine machine, Location buildLocation) {
-        PreMachineBuildEvent preMachineBuildEvent = new PreMachineBuildEvent(machine, buildLocation);
-        Bukkit.getPluginManager().callEvent(preMachineBuildEvent);
-        if (preMachineBuildEvent.isCancelled()) return false;
-        Player p = Bukkit.getPlayer(playerUuid);
-        List<Location> locations = machine.structure.build(buildLocation, p, machine.machineCoreBlockType, (printResult) -> {
-            if (printResult.getPlacementLocations() == null) {
-                p.sendMessage(ChatColor.translateAlternateColorCodes('&', Machinery.getInstance().getFileManager().getConfig("config.yml").get().getString(
-                        "not_empty_place")));
-                return false;
-            }
-            PlayerMachine playerMachine = Machinery.getInstance().getMachineManager().getMachineFactory().createMachine(machine,
-                    printResult.getOpenGUIBlockLocation(), 0, new ArrayList<>(), 0, 0, playerUuid, Arrays.asList(
-                            new LootBonusUpgrade(1),
-                            new SpeedUpgrade(1)
-                    ), new ArrayList<>());
-            Machinery.getInstance().getMachineManager().registerNewPlayerMachine(playerMachine, new HashSet<>(printResult.getPlacementLocations()));
-            PostMachineBuildEvent postMachineBuildEvent = new PostMachineBuildEvent(playerMachine, buildLocation);
-            Bukkit.getPluginManager().callEvent(postMachineBuildEvent);
+        try {
+            PreMachineBuildEvent preMachineBuildEvent = new PreMachineBuildEvent(machine, buildLocation);
+            Bukkit.getPluginManager().callEvent(preMachineBuildEvent);
+            if (preMachineBuildEvent.isCancelled()) return false;
+            Player p = Bukkit.getPlayer(playerUuid);
+            List<Location> locations = machine.structure.build(buildLocation, p, machine.machineCoreBlockType, (printResult) -> {
+                if (printResult.getPlacementLocations() == null) {
+                    p.sendMessage(ChatColor.translateAlternateColorCodes('&', Machinery.getInstance().getFileManager().getConfig("config.yml").get().getString(
+                            "not_empty_place")));
+                    return false;
+                }
+                PlayerMachine playerMachine = Machinery.getInstance().getMachineManager().getMachineFactory().createMachine(machine,
+                        printResult.getOpenGUIBlockLocation(), 0, new ArrayList<>(), 0, 0, playerUuid, Arrays.asList(
+                                new LootBonusUpgrade(1),
+                                new SpeedUpgrade(1)
+                        ), new HashMap<>());
+                Machinery.getInstance().getMachineManager().registerNewPlayerMachine(playerMachine, new HashSet<>(printResult.getPlacementLocations()));
+                PostMachineBuildEvent postMachineBuildEvent = new PostMachineBuildEvent(playerMachine, buildLocation);
+                Bukkit.getPluginManager().callEvent(postMachineBuildEvent);
+                return true;
+            });
+            if (locations == null) return false;
+            Machinery.getInstance().getMachineManager().addTemporaryPreRegisterMachinePartLocations(locations);
             return true;
-        });
-        if (locations == null) return false;
-        Machinery.getInstance().getMachineManager().addTemporaryPreRegisterMachinePartLocations(locations);
-        return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public HashSet<Location> getMachinePartLocations() {

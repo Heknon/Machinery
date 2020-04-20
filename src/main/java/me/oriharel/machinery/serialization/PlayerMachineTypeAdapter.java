@@ -8,9 +8,12 @@ import me.oriharel.machinery.machine.MachineFactory;
 import me.oriharel.machinery.machine.PlayerMachine;
 import me.oriharel.machinery.upgrades.AbstractUpgrade;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class PlayerMachineTypeAdapter extends MachineTypeAdapter<PlayerMachine> implements JsonSerializer<PlayerMachine>, JsonDeserializer<PlayerMachine> {
@@ -35,7 +38,7 @@ public class PlayerMachineTypeAdapter extends MachineTypeAdapter<PlayerMachine> 
         }.getType());
         List<AbstractUpgrade> upgrades = context.deserialize(machineJsonObject.get("resourcesGained"), new TypeToken<List<AbstractUpgrade>>() {
         }.getType());
-        List<ItemStack> resourcesGained = context.deserialize(machineJsonObject.get("resourcesGained"), new TypeToken<List<ItemStack>>() {
+        HashMap<Material, ItemStack> resourcesGained = context.deserialize(machineJsonObject.get("resourcesGained"), new TypeToken<HashMap<Material, ItemStack>>() {
         }.getType());
 
 
@@ -54,9 +57,9 @@ public class PlayerMachineTypeAdapter extends MachineTypeAdapter<PlayerMachine> 
         baseMachineSerialized.add("ownerUuidMost", new JsonPrimitive(machine.getOwner().getMostSignificantBits()));
         baseMachineSerialized.add("ownerUuidLeast", new JsonPrimitive(machine.getOwner().getLeastSignificantBits()));
 
-        baseMachineSerialized.add("coreBlockLocation", context.serialize(machine, Location.class));
+        baseMachineSerialized.add("coreBlockLocation", context.serialize(machine.getMachineCore(), Location.class));
 
-        baseMachineSerialized.add("resourcesGained", context.serialize(machine.getResourcesGained(), new TypeToken<List<ItemStack>>() {
+        baseMachineSerialized.add("resourcesGained", context.serialize(machine.getResourcesGained(), new TypeToken<HashMap<Material, ItemStack>>() {
         }.getType()));
         baseMachineSerialized.add("upgrades", context.serialize(machine.getUpgrades(), new TypeToken<List<AbstractUpgrade>>() {
         }.getType()));

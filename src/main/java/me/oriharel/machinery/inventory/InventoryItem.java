@@ -12,7 +12,6 @@ import java.util.Objects;
 public class InventoryItem extends ItemStack {
     protected int indexInInventory;
     protected Callback onClick = null;
-    protected boolean cancelOnClick = true;
 
     public InventoryItem(int indexInInventory, Material material, int amount, String displayName, String... lore) {
         super(material, amount);
@@ -35,11 +34,6 @@ public class InventoryItem extends ItemStack {
         this.indexInInventory = indexInInventory;
     }
 
-    public InventoryItem setCancelOnClick(boolean cancel) {
-        cancelOnClick = cancel;
-        return this;
-    }
-
     public InventoryItem runOnClick() {
         if (onClick == null) return this;
         onClick.apply();
@@ -58,7 +52,6 @@ public class InventoryItem extends ItemStack {
         if (!super.equals(o)) return false;
         InventoryItem that = (InventoryItem) o;
         return indexInInventory == that.indexInInventory &&
-                cancelOnClick == that.cancelOnClick &&
                 Objects.equals(onClick, that.onClick);
     }
 
@@ -69,6 +62,6 @@ public class InventoryItem extends ItemStack {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), indexInInventory, onClick, cancelOnClick);
+        return Objects.hash(super.hashCode(), indexInInventory, onClick);
     }
 }

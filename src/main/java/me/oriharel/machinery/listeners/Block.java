@@ -24,15 +24,15 @@ public class Block implements Listener {
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent e) {
-        MachineBlock machineBlock;
+        MachineBlock<Machine> machineBlock;
         try {
-            machineBlock = new MachineBlock(e.getItemInHand());
+            machineBlock = new MachineBlock<>(e.getItemInHand());
         } catch (MachineNotFoundException ex) {
             return;
         }
         Machine machine = machineBlock.getMachine();
-        machinery.getMachineManager().buildMachine(e.getPlayer().getUniqueId(), machine, e.getBlock().getLocation());
-        e.getBlock().setType(Material.AIR);
+        e.setCancelled(machinery.getMachineManager().buildMachine(e.getPlayer().getUniqueId(), machine, e.getBlock().getLocation()));
+
     }
 
     @EventHandler

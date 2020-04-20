@@ -31,7 +31,6 @@ public class Inventory implements InventoryHolder {
     }
 
     public void navigateToNamedRoute(String name) {
-        viewer.closeInventory();
         InventoryPage page = routes.get(name);
         viewer.openInventory(page.getInventory());
         currentPage = page;

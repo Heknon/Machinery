@@ -12,7 +12,9 @@ import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class PlayerMachine extends Machine {
@@ -20,7 +22,7 @@ public class PlayerMachine extends Machine {
     private final UUID owner;
     private final List<AbstractUpgrade> upgrades;
     private double totalResourcesGained;
-    private List<ItemStack> resourcesGained;
+    private HashMap<Material, ItemStack> resourcesGained;
     private List<PlayerFuel> fuels;
     private double totalZenCoinsGained;
     private double zenCoinsGained;
@@ -29,7 +31,7 @@ public class PlayerMachine extends Machine {
 
     public PlayerMachine(int machineReach, int maxFuel, int fuelDeficiency, List<String> fuelTypes, MachineType machineType,
                          Structure structure, Recipe recipe, String machineName, Material openGUIBlockType,
-                         double totalResourcesGained, List<ItemStack> resourcesGained, List<PlayerFuel> fuels, Location machineCore, double zenCoinsGained,
+                         double totalResourcesGained, HashMap<Material, ItemStack> resourcesGained, List<PlayerFuel> fuels, Location machineCore, double zenCoinsGained,
                          double totalZenCoinsGained, UUID owner, List<AbstractUpgrade> upgrades) {
         super(machineReach, maxFuel, fuelDeficiency, fuelTypes, machineType, structure, recipe, machineName, openGUIBlockType);
         this.totalResourcesGained = totalResourcesGained;
@@ -43,52 +45,22 @@ public class PlayerMachine extends Machine {
     }
 
 
-    public MachineBlock deconstruct() {
+    public MachineBlock<PlayerMachine> deconstruct() {
         MachineManager machineManager = Machinery.getInstance().getMachineManager();
         machineManager.clearMachineTileStateDataFromBlock(machineCore.getBlock());
         Location[] machinePartLocations = machineManager.getPlayerMachineLocations(machineCore.getBlock());
         machineManager.unregisterPlayerMachine(this);
+        machineResourceGetProcess.endProcess();
 
 
         for (Location loc : machinePartLocations) {
             Block block = loc.getBlock();
-            block.setBlockData(new BlockData() {
-                @Override
-                public Material getMaterial() {
-                    return null;
-                }
-
-                @Override
-                public String getAsString() {
-                    return null;
-                }
-
-                @Override
-                public String getAsString(boolean b) {
-                    return null;
-                }
-
-                @Override
-                public BlockData merge(BlockData blockData) {
-                    return null;
-                }
-
-                @Override
-                public boolean matches(BlockData blockData) {
-                    return false;
-                }
-
-                @Override
-                public BlockData clone() {
-                    return null;
-                }
-            });
             block.setType(Material.AIR);
         }
-        return new MachineBlock(this.recipe, this);
+        return new MachineBlock<>(this.recipe, this);
     }
 
-    public MachineResourceGetProcess run() {
+    public MachineResourceGetProcess getMinerProcess() {
         if (machineResourceGetProcess == null)
             machineResourceGetProcess = new MachineResourceGetProcess(this);
         return machineResourceGetProcess;
@@ -138,11 +110,11 @@ public class PlayerMachine extends Machine {
         return machineCore;
     }
 
-    public List<ItemStack> getResourcesGained() {
+    public HashMap<Material, ItemStack> getResourcesGained() {
         return resourcesGained;
     }
 
-    public void setResourcesGained(List<ItemStack> resourcesGained) {
+    public void setResourcesGained(HashMap<Material, ItemStack> resourcesGained) {
         this.resourcesGained = resourcesGained;
     }
 

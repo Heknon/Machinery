@@ -48,6 +48,7 @@ public final class Machinery extends JavaPlugin {
         fileManager.getConfig("machines.yml").copyDefaults(true).save();
         File file = new File(getDataFolder(), "structures");
         if (!file.exists()) file.mkdir();
+        
         Bukkit.getPluginManager().registerEvents(new Listeners(), this);
         Bukkit.getScheduler().runTaskAsynchronously(this, () -> fuelManager = new FuelManager(this));
         getPlugin(CustomRecipes.class).getRecipesManager().registerRecipesDoneCallback(() -> Bukkit.getScheduler().runTask(this, () -> {
