@@ -1,4 +1,4 @@
-package net.islandearth.schematics.extended;
+package schematics;
 
 /**
  * Utility class containing all supported NBT materials with the matching names

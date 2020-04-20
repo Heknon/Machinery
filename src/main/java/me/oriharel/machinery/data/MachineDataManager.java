@@ -161,7 +161,7 @@ public class MachineDataManager {
                 saveMachinesDataToBlocks();
             }
         };
-        process.runTaskTimerAsynchronously(machinery, 0, 20 * 60 * 10);
+        process.runTaskTimer(machinery, 0, 20 * 60 * 10);
     }
 
     public void forceMachineDataSave() {

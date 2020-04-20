@@ -8,7 +8,7 @@ import me.oriharel.machinery.machine.Machine;
 import me.oriharel.machinery.machine.MachineFactory;
 import me.oriharel.machinery.machine.MachineType;
 import me.oriharel.machinery.structure.Structure;
-import net.islandearth.schematics.extended.Schematic;
+import schematics.Schematic;
 import org.bukkit.Material;
 
 import java.io.File;

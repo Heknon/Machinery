@@ -1,4 +1,4 @@
-package net.islandearth.schematics.extended;
+package schematics;
 
 /**
  * Called when an NBT block has the wrong id

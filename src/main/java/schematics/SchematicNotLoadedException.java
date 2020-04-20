@@ -1,4 +1,4 @@
-package net.islandearth.schematics.extended;
+package schematics;
 
 /**
  * Called when a schematic's data has not been loaded.

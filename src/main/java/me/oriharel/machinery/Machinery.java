@@ -1,5 +1,6 @@
 package me.oriharel.machinery;
 
+import com.google.common.collect.Lists;
 import me.oriharel.customrecipes.CustomRecipes;
 import me.oriharel.machinery.config.FileManager;
 import me.oriharel.machinery.data.MachineDataManager;
@@ -9,11 +10,14 @@ import me.oriharel.machinery.listeners.Block;
 import me.oriharel.machinery.listeners.Interact;
 import me.oriharel.machinery.machine.MachineManager;
 import me.oriharel.machinery.structure.StructureManager;
+import me.oriharel.machinery.utilities.SignMenuFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.util.function.BiPredicate;
 
 public final class Machinery extends JavaPlugin {
 
@@ -24,6 +28,7 @@ public final class Machinery extends JavaPlugin {
     private StructureManager structureManager;
     private FuelManager fuelManager;
     private MachineDataManager machineDataManager;
+    private SignMenuFactory signMenuFactory;
 
     public static Machinery getInstance() {
         return INSTANCE;
@@ -48,7 +53,8 @@ public final class Machinery extends JavaPlugin {
         fileManager.getConfig("machines.yml").copyDefaults(true).save();
         File file = new File(getDataFolder(), "structures");
         if (!file.exists()) file.mkdir();
-        
+
+        this.signMenuFactory = new SignMenuFactory(this);
         Bukkit.getPluginManager().registerEvents(new Listeners(), this);
         Bukkit.getScheduler().runTaskAsynchronously(this, () -> fuelManager = new FuelManager(this));
         getPlugin(CustomRecipes.class).getRecipesManager().registerRecipesDoneCallback(() -> Bukkit.getScheduler().runTask(this, () -> {
@@ -62,6 +68,14 @@ public final class Machinery extends JavaPlugin {
                 machineDataManager.startMachineSaveDataProcess();
             });
         }));
+    }
+
+    public void createSignInput(Player target, BiPredicate<Player, String[]> response, String ...defaultLines) {
+        this.signMenuFactory
+                .newMenu(Lists.newArrayList(defaultLines))
+                .reopenIfFail()
+                .response(response)
+                .open(target);
     }
 
     @Override

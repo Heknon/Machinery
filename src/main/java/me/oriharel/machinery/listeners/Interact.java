@@ -7,6 +7,7 @@ import me.oriharel.machinery.inventory.*;
 import me.oriharel.machinery.items.MachineBlock;
 import me.oriharel.machinery.machine.PlayerMachine;
 import me.oriharel.machinery.upgrades.AbstractUpgrade;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.TileState;
@@ -18,9 +19,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -60,7 +63,7 @@ public class Interact implements Listener {
     private Inventory craftInventory(PlayerMachine machine, Player player) {
 
         HashMap<Material, ItemStack> resourcesGained = machine.getResourcesGained();
-        List<ItemStack> resources = new ArrayList<>(resourcesGained.values());
+        List<ItemStack> resources = new ArrayList<>(resourcesGained.values()).stream().filter(is -> is.getAmount() != 0).collect(Collectors.toList());
 
         Map<String, InventoryPage> routes = new HashMap<>();
         InventoryItem fillment = new InventoryFillmentItem(Material.GRAY_STAINED_GLASS_PANE, 1, "");
@@ -86,7 +89,33 @@ public class Interact implements Listener {
 
         List<PlayerFuel> fuels = machine.getFuels();
         routes.put("resources", new InventoryPage(9, "Resources", null,
-                IntStream.range(0, Math.min(resources.size(), 9)).mapToObj(i -> new InventoryItem(i, resources.get(i))).collect(Collectors.toSet()), machine).setCancelClick(false));
+                IntStream.range(0, resources.size()).mapToObj(i -> {
+                    ItemStack resource = resources.get(i);
+                    ItemStack itemStack = resource.clone();
+                    itemStack.setAmount(1);
+                    ItemMeta meta = itemStack.getItemMeta();
+                    meta.setLore(Arrays.asList("§d§lThere are currently", "§e§l" + decimalFormat.format(resource.getAmount()) + " §d§lof this item stored."));
+                    itemStack.setItemMeta(meta);
+                    return new InventoryItem(i, itemStack).setOnClick(() -> machinery.createSignInput(player, (p, lines) -> {
+                        String resourceName = StringUtils.capitalize(itemStack.getType().toString().toLowerCase().replaceAll("_", " "));
+                        p.sendMessage("§e§lYou are taking §b§l" + resourceName + " §e§lfrom a machine. Please enter an amount.");
+                        try {
+                            int num = Integer.parseInt(lines[0].replace("§9", "").replaceAll("\\D", ""));
+                            if (num > resource.getAmount()) {
+                                p.sendMessage("§c§lYou don't have that amount of resources of type " + resourceName + " in the machine.");
+                                return false;
+                            }
+                            resource.setAmount(resource.getAmount() - num);
+                            ItemStack givenItemStack = resource.clone();
+                            givenItemStack.setAmount(num);
+                            p.getInventory().addItem(givenItemStack);
+                        } catch (NumberFormatException e) {
+                            p.sendMessage("§c§lInvalid number!");
+                            return false;
+                        }
+                        return true;
+                    }, "§e§lAmount: §9", "", "", ""));
+                }).collect(Collectors.toSet()), machine));
         routes.put("fuels", new InventoryPage(9, "Fuels", null,
                 IntStream.range(0, fuels.size()).mapToObj(i -> {
                     PlayerFuel fuel = fuels.get(i);

@@ -2,7 +2,7 @@ name: Machinery
 version: ${project.version}
 main: me.oriharel.machinery.Machinery
 api-version: 1.13
-depend: [MultiEconomy, WorldEdit, CustomRecipes]
+depend: [MultiEconomy, WorldEdit, CustomRecipes, ProtocolLib]
 authors: [Heknon]
 description: Adds machines to the game
 website: oriharel.me

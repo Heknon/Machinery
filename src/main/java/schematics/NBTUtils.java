@@ -1,4 +1,4 @@
-package net.islandearth.schematics.extended;
+package schematics;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;

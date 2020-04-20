@@ -1,8 +1,8 @@
 package me.oriharel.machinery.structure;
 
 import com.sun.istack.internal.NotNull;
-import net.islandearth.schematics.extended.Schematic;
-import net.islandearth.schematics.extended.SchematicNotLoadedException;
+import schematics.Schematic;
+import schematics.SchematicNotLoadedException;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;

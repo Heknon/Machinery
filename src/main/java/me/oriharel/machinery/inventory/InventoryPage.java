@@ -44,7 +44,7 @@ public class InventoryPage implements InventoryHolder {
         this.onClose = null;
         this.owner = owner;
         inventory = new CraftInventoryCustom(this, size, title);
-        inventory.setMaxStackSize(128);
+        inventory.setMaxStackSize(20000000);
         populateItems();
     }
 
