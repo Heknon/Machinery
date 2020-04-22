@@ -1,18 +1,14 @@
 package me.oriharel.machinery.fuel;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
 import me.oriharel.machinery.Machinery;
-import me.oriharel.machinery.utilities.NMS;
-import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.craftbukkit.libs.org.apache.commons.codec.binary.Base64;
-import org.bukkit.inventory.ItemStack;
 
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 public class FuelManager {
@@ -20,21 +16,37 @@ public class FuelManager {
     private Machinery machinery;
     private Gson gson;
     private Set<Fuel> fuels;
+    private HashMap<String, Fuel> nbtIds;
 
     public FuelManager(Machinery machinery) {
         this.machinery = machinery;
         this.gson = new Gson();
         this.fuels = new HashSet<>();
+        nbtIds = new HashMap<String, Fuel>();
         initializeFuels();
     }
 
     public Fuel getFuelByName(String name) {
-        return fuels.stream().filter(f -> f.getName().equalsIgnoreCase(name)).findAny().get();
+        return fuels.stream().filter(f -> f.getName().equalsIgnoreCase(name)).findAny().orElse(null);
     }
 
-    public ItemStack getFuelItem(String fuelName, int amount) {
-        Fuel fuel = getFuelByName(fuelName).clone();
-        return new PlayerFuel(fuel.getName(), fuel.getMaterial(), fuel.getNbt(), fuel.getEnergy(), amount).getItem();
+    public PlayerFuel getPlayerFuelItem(String fuelName, int amount) {
+        Fuel fuel = getFuelByName(fuelName);
+        if (fuel == null) return null;
+        fuel = fuel.clone();
+        return new PlayerFuel(fuel.getName(), fuel.getType(), fuel.getNbtId(), fuel.getEnergy(), amount);
+    }
+
+    public PlayerFuel getPlayerFuelItem(Material material, int amount) {
+        Optional<Fuel> fuelOptional = fuels.stream().filter(f -> f.getType() == material).findAny();
+        if (!fuelOptional.isPresent()) return null;
+        Fuel fuel = fuelOptional.get();
+        return new PlayerFuel(fuel.getName(), fuel.getType(), fuel.getNbtId(), fuel.getEnergy(), amount);
+    }
+
+    public PlayerFuel getPlayerFuelItemByNbtId(String nbtId, int amount) {
+        Fuel fuel = nbtIds.get(nbtId).clone();
+        return new PlayerFuel(fuel.getName(), fuel.getType(), fuel.getNbtId(), fuel.getEnergy(), amount);
     }
 
     private void initializeFuels() {
@@ -51,20 +63,19 @@ public class FuelManager {
     private Fuel initializeFuel(String fuelName, YamlConfiguration configLoad) {
         Material material = Material.getMaterial(configLoad.getString(fuelName.concat(".material"), "___"));
         String nbtString = configLoad.getString(fuelName + ".nbt");
-        NBTTagCompound nbt = null;
-        Map<String, Object> nbtMap = null;
-        if (nbtString != null)
-            try {
-                nbtMap = gson.fromJson(new String(Base64.decodeBase64(nbtString)), Map.class);
-            } catch (JsonSyntaxException e) {
-                Bukkit.getLogger().severe("fuels.yml has an invalid NBT field. Please enter valid NBT data.");
-            }
-        if (nbtMap != null) nbt = NMS.nbtFromMap(nbtMap);
         int energy = configLoad.getInt(fuelName.concat(".energy"), -1);
         if (energy <= 0)
             throw new RuntimeException(
                     "Invalid energy for fuel amount. Fuel energy most be above 0. Check config to see if you defined energy.");
-        return new Fuel(fuelName, material, nbt, energy);
+        Fuel fuel = new Fuel(fuelName, material, nbtString, energy);
+        if (nbtString != null) {
+            nbtIds.put(nbtString, fuel);
+        }
+        return fuel;
+    }
+
+    public HashMap<String, Fuel> getNbtIds() {
+        return nbtIds;
     }
 
     public Set<Fuel> getFuels() {

@@ -2,6 +2,8 @@ package me.oriharel.machinery.utilities;
 
 import net.minecraft.server.v1_15_R1.*;
 import org.bukkit.craftbukkit.libs.jline.internal.Nullable;
+import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftMetaBlockState;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -78,10 +80,14 @@ public final class NMS {
 
     @Nullable
     public static Map<String, NBTBase> getItemStackUnhandledNBT(ItemStack itemStack) {
-        if (!itemStack.hasItemMeta()) itemStack.setItemMeta(new ItemStack(itemStack.getType(), itemStack.getAmount()).getItemMeta());
-
         ItemMeta metaReference = getItemStackMetaReference(itemStack);
         return ReflectionUtils.Fields.getFieldValueOfUnknownClass(metaReference, "org.bukkit.craftbukkit.v1_15_R1.inventory.CraftMetaItem", "unhandledTags");
+    }
+
+    @Nullable
+    public static Map<String, NBTBase> getItemStackNBTTMapClone(ItemStack itemStack) {
+        NBTTagCompound compound = CraftItemStack.asNMSCopy(itemStack).getTag();
+        return ReflectionUtils.Fields.getFieldValueOfUnknownClass(compound, NBTTagCompound.class, "map");
     }
 
     @Nullable

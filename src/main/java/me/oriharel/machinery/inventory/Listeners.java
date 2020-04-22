@@ -1,12 +1,32 @@
 package me.oriharel.machinery.inventory;
 
+import me.oriharel.machinery.Machinery;
+import me.oriharel.machinery.fuel.PlayerFuel;
+import me.oriharel.machinery.machine.PlayerMachine;
+import me.oriharel.machinery.utilities.NMS;
+import me.oriharel.machinery.utilities.Utils;
+import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
 public class Listeners implements Listener {
+
+    private Machinery machinery;
+    private Map<Inventory, ItemStack[]> inventories;
+
+    public Listeners(Machinery machinery) {
+        this.machinery = machinery;
+        this.inventories = new HashMap<>();
+    }
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
@@ -23,7 +43,6 @@ public class Listeners implements Listener {
                     inventoryNavigationItem.navigate();
                 } else {
                     item.runOnClick();
-
                 }
             }
         }
@@ -38,153 +57,87 @@ public class Listeners implements Listener {
         if (inventory.onClose != null) inventory.onClose.apply();
     }
 
+    @EventHandler
+    public void onInventoryOpenHandleFuels(InventoryOpenEvent e) {
+        Inventory inventory = e.getInventory();
+        if (!(inventory.getHolder() instanceof InventoryPage)) return;
+        if (!e.getView().getTitle().equalsIgnoreCase("fuels")) return;
 
-    // REPLACED WITH SIGN MENU
-//    @EventHandler
-//    public void onResourceGive(GiveResourcesEvent e) {
-//        Map<Material, ItemStack> resourcesGained = e.getMachine().getResourcesGained();
-//        ItemStack givenResource = e.getResourceGiven();
-//
-//        System.out.println(givenResource);
-//        System.out.println("Before give: " + resourcesGained.get(givenResource.getType()));
-//
-//        if (!resourcesGained.containsKey(givenResource.getType())) {
-//            resourcesGained.put(givenResource.getType(), givenResource);
-//            return;
-//        }
-//
-//        ItemStack resourceInMachine = resourcesGained.get(givenResource.getType());
-//
-//        resourceInMachine.setAmount(resourceInMachine.getAmount() + givenResource.getAmount());
-//
-//        System.out.println("After give: " + resourcesGained.get(givenResource.getType()));
-//    }
-//
-//    @EventHandler
-//    public void onResourceTake(TakeResourcesEvent e) {
-//        Map<Material, ItemStack> resourcesGained = e.getMachine().getResourcesGained();
-//        ItemStack takenResource = e.getResourceTaken();
-//
-//        System.out.println(takenResource);
-//        ItemStack resourceInMachine = resourcesGained.get(takenResource.getType());
-//        System.out.println("Before take: " + resourceInMachine);
-//
-//
-//        // since item is taken, we remove from the amount of that resource the amount taken
-//        resourceInMachine.setAmount(resourceInMachine.getAmount() - takenResource.getAmount());
-//        System.out.println("After take: " + resourceInMachine);
-//
-//        ItemStack resourceToSetInInventory = resourceInMachine.clone();
-//        // an inventory item can only hold up to 64 items in a stack. An itemstack of more than that is stored so i get the minimum just in case there is less than 64
-//        // in the resource bank
-//        resourceToSetInInventory.setAmount(Math.min(resourceInMachine.getAmount(), 64));
-//        e.getOpenedInventory().setItem(e.getSlotTakenFrom(), resourceToSetInInventory);
-//    }
-//
-//    /**
-//     * Handles the calling of {@link me.oriharel.machinery.api.events.TakeResourcesEvent}
-//     */
-//    @EventHandler
-//    public void onInventoryClickTakeResourceHandler(InventoryClickEvent e) {
-//        if (e.getClickedInventory() == null) return;
-//        if (!e.getClickedInventory().equals(e.getView().getTopInventory())) return;
-//        if (!(e.getClickedInventory().getHolder() instanceof InventoryPage)) return;
-//        if (!e.getView().getTitle().equalsIgnoreCase("resources")) return;
-//        // negate all cases that an item is not taken
-//        if (e.getClick() != ClickType.LEFT && e.getClick() != ClickType.RIGHT && e.getClick() != ClickType.SHIFT_LEFT && e.getClick() != ClickType.SHIFT_RIGHT && e
-//        .getClick() != ClickType.DOUBLE_CLICK)
-//            return;
-//
-//        InventoryPage page = (InventoryPage) e.getClickedInventory().getHolder();
-//        ItemStack clickedItem = e.getCurrentItem();
-//
-//        // on double click all items of same kind (up to 64) are compacted to one item.
-//        if (clickedItem != null && e.getClick() == ClickType.DOUBLE_CLICK) {
-//            Material type = clickedItem.getType();
-//            ItemStack compactItem = clickedItem.clone();
-//            compactItem.setAmount(0);
-//            for (ItemStack item : page.getInventory().getContents()) {
-//                if (compactItem.getAmount() > 64) break;
-//                // doesn't break out of loop once compactItem + item reaches 64 since another item might fill it up to 64
-//                if (item.getType() == type && compactItem.getAmount() + item.getAmount() <= 64) compactItem.setAmount(compactItem.getAmount() + item.getAmount());
-//            }
-//            Bukkit.getPluginManager().callEvent(new TakeResourcesEvent(compactItem, page.owner, e.getView().getTopInventory(), e.getSlot()));
-//            return;
-//        }
-//
-//        if (clickedItem != null && clickedItem.getType() != Material.AIR) {
-//            if (e.getCursor() != null && e.getCursor().getType() == clickedItem.getType()) {
-//                Bukkit.getPluginManager().callEvent(new TakeResourcesEvent(clickedItem.clone(), page.owner, e.getView().getTopInventory(), e.getSlot()));
-//            } else if (e.getClick() == ClickType.RIGHT) {
-//                System.out.println("------------------");
-//                System.out.println(clickedItem);
-//                ItemStack item = clickedItem.clone();
-//                item.setAmount((item.getAmount() / 2) + 1);
-//                System.out.println(item);
-//                Bukkit.getPluginManager().callEvent(new TakeResourcesEvent(item, page.owner, e.getView().getTopInventory(), e.getSlot()));
-//            } else {
-//                System.out.println("CLONE: " + clickedItem.clone());
-//                clickedItem.clone().setAmount(0);
-//                Bukkit.getPluginManager().callEvent(new TakeResourcesEvent(clickedItem.clone(), page.owner, e.getView().getTopInventory(), e.getSlot()));
-//            }
-//        }
-//    }
-//
-//    /**
-//     * Handles the calling of {@link me.oriharel.machinery.api.events.GiveResourcesEvent}
-//     */
-//    @EventHandler
-//    public void onInventoryClickGiveResourceHandler(InventoryClickEvent e) {
-//        if (e.getClickedInventory() == null) return;
-//        if (!(e.getView().getTopInventory().getHolder() instanceof InventoryPage)) return;
-//        if (!e.getView().getTitle().equalsIgnoreCase("resources")) return;
-//
-//        ClickType clickType = e.getClick();
-//        // negate all cases that an item is not given in
-//        if (clickType != ClickType.LEFT && clickType != ClickType.RIGHT && clickType != ClickType.SHIFT_LEFT && clickType != ClickType.SHIFT_RIGHT) return;
-//
-//        InventoryPage page = (InventoryPage) e.getView().getTopInventory().getHolder();
-//        if (page == null) return;
-//        ItemStack clickedItem = e.getCurrentItem();
-//        ItemStack cursorItem = e.getCursor();
-//        boolean clickedTopInventory = e.getClickedInventory().equals(e.getView().getTopInventory());
-//
-//        // cannot give items when shift clicking the item cursor
-//        if (clickedTopInventory) {
-//            if (clickType == ClickType.SHIFT_RIGHT || clickType == ClickType.SHIFT_LEFT) return;
-//            if (clickedItem != null && clickedItem.getType() != Material.AIR && cursorItem != null && cursorItem.getType() != Material.AIR)
-//                Bukkit.getPluginManager().callEvent(new GiveResourcesEvent(cursorItem.clone(), page.owner, e.getView().getTopInventory()));
-//            else if (cursorItem != null && cursorItem.getType() != Material.AIR && clickType == ClickType.RIGHT && (clickedItem == null || clickedItem.getType() ==
-//            Material.AIR)) {
-//                ItemStack resource = cursorItem.clone();
-//                resource.setAmount(1);
-//                Bukkit.getPluginManager().callEvent(new GiveResourcesEvent(resource, page.owner, e.getView().getTopInventory()));
-//            } else if (cursorItem != null && cursorItem.getType() != Material.AIR) {
-//                Bukkit.getPluginManager().callEvent(new GiveResourcesEvent(cursorItem.clone(), page.owner, e.getView().getTopInventory()));
-//            }
-//        } else if (clickedItem != null && clickedItem.getType() != Material.AIR && (clickType == ClickType.SHIFT_RIGHT || clickType == ClickType.SHIFT_LEFT)) {
-//            Bukkit.getPluginManager().callEvent(new GiveResourcesEvent(clickedItem.clone(), page.owner, e.getView().getTopInventory()));
-//        }
-//    }
-//
-//    /**
-//     * Handles the calling of {@link me.oriharel.machinery.api.events.GiveResourcesEvent} for when a player drags to spread out resources
-//     */
-//    @EventHandler
-//    public void onInventoryDragEvent(InventoryDragEvent e) {
-//        if (!(e.getInventory().getHolder() instanceof InventoryPage)) return;
-//        if (!e.getView().getTitle().equalsIgnoreCase("resources")) return;
-//
-//        Collection<ItemStack> newItems = e.getNewItems().values();
-//
-//        final ItemStack[] itemStack = {null};
-//        newItems.forEach(is -> {
-//            if (itemStack[0] == null) {
-//                itemStack[0] = is.clone();
-//                itemStack[0].setAmount(0);
-//            }
-//            itemStack[0].setAmount(itemStack[0].getAmount() + is.getAmount());
-//        });
-//        Bukkit.getPluginManager().callEvent(new GiveResourcesEvent(itemStack[0], ((InventoryPage) e.getInventory().getHolder()).owner, e.getInventory()));
-//    }
+        inventories.put(inventory, inventory.getContents());
+    }
+
+    @EventHandler // some brain damaging shit code to read
+    public void onInventoryCloseHandleFuels(InventoryCloseEvent e) {
+        Inventory inventory = e.getInventory();
+        if (!(inventory.getHolder() instanceof InventoryPage)) return;
+        if (!e.getView().getTitle().equalsIgnoreCase("fuels")) return;
+
+        // TODO: Check if fuel goes above max
+
+        InventoryPage page = (InventoryPage) inventory.getHolder();
+        ItemStack[] previousContents = inventories.get(inventory);
+        ItemStack[] newContents = new ItemStack[inventory.getContents().length];
+        boolean addedNonFuelItem = false;
+        int i = 0;
+        int previousSumFuels = page.owner.getFuels().stream().mapToInt(PlayerFuel::getEnergy).sum();
+        for (ItemStack item : inventory.getContents()) {
+            if (item == null || item.equals(previousContents[i]) || item.getType() == Material.AIR) {
+                i++;
+                continue;
+            }
+            boolean found = false;
+            System.out.println("-------------------------------");
+            for (String key : NMS.getItemStackNBTTMapClone(item).keySet()) {
+                if (machinery.getFuelManager().getNbtIds().containsKey(key)) {
+                    found = true;
+                    newContents[i] = item;
+                    Optional<PlayerFuel> fuelInMachine = page.owner.getFuels().stream().filter(f -> f.getName().equalsIgnoreCase(key)).findAny();
+                    if (fuelInMachine.isPresent()) {
+                        fuelInMachine.get().setAmount(fuelInMachine.get().getAmount() + item.getAmount() - previousContents[i].getAmount());
+                    } else {
+                        page.owner.getFuels().add(machinery.getFuelManager().getPlayerFuelItemByNbtId(key, item.getAmount()));
+                    }
+                    break;
+                }
+            }
+            if (found) {
+                i++;
+                continue;
+            }
+
+            Optional<PlayerFuel> fuelInMachine = page.owner.getFuels().stream().filter(f -> f.getType() == item.getType()).findAny();
+            if (fuelInMachine.isPresent()) {
+                fuelInMachine.get().setAmount(fuelInMachine.get().getAmount() + item.getAmount() - previousContents[i].getAmount());
+            } else {
+                PlayerFuel fuel = machinery.getFuelManager().getPlayerFuelItem(item.getType(), item.getAmount());
+                if (fuel == null) {
+                    addedNonFuelItem = true;
+                    if (Utils.inventoryHasSpaceForItemAdd(e.getPlayer().getInventory(), item))
+                        e.getPlayer().getInventory().addItem(item);
+                    else
+                        e.getPlayer().getLocation().getWorld().dropItemNaturally(e.getPlayer().getLocation(), item);
+                    i++;
+                    continue;
+                }
+                page.owner.getFuels().add(fuel);
+            }
+            newContents[i] = item;
+            i++;
+        }
+        inventory.setContents(newContents);
+        // if previous sum was zero and current is bigger than 0 start mine process
+        if (previousSumFuels == 0 && previousSumFuels < page.owner.getFuels().stream().mapToInt(PlayerFuel::getEnergy).sum()) {
+            page.owner.getMinerProcess().startProcess();
+        }
+        if (addedNonFuelItem) {
+            e.getPlayer().sendMessage("§c§lYou added a non fuel item to the fuels inventory. It was added back to your inventory.");
+        }
+    }
+
+
+    private void startMiningProcessIf0Fuel(PlayerMachine machine) {
+        if (machine.getFuels().stream().mapToInt(ItemStack::getAmount).sum() == 0) {
+            machine.getMinerProcess().startProcess();
+        }
+    }
 }

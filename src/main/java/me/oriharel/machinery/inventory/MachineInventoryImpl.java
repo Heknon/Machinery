@@ -36,7 +36,7 @@ public class MachineInventoryImpl {
         this.machine = machine;
         this.machinery = machinery;
         this.defaultFillment = new InventoryFillmentItem(Material.GRAY_STAINED_GLASS_PANE, 1, "");
-        this.decimalFormat = new DecimalFormat("#,##");
+        this.decimalFormat = new DecimalFormat("#,###");
         this.routes = new HashMap<>();
         this.parentInventory = new Inventory(routes, p);
         craftInventory();
@@ -124,7 +124,7 @@ public class MachineInventoryImpl {
     }
 
     private InventoryPage craftResourcesPage(List<ItemStack> resources) {
-        int closestMultipleTo9 = (int) (Math.ceil(resources.size() / 9.0) * 9);
+        int closestMultipleTo9 = Math.max((int) (Math.ceil(resources.size() / 9.0) * 9), 9);
 
         return new InventoryPage(Math.min(closestMultipleTo9, 54), "Resources", null,
                 IntStream.range(0, resources.size()).mapToObj(i -> {
@@ -147,7 +147,7 @@ public class MachineInventoryImpl {
         return new InventoryPage(9, "Fuels", null,
                 IntStream.range(0, fuels.size()).mapToObj(i -> {
                     PlayerFuel fuel = fuels.get(i);
-                    return new InventoryItem(i, fuel.getItem(fuel.getAmount()));
+                    return new InventoryItem(i, fuel);
                 }).collect(Collectors.toSet()), machine).setCancelClick(false);
     }
 
@@ -170,7 +170,7 @@ public class MachineInventoryImpl {
 
         for (AbstractUpgrade upgrade : machine.getUpgrades()) {
             for (int i = 0; i < upgrade.getLevel() + 1; i++) {
-                ItemStack upgradeItem = new ItemStack(i == upgrade.getLevel() ? Material.GREEN_STAINED_GLASS_PANE : Material.LIME_STAINED_GLASS_PANE, i + 1);
+                ItemStack upgradeItem = new ItemStack(i == upgrade.getLevel() ? Material.GREEN_STAINED_GLASS_PANE : Material.LIME_STAINED_GLASS_PANE, i);
                 ItemMeta meta = upgradeItem.getItemMeta();
                 meta.setDisplayName(ChatColor.DARK_AQUA + upgrade.getUpgradeName() + " " + ChatColor.GREEN + "(" + upgrade.getLevel() + ")");
                 if (i == upgrade.getLevel()) {
@@ -179,7 +179,7 @@ public class MachineInventoryImpl {
                     meta.setLore(Collections.singletonList("§aPurchased"));
                 }
                 upgradeItem.setItemMeta(meta);
-                upgradeItems.add(new InventoryItem(upgradeNumber * 9, Material.LIME_STAINED_GLASS_PANE, i + 1, ChatColor.DARK_AQUA + upgrade.getUpgradeName()));
+                upgradeItems.add(new InventoryItem(upgradeNumber * 9, upgradeItem));
             }
             ++upgradeNumber;
         }

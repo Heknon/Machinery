@@ -19,7 +19,7 @@ public class Test {
         fuelsWithEnoughEnergy.get(0).energy = 1;
         System.out.println(fuelsWithEnoughEnergy.hashCode());
         System.out.println(fuels.hashCode());
-    }
+}
 
 
     public static class Fuel {

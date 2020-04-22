@@ -1,6 +1,7 @@
 package me.oriharel.machinery.utilities;
 
 import com.google.gson.reflect.TypeToken;
+import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -60,7 +61,8 @@ public final class ReflectionUtils {
             try {
                 Field field = clazz.getDeclaredField(fieldName);
                 field.setAccessible(true);
-                return (R) field.get(instance);
+                R value = (R) field.get(instance);
+                return value;
             } catch (NoSuchFieldException | IllegalAccessException e) {
                 e.printStackTrace();
             }

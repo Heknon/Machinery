@@ -47,7 +47,7 @@ public class MachineResourceGetProcess {
         process = new BukkitRunnable() {
             @Override
             public void run() {
-                if (machine.getFuels().isEmpty() || machine.getFuels().stream().mapToInt(PlayerFuel::getAmount).sum() < machine.getFuelDeficiency()) {
+                if (machine.getFuels().isEmpty() || machine.getFuels().stream().mapToInt(PlayerFuel::getEnergy).sum() < machine.getFuelDeficiency()) {
                     cancel();
                     Player player = Bukkit.getPlayer(machine.getOwner());
                     if (player == null || !player.isOnline()) return;
@@ -93,11 +93,14 @@ public class MachineResourceGetProcess {
     public void runFuelRemoval() {
         Optional<PlayerFuel> fuelWithEnoughEnergy =
                 machine.getFuels().stream().filter(fuel -> fuel.getEnergy() >= machine.getFuelDeficiency()).findAny();
+        System.out.println("BEFORE: " + machine.getFuels().stream().mapToInt(PlayerFuel::getEnergy).sum());
         if (fuelWithEnoughEnergy.isPresent()) {
             PlayerFuel fuel = fuelWithEnoughEnergy.get();
             fuel.setEnergy(fuel.getEnergy() - machine.getFuelDeficiency());
+            System.out.println("AFTER: " + machine.getFuels().stream().mapToInt(PlayerFuel::getEnergy).sum());
             return;
         }
+
 
         AtomicInteger energySum = new AtomicInteger();
         Map<Integer, PlayerFuel> fuelCanRemoveFuelMap = new HashMap<>();
@@ -107,6 +110,9 @@ public class MachineResourceGetProcess {
             if (energySum.get() >= machine.getFuelDeficiency()) {
                 for (Map.Entry<Integer, PlayerFuel> fuelEntry : fuelCanRemoveFuelMap.entrySet()) {
                     fuelEntry.getValue().setEnergy(fuelEntry.getKey() - Math.max(fuelEntry.getKey(), machine.fuelDeficiency));
+                    if (fuelEntry.getValue().getEnergy() <= 0) {
+                        machine.getFuels().remove(fuelEntry.getValue());
+                    }
                 }
             }
         });

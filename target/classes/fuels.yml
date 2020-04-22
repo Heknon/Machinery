@@ -1,16 +1,22 @@
 # material - what material is the fuel
 # energy - say a machine requires 10 fuel for one go. Fuel with energy 10 will be used up, fuel with energy 20 will have half of it's energy left
 # nbt - allows to check if the item has a certain nbt if it does, it is the fuel
+# IF YOU DO NOT ADD NBT IT WILL BE MATCHED BY MATERIAL.
 
 fuel_type_name:
-  material: "BEDROCK"
+  displayName: "&eLevel 3 Fuel"
+  material: "BEACON"
+  nbt: "level3"
   energy: 50
 
 fuel_type_name2:
-  material: "OBSIDIAN"
+  displayName: "&eLevel 2 Fuel"
+  material: "BEACON"
+  nbt: "level2"
   energy: 30
 
 fuel_type_name3:
-  material: "OBSIDIAN"
-  nbt: "use the custom recipes command /customrecipes shownbt to get the nbt of an item and place it here"
+  displayName: "&eLevel 1 Fuel"
+  material: "BEACON"
+  nbt: "level1"
   energy: 5

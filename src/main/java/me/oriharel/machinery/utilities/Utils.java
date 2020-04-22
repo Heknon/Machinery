@@ -3,14 +3,13 @@ package me.oriharel.machinery.utilities;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import me.oriharel.machinery.Machinery;
+import me.oriharel.machinery.fuel.PlayerFuel;
 import me.oriharel.machinery.machine.Machine;
 import me.oriharel.machinery.machine.MachineFactory;
 import me.oriharel.machinery.machine.PlayerMachine;
-import me.oriharel.machinery.serialization.AbstractUpgradeTypeAdapter;
-import me.oriharel.machinery.serialization.LocationTypeAdapter;
-import me.oriharel.machinery.serialization.MachineTypeAdapter;
-import me.oriharel.machinery.serialization.PlayerMachineTypeAdapter;
+import me.oriharel.machinery.serialization.*;
 import me.oriharel.machinery.upgrades.AbstractUpgrade;
+import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -52,7 +51,9 @@ public final class Utils {
     public static <T extends Machine> Gson getGsonSerializationBuilderInstance(Class<T> machineType, MachineFactory factory) {
         return new GsonBuilder().registerTypeHierarchyAdapter(machineType, machineType == PlayerMachine.class ? new PlayerMachineTypeAdapter(factory) :
                 new MachineTypeAdapter<>(factory)).registerTypeHierarchyAdapter(AbstractUpgrade.class,
-                new AbstractUpgradeTypeAdapter()).registerTypeHierarchyAdapter(Location.class, new LocationTypeAdapter()).create();
+                new AbstractUpgradeTypeAdapter()).registerTypeHierarchyAdapter(Location.class, new LocationTypeAdapter())
+                .registerTypeHierarchyAdapter(NBTTagCompound.class, new NBTTagCompoundTypeAdapter())
+                .registerTypeHierarchyAdapter(PlayerFuel.class, new PlayerFuelTypeAdapter()).create();
 
     }
 }

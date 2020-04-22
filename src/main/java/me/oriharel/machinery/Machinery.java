@@ -4,7 +4,9 @@ import co.aikar.commands.BukkitCommandManager;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import me.oriharel.machinery.data.MachineDataManager;
+import me.oriharel.machinery.fuel.Fuel;
 import me.oriharel.machinery.fuel.FuelManager;
+import me.oriharel.machinery.fuel.PlayerFuel;
 import me.oriharel.machinery.inventory.Listeners;
 import me.oriharel.machinery.listeners.Block;
 import me.oriharel.machinery.listeners.Interact;
@@ -20,6 +22,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
@@ -64,10 +67,9 @@ public final class Machinery extends JavaPlugin {
 
         this.signMenuFactory = new SignMenuFactory(this);
 
-        Bukkit.getPluginManager().registerEvents(new Listeners(), this);
-        Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
-            fuelManager = new FuelManager(this);
-        });
+        Bukkit.getPluginManager().registerEvents(new Listeners(this), this);
+
+        fuelManager = new FuelManager(this);
 
         structureManager = new StructureManager(this);
         structureManager.registerOnDoneCallback(() -> {
@@ -99,12 +101,17 @@ public final class Machinery extends JavaPlugin {
     private void setupCommandManager() {
         this.commandManager = new BukkitCommandManager(this);
         commandManager.getCommandCompletions().registerCompletion("machines",
-                c -> ImmutableList.of(machineManager.getMachines().stream().map(Machine::getMachineName).collect(Collectors.joining())));
+                c -> Arrays.asList(machineManager.getMachines().stream().map(Machine::getMachineName).toArray(String[]::new)));
+        commandManager.getCommandCompletions().registerCompletion("fuels",
+                c -> Arrays.asList(fuelManager.getFuels().stream().map(Fuel::getName).toArray(String[]::new)));
         commandManager.getCommandContexts().registerIssuerAwareContext(Machine.class, (c) -> {
-            List<String> machineNames = machineManager.getMachines().stream().map(Machine::getMachineName).collect(Collectors.toList());
-            String machineName = c.getArgs().stream().filter(machineNames::contains).findFirst().orElse(null);
+            String machineName = c.getLastArg();
             if (machineName == null) return null;
             return machineManager.getMachines().stream().filter(machine -> machine.getMachineName().equalsIgnoreCase(machineName)).findFirst().get();
+        });
+        commandManager.getCommandContexts().registerIssuerAwareContext(PlayerFuel.class, (c) -> {
+            String fuelName = c.getLastArg();
+            return fuelManager.getPlayerFuelItem(fuelName, (Integer) c.getPassedArgs().get("amount"));
         });
         commandManager.registerCommand(new MachineCommand(this));
     }

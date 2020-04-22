@@ -7,3 +7,5 @@ authors: [Heknon]
 description: Adds machines to the game
 website: oriharel.me
 load: POSTWORLD
+commands:
+  machinery:
