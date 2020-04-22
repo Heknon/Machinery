@@ -1,21 +1,32 @@
 package me.oriharel.machinery;
 
 import com.google.gson.Gson;
+import me.oriharel.machinery.fuel.PlayerFuel;
 import me.oriharel.machinery.machine.MachineType;
 import me.oriharel.machinery.machine.PlayerMachine;
 import me.oriharel.machinery.utilities.Utils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Test {
     public static void main(String[] args) {
-        PlayerMachine machine = new PlayerMachine(1, 1, 1, Collections.singletonList("fuel"), MachineType.MINER, null, null, "name", Material.COMMAND_BLOCK, 0,
-                new HashMap<>(), new ArrayList<>(), new Location(null, 0, 0, 0), 0, 0, UUID.randomUUID(), new ArrayList<>(), null);
-        Gson gson = Utils.getGsonSerializationBuilderInstance(PlayerMachine.class, null);
+        List<Fuel> fuels = Arrays.asList(new Fuel(1), new Fuel(5), new Fuel(7));
+        List<Fuel> fuelsWithEnoughEnergy =
+                fuels.stream().filter(fuel -> fuel.energy >= 4).collect(Collectors.toList());
+        fuelsWithEnoughEnergy.get(0).energy = 1;
+        System.out.println(fuelsWithEnoughEnergy.hashCode());
+        System.out.println(fuels.hashCode());
+    }
+
+
+    public static class Fuel {
+        int energy;
+        public Fuel(int energy) {
+            this.energy = energy;
+        }
+
     }
 }

@@ -9,17 +9,14 @@ import me.oriharel.machinery.upgrades.AbstractUpgrade;
 import me.oriharel.machinery.utilities.RandomCollection;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.Tag;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class MachineResourceGetProcess {
@@ -61,6 +58,7 @@ public class MachineResourceGetProcess {
                     if (!upgrade.isRunOnlyOnProcessStart()) upgrade.applyUpgradeModifier(MachineResourceGetProcess.this);
                 });
                 insertResources();
+                runFuelRemoval();
             }
         };
         process.runTaskTimerAsynchronously(Machinery.getInstance(), 0, minePeriod);
@@ -90,6 +88,28 @@ public class MachineResourceGetProcess {
             double amount = ThreadLocalRandom.current().nextDouble(chance.getMinimumAmount(), chance.getMaximumAmount());
             machine.addZenCoinsGained(amount);
         }
+    }
+
+    public void runFuelRemoval() {
+        Optional<PlayerFuel> fuelWithEnoughEnergy =
+                machine.getFuels().stream().filter(fuel -> fuel.getEnergy() >= machine.getFuelDeficiency()).findAny();
+        if (fuelWithEnoughEnergy.isPresent()) {
+            PlayerFuel fuel = fuelWithEnoughEnergy.get();
+            fuel.setEnergy(fuel.getEnergy() - machine.getFuelDeficiency());
+            return;
+        }
+
+        AtomicInteger energySum = new AtomicInteger();
+        Map<Integer, PlayerFuel> fuelCanRemoveFuelMap = new HashMap<>();
+        machine.getFuels().forEach(fuel -> {
+            energySum.addAndGet(fuel.getEnergy());
+            fuelCanRemoveFuelMap.put(fuel.getEnergy(), fuel);
+            if (energySum.get() >= machine.getFuelDeficiency()) {
+                for (Map.Entry<Integer, PlayerFuel> fuelEntry : fuelCanRemoveFuelMap.entrySet()) {
+                    fuelEntry.getValue().setEnergy(fuelEntry.getKey() - Math.max(fuelEntry.getKey(), machine.fuelDeficiency));
+                }
+            }
+        });
     }
 
     protected void insertResources() {

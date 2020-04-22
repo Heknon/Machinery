@@ -45,6 +45,10 @@ class Fuel implements Cloneable {
         return name;
     }
 
+    public void setEnergy(int energy) {
+        this.energy = energy;
+    }
+
     protected Fuel clone() {
         return new Fuel(name, material, nbt.clone(), energy);
     }
