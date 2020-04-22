@@ -1,19 +1,10 @@
 package me.oriharel.machinery.inventory;
 
-import me.oriharel.machinery.api.events.GiveResourcesEvent;
-import me.oriharel.machinery.api.events.TakeResourcesEvent;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.Collection;
-import java.util.Map;
 
 public class Listeners implements Listener {
 
@@ -46,7 +37,6 @@ public class Listeners implements Listener {
         InventoryPage inventory = (InventoryPage) e.getInventory().getHolder();
         if (inventory.onClose != null) inventory.onClose.apply();
     }
-
 
 
     // REPLACED WITH SIGN MENU
@@ -101,7 +91,8 @@ public class Listeners implements Listener {
 //        if (!(e.getClickedInventory().getHolder() instanceof InventoryPage)) return;
 //        if (!e.getView().getTitle().equalsIgnoreCase("resources")) return;
 //        // negate all cases that an item is not taken
-//        if (e.getClick() != ClickType.LEFT && e.getClick() != ClickType.RIGHT && e.getClick() != ClickType.SHIFT_LEFT && e.getClick() != ClickType.SHIFT_RIGHT && e.getClick() != ClickType.DOUBLE_CLICK)
+//        if (e.getClick() != ClickType.LEFT && e.getClick() != ClickType.RIGHT && e.getClick() != ClickType.SHIFT_LEFT && e.getClick() != ClickType.SHIFT_RIGHT && e
+//        .getClick() != ClickType.DOUBLE_CLICK)
 //            return;
 //
 //        InventoryPage page = (InventoryPage) e.getClickedInventory().getHolder();
@@ -163,7 +154,8 @@ public class Listeners implements Listener {
 //            if (clickType == ClickType.SHIFT_RIGHT || clickType == ClickType.SHIFT_LEFT) return;
 //            if (clickedItem != null && clickedItem.getType() != Material.AIR && cursorItem != null && cursorItem.getType() != Material.AIR)
 //                Bukkit.getPluginManager().callEvent(new GiveResourcesEvent(cursorItem.clone(), page.owner, e.getView().getTopInventory()));
-//            else if (cursorItem != null && cursorItem.getType() != Material.AIR && clickType == ClickType.RIGHT && (clickedItem == null || clickedItem.getType() == Material.AIR)) {
+//            else if (cursorItem != null && cursorItem.getType() != Material.AIR && clickType == ClickType.RIGHT && (clickedItem == null || clickedItem.getType() ==
+//            Material.AIR)) {
 //                ItemStack resource = cursorItem.clone();
 //                resource.setAmount(1);
 //                Bukkit.getPluginManager().callEvent(new GiveResourcesEvent(resource, page.owner, e.getView().getTopInventory()));

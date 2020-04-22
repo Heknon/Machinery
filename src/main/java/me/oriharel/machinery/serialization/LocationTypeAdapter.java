@@ -1,6 +1,7 @@
 package me.oriharel.machinery.serialization;
 
 import com.google.gson.*;
+import me.oriharel.machinery.utilities.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -12,21 +13,22 @@ public class LocationTypeAdapter implements JsonSerializer<Location>, JsonDeseri
     @Override
     public Location deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject obj = jsonElement.getAsJsonObject();
-        double x = obj.get("x").getAsDouble();
-        double y = obj.get("y").getAsDouble();
-        double z = obj.get("z").getAsDouble();
-        float pitch = obj.get("x").getAsFloat();
-        float yaw = obj.get("x").getAsFloat();
-        World world = Bukkit.getWorld(UUID.fromString(obj.get("world").getAsString()));
-        return new Location(world, x, y, z, yaw, pitch);
+
+        float pitch = obj.get("pitch").getAsFloat();
+        float yaw = obj.get("yaw").getAsFloat();
+
+        Location xyzLoc = Utils.longToLocation(obj.get("xyz").getAsLong(), Bukkit.getWorld(UUID.fromString(obj.get("world").getAsString())));
+
+        xyzLoc.setPitch(pitch);
+        xyzLoc.setYaw(yaw);
+
+        return xyzLoc;
     }
 
     @Override
     public JsonElement serialize(Location location, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject obj = new JsonObject();
-        obj.add("y", new JsonPrimitive(location.getY()));
-        obj.add("x", new JsonPrimitive(location.getX()));
-        obj.add("z", new JsonPrimitive(location.getZ()));
+        obj.add("xyz", new JsonPrimitive(Utils.locationToLong(location)));
         obj.add("yaw", new JsonPrimitive(location.getYaw()));
         obj.add("pitch", new JsonPrimitive(location.getPitch()));
         obj.add("world", new JsonPrimitive(location.getWorld().getUID().toString()));

@@ -5,7 +5,6 @@ import org.bukkit.craftbukkit.libs.jline.internal.Nullable;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
@@ -58,24 +57,22 @@ public final class NMS {
         return null;
     }
 
-    public static void changeItemStackNBT(ItemStack itemStack, NBTTagCompound toCompound) {
-        if (!itemStack.hasItemMeta()) itemStack.setItemMeta(new ItemStack(itemStack.getType(), itemStack.getAmount()).getItemMeta());
-        try {
-            Field metaField = ItemStack.class.getDeclaredField("meta");
+    public static void addNBTToItemStack(ItemStack itemStack, NBTTagCompound toAddCompound, boolean force) {
+        if (toAddCompound == null) return;
 
-            metaField.setAccessible(true);
-            ItemMeta meta = (ItemMeta) metaField.get(itemStack);
-            Class craftMetaItem = Class.forName("org.bukkit.craftbukkit.v1_15_R1.inventory.CraftMetaItem");
-            Field unhandledTagsField = craftMetaItem.getDeclaredField("unhandledTags");
-            unhandledTagsField.setAccessible(true);
-            Field nbtMapField = NBTTagCompound.class.getDeclaredField("map");
-            nbtMapField.setAccessible(true);
-            if (toCompound != null) {
-                Map<String, NBTBase> tagCompoundMapToSet = (Map<String, NBTBase>) nbtMapField.get(toCompound);
-                unhandledTagsField.set(meta, tagCompoundMapToSet);
+        if (!itemStack.hasItemMeta()) itemStack.setItemMeta(new ItemStack(itemStack.getType(), itemStack.getAmount()).getItemMeta());
+
+        Map<String, NBTBase> unhandled = getItemStackUnhandledNBT(itemStack);
+        Map<String, NBTBase> nbtBaseMap = ReflectionUtils.Fields.getFieldValueOfObject(toAddCompound, "map");
+
+        if (nbtBaseMap == null) return;
+
+        for (Map.Entry<String, NBTBase> entry : nbtBaseMap.entrySet()) {
+            if (force) {
+                unhandled.put(entry.getKey(), entry.getValue());
+            } else {
+                unhandled.putIfAbsent(entry.getKey(), entry.getValue());
             }
-        } catch (NoSuchFieldException | ClassNotFoundException | IllegalAccessException e) {
-            e.printStackTrace();
         }
     }
 
@@ -83,36 +80,14 @@ public final class NMS {
     public static Map<String, NBTBase> getItemStackUnhandledNBT(ItemStack itemStack) {
         if (!itemStack.hasItemMeta()) itemStack.setItemMeta(new ItemStack(itemStack.getType(), itemStack.getAmount()).getItemMeta());
 
-        Field metaField;
-        try {
-            metaField = ItemStack.class.getDeclaredField("meta");
-
-
-            metaField.setAccessible(true);
-            ItemMeta meta = (ItemMeta) metaField.get(itemStack);
-            Class craftMetaItem = Class.forName("org.bukkit.craftbukkit.v1_15_R1.inventory.CraftMetaItem");
-            Field unhandledTagsField = craftMetaItem.getDeclaredField("unhandledTags");
-            unhandledTagsField.setAccessible(true);
-            Field nbtMapField = NBTTagCompound.class.getDeclaredField("map");
-            nbtMapField.setAccessible(true);
-            return (Map<String, NBTBase>) unhandledTagsField.get(meta);
-        } catch (NoSuchFieldException | ClassNotFoundException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return null;
+        ItemMeta metaReference = getItemStackMetaReference(itemStack);
+        return ReflectionUtils.Fields.getFieldValueOfUnknownClass(metaReference, "org.bukkit.craftbukkit.v1_15_R1.inventory.CraftMetaItem", "unhandledTags");
     }
 
     @Nullable
     public static ItemMeta getItemStackMetaReference(ItemStack itemStack) {
         if (!itemStack.hasItemMeta()) itemStack.setItemMeta(new ItemStack(itemStack.getType(), itemStack.getAmount()).getItemMeta());
-        try {
-            Field metaField = ItemStack.class.getDeclaredField("meta");
-            metaField.setAccessible(true);
-            return (ItemMeta) metaField.get(itemStack);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return ReflectionUtils.Fields.getFieldValueOfUnknownClass(itemStack, ItemStack.class, "meta");
     }
 
 }

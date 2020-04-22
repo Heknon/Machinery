@@ -7,13 +7,14 @@ import me.oriharel.machinery.machine.Machine;
 import me.oriharel.machinery.machine.MachineFactory;
 import me.oriharel.machinery.machine.PlayerMachine;
 import me.oriharel.machinery.upgrades.AbstractUpgrade;
+import me.oriharel.machinery.utilities.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 public class PlayerMachineTypeAdapter extends MachineTypeAdapter<PlayerMachine> implements JsonSerializer<PlayerMachine>, JsonDeserializer<PlayerMachine> {
@@ -30,13 +31,15 @@ public class PlayerMachineTypeAdapter extends MachineTypeAdapter<PlayerMachine> 
         double totalZenCoinsGained = machineJsonObject.get("totalZenCoinsGained").getAsDouble();
         double totalResourcesGained = machineJsonObject.get("totalResourcesGained").getAsDouble();
 
-        Location machineCoreBlockLocation = context.deserialize(machineJsonObject.get("coreBlockLocation"), Location.class);
+        JsonObject locObj = machineJsonObject.get("coreBlockLocation").getAsJsonObject();
+        Location machineCoreBlockLocation = Utils.longToLocation(locObj.get("xyz").getAsLong(),
+                Bukkit.getWorld(UUID.fromString(locObj.get("world").getAsString())));
 
         UUID ownerUuid = new UUID(machineJsonObject.get("ownerUuidMost").getAsLong(), machineJsonObject.get("ownerUuidLeast").getAsLong());
 
-        List<PlayerFuel> fuels = context.deserialize(machineJsonObject.get("resourcesGained"), new TypeToken<List<PlayerFuel>>() {
+        List<PlayerFuel> fuels = context.deserialize(machineJsonObject.get("fuels"), new TypeToken<List<PlayerFuel>>() {
         }.getType());
-        List<AbstractUpgrade> upgrades = context.deserialize(machineJsonObject.get("resourcesGained"), new TypeToken<List<AbstractUpgrade>>() {
+        List<AbstractUpgrade> upgrades = context.deserialize(machineJsonObject.get("upgrades"), new TypeToken<List<AbstractUpgrade>>() {
         }.getType());
         HashMap<Material, ItemStack> resourcesGained = context.deserialize(machineJsonObject.get("resourcesGained"), new TypeToken<HashMap<Material, ItemStack>>() {
         }.getType());
@@ -57,7 +60,10 @@ public class PlayerMachineTypeAdapter extends MachineTypeAdapter<PlayerMachine> 
         baseMachineSerialized.add("ownerUuidMost", new JsonPrimitive(machine.getOwner().getMostSignificantBits()));
         baseMachineSerialized.add("ownerUuidLeast", new JsonPrimitive(machine.getOwner().getLeastSignificantBits()));
 
-        baseMachineSerialized.add("coreBlockLocation", context.serialize(machine.getMachineCore(), Location.class));
+        JsonObject locObj = new JsonObject();
+        locObj.add("xyz", new JsonPrimitive(Utils.locationToLong(machine.getMachineCore())));
+        locObj.add("world", new JsonPrimitive(machine.getMachineCore().getWorld().getUID().toString()));
+        baseMachineSerialized.add("coreBlockLocation", locObj);
 
         baseMachineSerialized.add("resourcesGained", context.serialize(machine.getResourcesGained(), new TypeToken<HashMap<Material, ItemStack>>() {
         }.getType()));

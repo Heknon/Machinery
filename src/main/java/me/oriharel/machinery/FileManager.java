@@ -1,4 +1,4 @@
-package me.oriharel.machinery.config;
+package me.oriharel.machinery;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;

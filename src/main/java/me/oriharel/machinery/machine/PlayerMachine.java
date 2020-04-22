@@ -1,39 +1,42 @@
 package me.oriharel.machinery.machine;
 
-import me.oriharel.customrecipes.recipe.Recipe;
+import com.google.gson.annotations.JsonAdapter;
 import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.fuel.PlayerFuel;
 import me.oriharel.machinery.items.MachineBlock;
+import me.oriharel.machinery.serialization.AbstractUpgradeTypeAdapter;
+import me.oriharel.machinery.serialization.LocationTypeAdapter;
 import me.oriharel.machinery.structure.Structure;
 import me.oriharel.machinery.upgrades.AbstractUpgrade;
+import me.wolfyscript.customcrafting.recipes.types.CustomRecipe;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 public class PlayerMachine extends Machine {
     private final Location machineCore;
     private final UUID owner;
+    @JsonAdapter(AbstractUpgradeTypeAdapter.class)
     private final List<AbstractUpgrade> upgrades;
     private double totalResourcesGained;
     private HashMap<Material, ItemStack> resourcesGained;
     private List<PlayerFuel> fuels;
     private double totalZenCoinsGained;
     private double zenCoinsGained;
-    private MachineResourceGetProcess machineResourceGetProcess;
+    private transient MachineResourceGetProcess machineResourceGetProcess;
+    private transient MachineFactory factory;
 
 
     public PlayerMachine(int machineReach, int maxFuel, int fuelDeficiency, List<String> fuelTypes, MachineType machineType,
-                         Structure structure, Recipe recipe, String machineName, Material openGUIBlockType,
+                         Structure structure, CustomRecipe<?> recipe, String machineName, Material openGUIBlockType,
                          double totalResourcesGained, HashMap<Material, ItemStack> resourcesGained, List<PlayerFuel> fuels, Location machineCore, double zenCoinsGained,
-                         double totalZenCoinsGained, UUID owner, List<AbstractUpgrade> upgrades) {
-        super(machineReach, maxFuel, fuelDeficiency, fuelTypes, machineType, structure, recipe, machineName, openGUIBlockType);
+                         double totalZenCoinsGained, UUID owner, List<AbstractUpgrade> upgrades, MachineFactory factory) {
+        super(machineReach, maxFuel, fuelDeficiency, fuelTypes, machineType, structure, recipe, machineName, openGUIBlockType, factory);
         this.totalResourcesGained = totalResourcesGained;
         this.resourcesGained = resourcesGained;
         this.fuels = fuels;
@@ -42,10 +45,11 @@ public class PlayerMachine extends Machine {
         this.totalZenCoinsGained = totalZenCoinsGained;
         this.owner = owner;
         this.upgrades = upgrades;
+        this.factory = factory;
     }
 
 
-    public MachineBlock<PlayerMachine> deconstruct() {
+    public MachineBlock deconstruct() {
         MachineManager machineManager = Machinery.getInstance().getMachineManager();
         machineManager.clearMachineTileStateDataFromBlock(machineCore.getBlock());
         Location[] machinePartLocations = machineManager.getPlayerMachineLocations(machineCore.getBlock());
@@ -57,7 +61,7 @@ public class PlayerMachine extends Machine {
             Block block = loc.getBlock();
             block.setType(Material.AIR);
         }
-        return new MachineBlock<>(this.recipe, this);
+        return new MachineBlock(this.recipe, this, factory);
     }
 
     public MachineResourceGetProcess getMinerProcess() {
@@ -82,24 +86,21 @@ public class PlayerMachine extends Machine {
         return totalResourcesGained;
     }
 
-    public void setTotalResourcesGained(double totalResourcesGained) {
-        this.totalResourcesGained = totalResourcesGained;
-    }
-
     public double getTotalZenCoinsGained() {
         return totalZenCoinsGained;
-    }
-
-    public void setTotalZenCoinsGained(double totalZenCoinsGained) {
-        this.totalZenCoinsGained = totalZenCoinsGained;
     }
 
     public double getZenCoinsGained() {
         return zenCoinsGained;
     }
 
-    public void setZenCoinsGained(double zenCoinsGained) {
-        this.zenCoinsGained = zenCoinsGained;
+    public void addZenCoinsGained(double zenCoinsGained) {
+        this.totalZenCoinsGained += zenCoinsGained;
+        this.zenCoinsGained += zenCoinsGained;
+    }
+
+    public void removeZenCoinsGained(double zenCoinsToRemove) {
+        this.zenCoinsGained -= zenCoinsToRemove;
     }
 
     public UUID getOwner() {
@@ -122,4 +123,15 @@ public class PlayerMachine extends Machine {
         return upgrades;
     }
 
+    public void setTotalResourcesGained(double totalResourcesGained) {
+        this.totalResourcesGained = totalResourcesGained;
+    }
+
+    public void setTotalZenCoinsGained(double totalZenCoinsGained) {
+        this.totalZenCoinsGained = totalZenCoinsGained;
+    }
+
+    public void setZenCoinsGained(double zenCoinsGained) {
+        this.zenCoinsGained = zenCoinsGained;
+    }
 }

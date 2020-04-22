@@ -22,16 +22,16 @@ public class GiveResourcesEvent extends Event {
         this.openedInventory = openedInventory;
     }
 
+    public static HandlerList getHandlerList() {
+        return HANDLERS;
+    }
+
     public ItemStack getResourceGiven() {
         return resourceGiven;
     }
 
     public PlayerMachine getMachine() {
         return machine;
-    }
-
-    public static HandlerList getHandlerList() {
-        return HANDLERS;
     }
 
     public HandlerList getHandlers() {

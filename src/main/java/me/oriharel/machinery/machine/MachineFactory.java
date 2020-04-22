@@ -1,21 +1,19 @@
 package me.oriharel.machinery.machine;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import me.oriharel.customrecipes.api.CustomRecipesAPI;
-import me.oriharel.customrecipes.recipe.Recipe;
-import me.oriharel.customrecipes.recipe.item.RecipeResultReference;
 import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.exceptions.MachineNotFoundException;
 import me.oriharel.machinery.exceptions.MaterialNotFoundException;
 import me.oriharel.machinery.exceptions.NotMachineTypeException;
 import me.oriharel.machinery.exceptions.RecipeNotFoundException;
 import me.oriharel.machinery.fuel.PlayerFuel;
-import me.oriharel.machinery.serialization.MachineTypeAdapter;
 import me.oriharel.machinery.structure.Structure;
 import me.oriharel.machinery.upgrades.AbstractUpgrade;
-import net.minecraft.server.v1_15_R1.NBTTagCompound;
-import org.bukkit.Bukkit;
+import me.oriharel.machinery.utilities.NMS;
+import me.oriharel.machinery.utilities.Utils;
+import me.wolfyscript.customcrafting.CustomCrafting;
+import me.wolfyscript.customcrafting.recipes.types.CustomRecipe;
+import me.wolfyscript.utilities.api.custom_items.CustomItem;
+import net.minecraft.server.v1_15_R1.NBTTagString;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -24,10 +22,8 @@ import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nullable;
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 public class MachineFactory {
@@ -60,16 +56,17 @@ public class MachineFactory {
         int maxFuel = section.getInt("max_fuel", 0);
         int fuelDeficiency = section.getInt("deficiency", 0);
         List<String> fuelTypes = section.getStringList("fuel_types");
-        String recipeName = section.getString("recipe", "");
+        String recipeName = section.getString("recipe", null);
         if (recipeName == null) throw new NullPointerException("No recipe given in machine section for machine named " + machineKey);
-        Recipe recipe = CustomRecipesAPI.getImplementation().getRecipesManager().getRecipeByName(recipeName);
+        recipeName = recipeName.replaceAll("\\|", ":");
+        CustomRecipe<?> recipe = CustomCrafting.getRecipeHandler().getRecipe(recipeName);
         if (recipe == null) throw new RecipeNotFoundException("Recipe with the name " + recipeName + " given in the machine section of " + machineKey + " has not been " +
                 "located.");
         MachineType machineType = MachineType.getMachine(section.getString("type", null));
         Structure structure =
                 machinery.getStructureManager().getSchematicByPath(new File(machinery.getDataFolder(), "structures/" + machineKey + Machinery.STRUCTURE_EXTENSION).getPath());
         Machine machine = new Machine(machineReach, maxFuel, fuelDeficiency, fuelTypes, machineType, structure, recipe, machineKey,
-                machineCoreBlockType);
+                machineCoreBlockType, this);
         machine.setRecipe(injectMachineNBTIntoRecipe(machine.getRecipe(), machine));
         return machine;
     }
@@ -81,11 +78,11 @@ public class MachineFactory {
                                  List<String> fuelTypes,
                                  MachineType machineType,
                                  Structure structure,
-                                 Recipe recipe,
+                                 CustomRecipe<?> recipe,
                                  String machineKey, Material machineCoreBlockType) throws IllegalArgumentException {
         if (machineType == null) throw new IllegalArgumentException("Machine type must not be null (MachineFactory)");
         Machine machine = new Machine(machineReach, maxFuel, fuelDeficiency, fuelTypes, machineType, structure,
-                recipe, machineKey, machineCoreBlockType);
+                recipe, machineKey, machineCoreBlockType, this);
         machine.setRecipe(injectMachineNBTIntoRecipe(machine.getRecipe(), machine));
         return machine;
     }
@@ -97,7 +94,7 @@ public class MachineFactory {
                                        List<String> fuelTypes,
                                        MachineType machineType,
                                        Structure structure,
-                                       Recipe recipe,
+                                       CustomRecipe<?> recipe,
                                        String machineKey, Material machineCoreBlockType, double totalResourcesGained,
                                        HashMap<Material, ItemStack> resourcesGained,
                                        List<PlayerFuel> fuels, Location machineCoreBlockLocation, double zenCoinsGained, double totalZenCoinsGained, UUID owner,
@@ -105,7 +102,7 @@ public class MachineFactory {
         if (machineType == null) throw new IllegalArgumentException("Machine type must not be null (MachineFactory)");
         return new PlayerMachine(machineReach, maxFuel, fuelDeficiency, fuelTypes, machineType, structure,
                 recipe, machineKey, machineCoreBlockType, totalResourcesGained, resourcesGained, fuels, machineCoreBlockLocation,
-                zenCoinsGained, totalZenCoinsGained, owner, upgrades);
+                zenCoinsGained, totalZenCoinsGained, owner, upgrades, this);
     }
 
     public PlayerMachine createMachine(Machine machine, Location machineCoreBlockLocation, double totalResourcesGained,
@@ -115,32 +112,16 @@ public class MachineFactory {
         return new PlayerMachine(machine.machineReach, machine.maxFuel, machine.fuelDeficiency, machine.fuelTypes,
                 machine.machineType, machine.structure,
                 machine.recipe, machine.machineName, machine.machineCoreBlockType, totalResourcesGained, resourcesGained, fuels,
-                machineCoreBlockLocation, zenCoinsGained, totalZenCoinsGained, owner, upgrades);
+                machineCoreBlockLocation, zenCoinsGained, totalZenCoinsGained, owner, upgrades, this);
     }
 
-    private Recipe injectMachineNBTIntoRecipe(Recipe recipe, Machine machine) {
-        RecipeResultReference recipeResultReference = recipe.getResult();
-        Field nbtTagField;
-        try {
-            nbtTagField = RecipeResultReference.class.getSuperclass().getDeclaredField("nbtTagCompound");
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-            return null;
+    private CustomRecipe<?> injectMachineNBTIntoRecipe(CustomRecipe<?> recipe, Machine machine) {
+        List<CustomItem> results = recipe.getCustomResults();
+        for (CustomItem item : results) {
+            NMS.getItemStackUnhandledNBT(item).put("machine",
+                    NBTTagString.a(Utils.getGsonSerializationBuilderInstance(PlayerMachine.class, this).toJson(machine,
+                            Machine.class)));
         }
-        nbtTagField.setAccessible(true);
-        NBTTagCompound nbtTagCompound = recipeResultReference.getNBTTagCompound();
-        if (nbtTagCompound == null) nbtTagCompound = new NBTTagCompound();
-        Gson gson = new GsonBuilder().registerTypeHierarchyAdapter(Machine.class, new MachineTypeAdapter<>(this)).create();
-        nbtTagCompound.setString("machine", gson.toJson(machine));
-        try {
-            nbtTagField.set(recipeResultReference, nbtTagCompound);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            return null;
-        }
-        recipe.getResult().buildItemStack();
-        recipe.setRecipe(recipe.constructRecipe());
-        Bukkit.getScheduler().runTask(machinery, () -> CustomRecipesAPI.getImplementation().getRecipesManager().replaceRecipeNamed(recipe.getRecipeKey(), recipe));
         return recipe;
     }
 }

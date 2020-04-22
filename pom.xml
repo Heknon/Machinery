@@ -28,6 +28,11 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
             <plugin>
@@ -42,6 +47,14 @@
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml
+                            </dependencyReducedPomLocation>
+                            <relocations>
+                                <relocation>
+                                    <pattern>co.aikar.commands</pattern>
+                                    <shadedPattern>me.oriharel.machinery.acf</shadedPattern>
+                                </relocation>
+                            </relocations>
                         </configuration>
                     </execution>
                 </executions>
@@ -65,8 +78,8 @@
             <url>https://oss.sonatype.org/content/groups/public/</url>
         </repository>
         <repository>
-            <id>pagedinventories-repo</id>
-            <url>https://oss.sonatype.org/content/groups/public/</url>
+            <id>aikar</id>
+            <url>https://repo.aikar.co/content/groups/aikar/</url>
         </repository>
     </repositories>
 
@@ -76,11 +89,6 @@
             <artifactId>spigot-api</artifactId>
             <version>1.15.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.tchristofferson</groupId>
-            <artifactId>PagedInventories</artifactId>
-            <version>2.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>

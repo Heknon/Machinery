@@ -4,7 +4,6 @@ import me.oriharel.machinery.machine.PlayerMachine;
 import me.oriharel.machinery.utilities.Callback;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftInventoryCustom;
-import org.bukkit.craftbukkit.v1_15_R1.util.CraftMagicNumbers;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;

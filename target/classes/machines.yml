@@ -18,7 +18,16 @@ schematic_name:
   deficiency: 10
   open_gui_block_type: "COMMAND_BLOCK"
   fuel_types: ["fuel_type_name", "fuel_type_name2"]
-  recipe: "schematic_name_recipe"
+  recipe: "recipes|schematic_name_recipe"
+  deconstructedItem:
+    displayName: "§6Machine"
+    lore: [
+      "§bTotal Resources Gained: §e%total_resources_gained%",
+      "§bResources in Machine: §e%resources_gained%",
+      "§bTotal Zen Coins Gained: §e%total_zen_coins_gained%",
+      "§bZen Coins in Machine: §e%zen_coins_gained%",
+      "§bEnergy: §e%energy%"
+    ]
   type: MINER
 
 schematic_name_super_machine:
@@ -29,5 +38,5 @@ schematic_name_super_machine:
   deficiency: 50
   open_gui_block_type: "COMMAND_BLOCK"
   fuel_types: ["fuel_type_name3"]
-  recipe: "schematic_name_super_machine_recipe"
+  recipe: "recipes|schematic_name_super_machine_recipe"
   type: MINER

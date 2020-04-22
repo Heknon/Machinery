@@ -1,11 +1,17 @@
 package me.oriharel.machinery.machine;
 
 import me.oriharel.machinery.Machinery;
-import me.oriharel.machinery.MaterialChance;
+import me.oriharel.machinery.data.Chance;
+import me.oriharel.machinery.data.MaterialChance;
+import me.oriharel.machinery.data.ZenCoinChance;
+import me.oriharel.machinery.fuel.PlayerFuel;
 import me.oriharel.machinery.upgrades.AbstractUpgrade;
 import me.oriharel.machinery.utilities.RandomCollection;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.Tag;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -14,13 +20,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class MachineResourceGetProcess {
     protected List<ItemStack> itemsGained;
     protected PlayerMachine machine;
     protected int minePeriod;
     protected BukkitRunnable process;
-    protected RandomCollection<MaterialChance> materialChances;
+    protected RandomCollection<Chance> materialChances;
     protected double lootAmplifier;
     protected Random random;
 
@@ -43,6 +50,12 @@ public class MachineResourceGetProcess {
         process = new BukkitRunnable() {
             @Override
             public void run() {
+                if (machine.getFuels().isEmpty() || machine.getFuels().stream().mapToInt(PlayerFuel::getAmount).sum() < machine.getFuelDeficiency()) {
+                    cancel();
+                    Player player = Bukkit.getPlayer(machine.getOwner());
+                    if (player == null || !player.isOnline()) return;
+                    player.sendMessage("§c§lOne of your machines doesn't have enough fuel to operate!");
+                }
                 getResources();
                 upgrades.forEach(upgrade -> {
                     if (!upgrade.isRunOnlyOnProcessStart()) upgrade.applyUpgradeModifier(MachineResourceGetProcess.this);
@@ -68,15 +81,23 @@ public class MachineResourceGetProcess {
         if (materialChances == null) {
             initializeMaterialChances();
         }
-        MaterialChance chance = materialChances.next();
-        chance.getMaterials().forEach(mat -> itemsGained.add(new ItemStack(mat, ThreadLocalRandom.current().nextInt(chance.getMinimumAmount(),
-                chance.getMaximumAmount()))));
+        Chance chance = materialChances.next();
+        if (chance instanceof MaterialChance) {
+            MaterialChance materialChance = (MaterialChance) chance;
+            materialChance.getMaterials().forEach(mat -> itemsGained.add(new ItemStack(mat, ThreadLocalRandom.current().nextInt(chance.getMinimumAmount(),
+                    chance.getMaximumAmount()))));
+        } else if (chance instanceof ZenCoinChance) {
+            double amount = ThreadLocalRandom.current().nextDouble(chance.getMinimumAmount(), chance.getMaximumAmount());
+            machine.addZenCoinsGained(amount);
+        }
     }
 
     protected void insertResources() {
         HashMap<Material, ItemStack> resourcesGained = machine.getResourcesGained();
+        AtomicReference<Double> totalAmount = new AtomicReference<>((double) 0);
         itemsGained.forEach(
                 item -> {
+                    totalAmount.updateAndGet(v -> v + item.getAmount());
                     if (resourcesGained.containsKey(item.getType())) {
                         ItemStack prev = resourcesGained.get(item.getType());
                         prev.setAmount(prev.getAmount() + item.getAmount());
@@ -85,13 +106,15 @@ public class MachineResourceGetProcess {
                     resourcesGained.put(item.getType(), item.clone());
                 }
         );
+        machine.setTotalResourcesGained(machine.getTotalResourcesGained() + totalAmount.get());
     }
 
     /**
      * Uses MaterialChance class to define materials given for a specific chance, in a specific range
      */
     private void initializeMaterialChances() {
-        materialChances = new RandomCollection<>();
+        materialChances = new RandomCollection<Chance>();
+        addZenCoinChances();
         switch (machine.machineType) {
             case LUMBERJACK:
                 addLumberjackMaterialChances();
@@ -112,6 +135,10 @@ public class MachineResourceGetProcess {
                 addLumberjackMaterialChances();
                 break;
         }
+    }
+
+    private void addZenCoinChances() {
+        materialChances.add(1, new ZenCoinChance(10, 50));
     }
 
     private void addMinerMaterialChances() {
@@ -138,7 +165,7 @@ public class MachineResourceGetProcess {
         materialChances.add(100, chance);
     }
 
-    public RandomCollection<MaterialChance> getMaterialChances() {
+    public RandomCollection<Chance> getMaterialChances() {
         return materialChances;
     }
 

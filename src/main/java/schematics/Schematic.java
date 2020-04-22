@@ -290,7 +290,7 @@ public class Schematic {
             boolean validated = true;
             Set<Block> validatedBlocks = new HashSet<>(); // Stores previous blocks before placing green glass
             for (Location validate : locations) {
-                if ((validate.getBlock().getType() != Material.AIR || validate.clone().subtract(0, 1, 0).getBlock().getType() == Material.WATER) || new Location(validate.getWorld(), validate.getX(), loc.getY() - 1, validate.getZ()).getBlock().getType() == Material.AIR || validate.getBlock().getType() == Material.GRASS) {
+                if (((validate.getBlock().getType() != Material.AIR && validate.getBlock().getType() != Material.GRASS) || validate.clone().subtract(0, 1, 0).getBlock().getType() == Material.WATER) || new Location(validate.getWorld(), validate.getX(), loc.getY() - 1, validate.getZ()).getBlock().getType() == Material.AIR) {
                     /*
                      * Show fake block where block is interfering with schematic
                      */
@@ -312,7 +312,8 @@ public class Schematic {
                     paster.sendBlockChange(validate.getBlock().getLocation(), Material.GREEN_STAINED_GLASS.createBlockData());
                     if (!options.contains(Options.PREVIEW)) {
                         Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
-                            if (validate.getBlock().getType() == Material.AIR) paster.sendBlockChange(validate.getBlock().getLocation(), Material.AIR.createBlockData());
+                            if (validate.getBlock().getType() == Material.AIR || validate.getBlock().getType() == Material.GRASS) paster.sendBlockChange(validate.getBlock().getLocation(),
+                                    Material.AIR.createBlockData());
                         }, 60);
                     }
                 }
@@ -606,7 +607,6 @@ public class Schematic {
                     });
 
                     toUpdate.forEach(b -> b.getState().update(true, false));
-                    System.out.println("2");
                     callback.apply(locations);
                 }
             }, 0, time));

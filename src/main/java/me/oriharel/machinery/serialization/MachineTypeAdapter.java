@@ -1,15 +1,16 @@
 package me.oriharel.machinery.serialization;
 
+import com.google.common.base.Preconditions;
 import com.google.gson.*;
-import me.oriharel.customrecipes.api.CustomRecipesAPI;
-import me.oriharel.customrecipes.recipe.Recipe;
 import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.machine.Machine;
 import me.oriharel.machinery.machine.MachineFactory;
 import me.oriharel.machinery.machine.MachineType;
 import me.oriharel.machinery.structure.Structure;
-import schematics.Schematic;
+import me.wolfyscript.customcrafting.CustomCrafting;
+import me.wolfyscript.customcrafting.recipes.types.CustomRecipe;
 import org.bukkit.Material;
+import schematics.Schematic;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -20,6 +21,8 @@ public class MachineTypeAdapter<T extends Machine> implements JsonSerializer<T>,
     protected MachineFactory factory;
 
     public MachineTypeAdapter(MachineFactory factory) {
+        //Preconditions.checkNotNull(factory, "Factory must not be null!");
+
         this.factory = factory;
     }
 
@@ -51,9 +54,9 @@ public class MachineTypeAdapter<T extends Machine> implements JsonSerializer<T>,
         Structure structure =
                 Machinery.getInstance().getStructureManager().getSchematicByPath(machineJsonObject.get("structure").getAsString());
 
-        Recipe recipe =
-                CustomRecipesAPI.getImplementation().getRecipesManager().getRecipes().stream().filter(r -> r.getRecipeKey().equalsIgnoreCase(recipeName)).findAny().orElse(null);
+        CustomRecipe<?> recipe = CustomCrafting.getRecipeHandler().getRecipe(recipeName);
 
+        if (factory == null) factory = Machinery.getInstance().getMachineManager().getMachineFactory();
         return (T) factory.createMachine(machineReach, machineMaxFuel,
                 machineFuelDeficiency, fuelTypes, machineType, structure, recipe, machineName, machineCoreBlockType);
     }
@@ -64,12 +67,11 @@ public class MachineTypeAdapter<T extends Machine> implements JsonSerializer<T>,
         obj.add("name", new JsonPrimitive(machine.getMachineName()));
         obj.add("type", new JsonPrimitive(machine.getType().toString()));
         obj.add("structure", new JsonPrimitive(getSchematicPath(machine.getStructure())));
-        obj.add("recipe", new JsonPrimitive(machine.getRecipe().getRecipeKey()));
+        obj.add("recipe", new JsonPrimitive(machine.getRecipe().getId()));
         obj.add("fuelDeficiency", new JsonPrimitive(machine.getFuelDeficiency()));
         obj.add("reach", new JsonPrimitive(machine.getMachineReach()));
         obj.add("maxFuel", new JsonPrimitive(machine.getMaxFuel()));
         obj.add("coreBlockType", new JsonPrimitive(machine.getMachineCoreBlockType().toString()));
-
         obj.add("fuelTypes", context.serialize(machine.getFuelTypes(), List.class));
 
         return obj;

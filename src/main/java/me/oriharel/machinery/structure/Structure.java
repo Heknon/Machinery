@@ -1,12 +1,12 @@
 package me.oriharel.machinery.structure;
 
 import com.sun.istack.internal.NotNull;
-import schematics.Schematic;
-import schematics.SchematicNotLoadedException;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import schematics.Schematic;
+import schematics.SchematicNotLoadedException;
 
 import java.util.List;
 import java.util.function.Function;

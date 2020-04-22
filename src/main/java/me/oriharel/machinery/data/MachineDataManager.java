@@ -54,34 +54,31 @@ public class MachineDataManager {
                 Location loc = Utils.longToLocation(position, world);
                 org.bukkit.block.Block block = loc.getBlock();
 
-                Bukkit.getScheduler().runTask(machinery, () -> {
+                try {
+                    if (!(block.getState() instanceof TileState)) throw new ClassCastException();
+                    PlayerMachine machine = machineManager.getPlayerMachineFromBlock(block);
+                    if (machine == null) throw new ClassCastException();
+                    machineManager.getMachineCores().put(loc, machine);
+
+                    Location[] locations;
+                    locations = machineManager.getPlayerMachineLocations(block);
+                    Arrays.stream(locations).forEach(l -> l.setWorld(world));
+                    machineManager.getMachinePartLocations().addAll(Arrays.asList(locations));
+
+                    Bukkit.getScheduler().runTaskLater(machinery, () -> machine.getMinerProcess().startProcess(), 40);
+
+                } catch (ClassCastException e) {
+                    e.printStackTrace();
+                    locationsToRemove.add(position);
                     try {
-                        if (!(block.getState() instanceof TileState)) throw new ClassCastException();
-                        PlayerMachine machine = machineManager.getPlayerMachineFromBlock(block);
-                        if (machine == null) throw new ClassCastException();
-                        machineManager.getMachineCores().put(loc, machine);
-
-                        Location[] locations;
-                        locations = machineManager.getPlayerMachineLocations(block);
-                        Arrays.stream(locations).forEach(l -> l.setWorld(world));
-                        machineManager.getMachinePartLocations().addAll(Arrays.asList(locations));
-
-                        Bukkit.getScheduler().runTaskLater(machinery, () -> machine.getMinerProcess().startProcess(), 40);
-
-                    } catch (ClassCastException e) {
-                        locationsToRemove.add(position);
-                        try {
-                            in.close();
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                        }
+                        in.close();
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
                     }
-                });
+                }
+
             }
             if (locationsToRemove.size() != 0) {
-                System.out.println(
-                        "ds"
-                );
                 removeMachineCoreLocations(locationsToRemove, world);
                 makeBackup(data);
                 machinery.getLogger().severe("Removed " + locationsToRemove.size() + " locations from the machines.dat file since they were not machines");

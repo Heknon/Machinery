@@ -24,16 +24,16 @@ public class TakeResourcesEvent extends Event {
         this.slotTakenFrom = slotTakenFrom;
     }
 
+    public static HandlerList getHandlerList() {
+        return HANDLERS;
+    }
+
     public ItemStack getResourceTaken() {
         return resourceTaken;
     }
 
     public PlayerMachine getMachine() {
         return machine;
-    }
-
-    public static HandlerList getHandlerList() {
-        return HANDLERS;
     }
 
     public HandlerList getHandlers() {

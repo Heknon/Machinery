@@ -2,9 +2,9 @@ package me.oriharel.machinery.structure;
 
 import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.utilities.Callback;
-import schematics.Schematic;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
+import schematics.Schematic;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -52,7 +52,7 @@ public class StructureManager {
             for (String key : keys) {
                 registerSchematic(key);
             }
-            this.callbacksOnDone.forEach(Callback::apply);
+            Bukkit.getScheduler().runTask(machinery, () -> this.callbacksOnDone.forEach(Callback::apply));
         });
 
     }

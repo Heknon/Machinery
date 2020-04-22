@@ -2,16 +2,18 @@ package me.oriharel.machinery.items;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import me.oriharel.customrecipes.recipe.Recipe;
 import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.exceptions.MachineNotFoundException;
 import me.oriharel.machinery.fuel.PlayerFuel;
 import me.oriharel.machinery.machine.Machine;
+import me.oriharel.machinery.machine.MachineFactory;
 import me.oriharel.machinery.machine.PlayerMachine;
-import me.oriharel.machinery.serialization.MachineTypeAdapter;
 import me.oriharel.machinery.serialization.PlayerMachineTypeAdapter;
 import me.oriharel.machinery.utilities.NMS;
+import me.oriharel.machinery.utilities.Utils;
+import me.wolfyscript.customcrafting.recipes.types.CustomRecipe;
 import net.minecraft.server.v1_15_R1.NBTTagString;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -22,32 +24,33 @@ import java.util.stream.Collectors;
 /**
  * Inject Machine into recipe NBT
  */
-public class MachineBlock<T extends Machine> {
+public class MachineBlock {
 
-    private transient final Recipe recipe;
-    private transient final T machine;
+    private transient final CustomRecipe<?> recipe;
+    private transient final Machine machine;
+    private transient final Gson gson;
 
-    public MachineBlock(Recipe recipe, T machine) {
+    public MachineBlock(CustomRecipe<?> recipe, Machine machine, MachineFactory factory) {
+        this.gson = Utils.getGsonSerializationBuilderInstance(machine.getClass(), factory);
         this.recipe = recipe;
         this.machine = machine;
     }
 
-    public MachineBlock(ItemStack itemStack) throws MachineNotFoundException {
+    public MachineBlock(ItemStack itemStack, MachineFactory factory, Class<? extends Machine> machineType) throws MachineNotFoundException {
+        this.gson = Utils.getGsonSerializationBuilderInstance(machineType, factory);
         net.minecraft.server.v1_15_R1.ItemStack is = CraftItemStack.asNMSCopy(itemStack);
-        System.out.println();
+
         if (!is.hasTag() || (!is.getTag().hasKey("playerMachine") && !is.getTag().hasKey("machine"))) throw new MachineNotFoundException("Machine not found in " +
                 "ItemStack passed to MachineBlock constructor.");
+
         if (is.getTag().hasKey("playerMachine")) {
             String data = is.getTag().getString("playerMachine");
-            Gson gson = new GsonBuilder().registerTypeHierarchyAdapter(PlayerMachine.class,
-                    new PlayerMachineTypeAdapter(Machinery.getInstance().getMachineManager().getMachineFactory())).create();
-            this.machine = (T)gson.fromJson(data, PlayerMachine.class);
+            this.machine =
+                    gson.fromJson(data, PlayerMachine.class);
             this.recipe = this.machine.getRecipe();
         } else if (is.getTag().hasKey("machine")) {
             String data = is.getTag().getString("machine");
-            Gson gson = new GsonBuilder().registerTypeHierarchyAdapter(Machine.class,
-                    new MachineTypeAdapter<>(Machinery.getInstance().getMachineManager().getMachineFactory())).create();
-            this.machine = (T)gson.fromJson(data, Machine.class);
+            this.machine = gson.fromJson(data, Machine.class);
             this.recipe = this.machine.getRecipe();
         } else {
             machine = null;
@@ -56,20 +59,29 @@ public class MachineBlock<T extends Machine> {
     }
 
     public ItemStack getItemStackWithAppliedPlaceholders() {
-        ItemStack is = recipe.getResult();
-        ItemMeta meta = is.getItemMeta();
-        meta.setDisplayName(applyPlaceholders(meta.getDisplayName()));
-        meta.setLore(meta.getLore().stream().map(this::applyPlaceholders).collect(Collectors.toList()));
-        is.setItemMeta(meta);
+        if (machine.getClass() == PlayerMachine.class) {
+            YamlConfiguration configLoad = Machinery.getInstance().getFileManager().getConfig("machines.yml").get();
+            ItemStack is = new ItemStack(recipe.getResult().getType(), 1);
+            ItemMeta meta = is.getItemMeta();
 
-        return is;
+            meta.setDisplayName(applyPlaceholders(configLoad.getString(machine.getMachineName() + ".deconstructedItem.displayName")));
+            meta.setLore(configLoad.getStringList(machine.getMachineName() + ".deconstructedItem.lore"));
+            meta.setLore(meta.getLore().stream().map(this::applyPlaceholders).collect(Collectors.toList()));
+            is.setItemMeta(meta);
+            NMS.getItemStackUnhandledNBT(is).put("playerMachine", NBTTagString.a(gson.toJson(machine, PlayerMachine.class)));
+            return is;
+        } else if (machine.getClass() == Machine.class) {
+            return recipe.getResult();
+        }
+        return null;
     }
 
     private String applyPlaceholders(String string) {
         string = string.replaceAll("%total_resources_gained%",
                 String.valueOf(machine instanceof PlayerMachine ? ((PlayerMachine) machine).getTotalResourcesGained() : 0));
         string = string.replaceAll("%resources_gained%",
-                String.valueOf(machine instanceof PlayerMachine ? ((PlayerMachine) machine).getResourcesGained().values().stream().mapToInt(ItemStack::getAmount).sum() : 0));
+                String.valueOf(machine instanceof PlayerMachine ?
+                        ((PlayerMachine) machine).getResourcesGained().values().stream().mapToInt(ItemStack::getAmount).sum() : 0));
         string = string.replaceAll("%total_zen_coins_gained%",
                 String.valueOf(machine instanceof PlayerMachine ? ((PlayerMachine) machine).getTotalZenCoinsGained() : 0));
         string = string.replaceAll("%zen_coins_gained%",
@@ -79,7 +91,7 @@ public class MachineBlock<T extends Machine> {
         return string;
     }
 
-    public Recipe getRecipe() {
+    public CustomRecipe<?> getRecipe() {
         return recipe;
     }
 

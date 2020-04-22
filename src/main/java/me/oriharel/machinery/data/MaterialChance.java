@@ -1,49 +1,35 @@
-package me.oriharel.machinery;
+package me.oriharel.machinery.data;
 
 import org.bukkit.Material;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public final class MaterialChance {
+public final class MaterialChance extends Chance {
     private final List<Material> materials;
-    private final int minimumAmount;
-    private final int maximumAmount;
 
     public MaterialChance(List<Material> materials, int minimumAmount, int maximumAmount) {
+        super(minimumAmount, maximumAmount);
         this.materials = materials;
-        this.minimumAmount = minimumAmount;
-        this.maximumAmount = maximumAmount;
     }
 
     public MaterialChance(int minimumAmount, int maximumAmount, Material... materials) {
+        super(minimumAmount, maximumAmount);
         this.materials = Arrays.stream(materials).collect(Collectors.toList());
-        this.minimumAmount = minimumAmount;
-        this.maximumAmount = maximumAmount;
     }
 
     public MaterialChance(Material material, int minimumAmount, int maximumAmount) {
+        super(minimumAmount, maximumAmount);
         this.materials = new ArrayList<>(Collections.singleton(material));
-        this.minimumAmount = minimumAmount;
-        this.maximumAmount = maximumAmount;
     }
 
     public MaterialChance(int minimumAmount, int maximumAmount) {
+        super(minimumAmount, maximumAmount);
         this.materials = new ArrayList<>();
-        this.minimumAmount = minimumAmount;
-        this.maximumAmount = maximumAmount;
     }
 
     public List<Material> getMaterials() {
         return materials;
-    }
-
-    public int getMinimumAmount() {
-        return minimumAmount;
-    }
-
-    public int getMaximumAmount() {
-        return maximumAmount;
     }
 
     @Override

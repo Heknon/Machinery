@@ -1,0 +1,30 @@
+# COSTS SECTION:
+#   costs is a map. level: costInZenCoins. if you enter up to 6 there will only be 6 levels! up to 9 levels MAX.
+# SPEED UPGRADE INFO:
+#   basePeriod - the amount of time in seconds between each mine operation at level 1
+#   calculate - the operation that will take place to calculate the speed at a certain level
+# LOOT BONUS UPGRADE INFO:
+#   baseAmplifier - recommended to set as 1 since that way the amount of loot given will be multiplied by 1 aka not changed
+#   lootAmplifier - the amount of times to *multiply* the amount of loot given.
+
+speed:
+  basePeriod: 10
+  calculate: "{basePeriod} / {level}"
+  costs:
+    1: 100
+    2: 300
+    3: 500
+    4: 1000
+    5: 5000
+    6: 10000
+
+lootbonus:
+  baseAmplifier: 1
+  lootAmplifier: "{baseAmplifier} * (1 + {level} / 2)"
+  costs:
+    1: 100
+    2: 300
+    3: 500
+    4: 1000
+    5: 8000
+    6: 10000

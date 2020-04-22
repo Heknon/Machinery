@@ -5,7 +5,6 @@ import me.oriharel.machinery.api.events.PostMachineBuildEvent;
 import me.oriharel.machinery.api.events.PreMachineBuildEvent;
 import me.oriharel.machinery.data.PlayerMachinePersistentDataType;
 import me.oriharel.machinery.exceptions.*;
-import me.oriharel.machinery.items.MachineBlock;
 import me.oriharel.machinery.upgrades.LootBonusUpgrade;
 import me.oriharel.machinery.upgrades.SpeedUpgrade;
 import me.oriharel.machinery.utilities.Utils;
@@ -18,9 +17,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.TileState;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.libs.jline.internal.Nullable;
-import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -134,29 +131,36 @@ public class MachineManager {
         persistentDataContainer.remove(MACHINE_NAMESPACE_KEY);
     }
 
-    public boolean buildMachine(UUID playerUuid, Machine machine, Location buildLocation) {
+    public <T extends Machine> boolean buildMachine(UUID playerUuid, T machine, Location buildLocation) {
         try {
             PreMachineBuildEvent preMachineBuildEvent = new PreMachineBuildEvent(machine, buildLocation);
             Bukkit.getPluginManager().callEvent(preMachineBuildEvent);
             if (preMachineBuildEvent.isCancelled()) return false;
             Player p = Bukkit.getPlayer(playerUuid);
             List<Location> locations = machine.structure.build(buildLocation, p, machine.machineCoreBlockType, (printResult) -> {
-                if (printResult.getPlacementLocations() == null) {
-                    p.sendMessage(ChatColor.translateAlternateColorCodes('&', Machinery.getInstance().getFileManager().getConfig("config.yml").get().getString(
-                            "not_empty_place")));
-                    return false;
+                PlayerMachine machineToRegister;
+                if (machine instanceof PlayerMachine) {
+                    PlayerMachine pMachine = (PlayerMachine) machine;
+                    machineToRegister = machineFactory.createMachine(machine, printResult.getOpenGUIBlockLocation(), pMachine.getTotalResourcesGained(),
+                            pMachine.getFuels(), pMachine.getZenCoinsGained(), pMachine.getTotalZenCoinsGained(), pMachine.getOwner(), pMachine.getUpgrades(),
+                            pMachine.getResourcesGained());
+                } else {
+                    machineToRegister = Machinery.getInstance().getMachineManager().getMachineFactory().createMachine(machine,
+                            printResult.getOpenGUIBlockLocation(), 0, new ArrayList<>(), 0, 0, playerUuid, Arrays.asList(
+                                    new LootBonusUpgrade(1),
+                                    new SpeedUpgrade(1)
+                            ), new HashMap<>());
                 }
-                PlayerMachine playerMachine = Machinery.getInstance().getMachineManager().getMachineFactory().createMachine(machine,
-                        printResult.getOpenGUIBlockLocation(), 0, new ArrayList<>(), 0, 0, playerUuid, Arrays.asList(
-                                new LootBonusUpgrade(1),
-                                new SpeedUpgrade(1)
-                        ), new HashMap<>());
-                Machinery.getInstance().getMachineManager().registerNewPlayerMachine(playerMachine, new HashSet<>(printResult.getPlacementLocations()));
-                PostMachineBuildEvent postMachineBuildEvent = new PostMachineBuildEvent(playerMachine, buildLocation);
+                registerNewPlayerMachine(machineToRegister, new HashSet<>(printResult.getPlacementLocations()));
+                PostMachineBuildEvent postMachineBuildEvent = new PostMachineBuildEvent(machineToRegister, buildLocation);
                 Bukkit.getPluginManager().callEvent(postMachineBuildEvent);
                 return true;
             });
-            if (locations == null) return false;
+            if (locations == null) {
+                p.sendMessage(ChatColor.translateAlternateColorCodes('&', Machinery.getInstance().getFileManager().getConfig("config.yml").get().getString(
+                        "not_empty_place")));
+                return false;
+            }
             Machinery.getInstance().getMachineManager().addTemporaryPreRegisterMachinePartLocations(locations);
             return true;
         } catch (Exception e) {
