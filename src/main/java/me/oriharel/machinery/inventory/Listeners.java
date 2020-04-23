@@ -14,9 +14,9 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class Listeners implements Listener {
 
@@ -72,12 +72,10 @@ public class Listeners implements Listener {
         if (!(inventory.getHolder() instanceof InventoryPage)) return;
         if (!e.getView().getTitle().equalsIgnoreCase("fuels")) return;
 
-        // TODO: Check if fuel goes above max
-
         InventoryPage page = (InventoryPage) inventory.getHolder();
         ItemStack[] previousContents = inventories.get(inventory);
         ItemStack[] newContents = new ItemStack[inventory.getContents().length];
-        boolean addedNonFuelItem = false;
+        List<ItemStack> nonFuelItems = new ArrayList<>();
         int i = 0;
         int previousSumFuels = page.owner.getFuels().stream().mapToInt(PlayerFuel::getEnergy).sum();
         for (ItemStack item : inventory.getContents()) {
@@ -86,7 +84,6 @@ public class Listeners implements Listener {
                 continue;
             }
             boolean found = false;
-            System.out.println("-------------------------------");
             for (String key : NMS.getItemStackNBTTMapClone(item).keySet()) {
                 if (machinery.getFuelManager().getNbtIds().containsKey(key)) {
                     found = true;
@@ -111,11 +108,7 @@ public class Listeners implements Listener {
             } else {
                 PlayerFuel fuel = machinery.getFuelManager().getPlayerFuelItem(item.getType(), item.getAmount());
                 if (fuel == null) {
-                    addedNonFuelItem = true;
-                    if (Utils.inventoryHasSpaceForItemAdd(e.getPlayer().getInventory(), item))
-                        e.getPlayer().getInventory().addItem(item);
-                    else
-                        e.getPlayer().getLocation().getWorld().dropItemNaturally(e.getPlayer().getLocation(), item);
+                    nonFuelItems.add(item);
                     i++;
                     continue;
                 }
@@ -125,12 +118,52 @@ public class Listeners implements Listener {
             i++;
         }
         inventory.setContents(newContents);
+
+        int totalEnergy = page.owner.getFuels().stream().mapToInt(PlayerFuel::getEnergy).sum();
         // if previous sum was zero and current is bigger than 0 start mine process
-        if (previousSumFuels == 0 && previousSumFuels < page.owner.getFuels().stream().mapToInt(PlayerFuel::getEnergy).sum()) {
+        if (previousSumFuels == 0 && previousSumFuels < totalEnergy) {
             page.owner.getMinerProcess().startProcess();
         }
-        if (addedNonFuelItem) {
-            e.getPlayer().sendMessage("§c§lYou added a non fuel item to the fuels inventory. It was added back to your inventory.");
+        if (!nonFuelItems.isEmpty()) {
+            for (ItemStack nonFuelItem : nonFuelItems) {
+                if (Utils.inventoryHasSpaceForItemAdd(e.getPlayer().getInventory(), nonFuelItem))
+                    e.getPlayer().getInventory().addItem(nonFuelItem);
+                else
+                    e.getPlayer().getLocation().getWorld().dropItemNaturally(e.getPlayer().getLocation(), nonFuelItem);
+            }
+            e.getPlayer().sendMessage("§c§lYou've added non fuel items to the fuels inventory. They were added back to your inventory.");
+        }
+
+        if (totalEnergy > page.owner.getMaxFuel()) {
+            e.getPlayer().sendMessage("§c§lYou've surpassed the max fuel limit of this machine. Removing necessary fuels.");
+            Set<PlayerFuel> fuelsRemoved = new HashSet<>();
+            int fuelNeededToRemove = totalEnergy - page.owner.getMaxFuel();
+            // sorting so that it'll remove the fuels with the least amount of fuel. ending with the maximized amount of fuel with the fuels entered
+            List<PlayerFuel> sortedAscendingPlayerFuel = page.owner.getFuels().stream().sorted(Comparator.comparingInt(PlayerFuel::getEnergy)).collect(Collectors.toList());
+            for (PlayerFuel playerFuel : sortedAscendingPlayerFuel) {
+                if (fuelNeededToRemove <= 0) break;
+                if (playerFuel.getAmount() > 1) {
+                    int realEnergy = playerFuel.getEnergy() / playerFuel.getAmount();
+                    int neededToRemove = (int) Math.ceil((double) realEnergy / fuelNeededToRemove);
+                    if (neededToRemove <= playerFuel.getAmount()) {
+                        PlayerFuel clone = playerFuel.clone();
+                        clone.setAmount(neededToRemove);
+                        playerFuel.setAmount(playerFuel.getAmount() - neededToRemove);
+                        fuelsRemoved.add(clone);
+                    }
+                } else {
+                    fuelsRemoved.add(playerFuel);
+                    page.owner.getFuels().remove(playerFuel);
+                    fuelNeededToRemove -= playerFuel.getEnergy();
+                }
+            }
+            fuelsRemoved.forEach(f -> {
+                if (Utils.inventoryHasSpaceForItemAdd(e.getPlayer().getInventory(), f))
+                    e.getPlayer().getInventory().addItem(f.clone());
+                else
+                    e.getPlayer().getLocation().getWorld().dropItemNaturally(e.getPlayer().getLocation(), f.clone());
+            });
+
         }
     }
 

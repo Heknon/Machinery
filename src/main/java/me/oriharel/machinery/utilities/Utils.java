@@ -10,15 +10,16 @@ import me.oriharel.machinery.machine.PlayerMachine;
 import me.oriharel.machinery.serialization.*;
 import me.oriharel.machinery.upgrades.AbstractUpgrade;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public final class Utils {
 
     public static Machinery MACHINERY_INSTANCE = null;
-    public static MachineFactory MACHINE_FACTORY_INSTANCE = null;
 
     public static long locationToLong(Location location) {
         int x = location.getBlockX();
@@ -54,6 +55,5 @@ public final class Utils {
                 new AbstractUpgradeTypeAdapter()).registerTypeHierarchyAdapter(Location.class, new LocationTypeAdapter())
                 .registerTypeHierarchyAdapter(NBTTagCompound.class, new NBTTagCompoundTypeAdapter())
                 .registerTypeHierarchyAdapter(PlayerFuel.class, new PlayerFuelTypeAdapter()).create();
-
     }
 }
