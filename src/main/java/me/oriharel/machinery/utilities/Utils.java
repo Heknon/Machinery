@@ -10,12 +10,13 @@ import me.oriharel.machinery.machine.PlayerMachine;
 import me.oriharel.machinery.serialization.*;
 import me.oriharel.machinery.upgrades.AbstractUpgrade;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.Collection;
 
 public final class Utils {
 
@@ -41,12 +42,42 @@ public final class Utils {
         return loc;
     }
 
-    public static boolean inventoryHasSpaceForItemAdd(org.bukkit.inventory.Inventory inventory, ItemStack toAdd) {
-        for (ItemStack itemStack : inventory) {
-            if (itemStack == null || itemStack.getType() == Material.AIR) return true;
-            if (itemStack.getType() == toAdd.getType() && itemStack.getAmount() + toAdd.getAmount() <= 64) return true;
+    public static boolean inventoryHasSpaceForItemAdd(org.bukkit.inventory.Inventory inventory) {
+        return inventory.firstEmpty() != -1;
+    }
+
+    public static <T extends ItemStack> void giveItemsOrDrop(HumanEntity player, Collection<T> items, boolean cloneDrop) {
+        Inventory playerInventory = player.getInventory();
+        Location playerLocation = player.getLocation();
+        World playerWorld = player.getWorld();
+
+        for (ItemStack item : items) {
+            if (Utils.inventoryHasSpaceForItemAdd(playerInventory)) {
+                int amount = item.getAmount();
+                ItemStack toAdd = cloneDrop ? item.clone() : item;
+                if (cloneDrop) toAdd.setAmount(amount);
+                playerInventory.addItem(toAdd);
+
+            } else {
+                playerWorld.dropItemNaturally(playerLocation, cloneDrop ? item.clone() : item);
+            }
         }
-        return false;
+    }
+
+    public static <T extends ItemStack> void giveItemOrDrop(HumanEntity player, T item, boolean cloneDrop) {
+        Inventory playerInventory = player.getInventory();
+        Location playerLocation = player.getLocation();
+        World playerWorld = player.getWorld();
+
+        if (Utils.inventoryHasSpaceForItemAdd(playerInventory)) {
+            int amount = item.getAmount();
+            ItemStack toAdd = cloneDrop ? item.clone() : item;
+            if (cloneDrop) toAdd.setAmount(amount);
+            playerInventory.addItem(toAdd);
+
+        } else {
+            playerWorld.dropItemNaturally(playerLocation, cloneDrop ? item.clone() : item);
+        }
     }
 
     public static <T extends Machine> Gson getGsonSerializationBuilderInstance(Class<T> machineType, MachineFactory factory) {

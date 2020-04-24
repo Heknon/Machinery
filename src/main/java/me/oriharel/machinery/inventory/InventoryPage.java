@@ -8,29 +8,16 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
-import java.lang.reflect.Field;
 import java.util.Set;
 
 public class InventoryPage implements InventoryHolder {
-
-    private static final Field ITEM_MAX_STACK;
-
-    static {
-        try {
-            ITEM_MAX_STACK = net.minecraft.server.v1_15_R1.Item.class
-                    .getDeclaredField("maxStackSize");
-            ITEM_MAX_STACK.setAccessible(true);
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
 
     protected final int size;
     protected final String title;
     protected final InventoryItem fillment;
-    protected final Set<InventoryItem> inventoryItems;
     protected final Inventory inventory;
+    protected Set<InventoryItem> inventoryItems;
     protected Callback onClose;
     protected boolean cancelClick = true;
     protected PlayerMachine owner;
@@ -60,7 +47,14 @@ public class InventoryPage implements InventoryHolder {
         populateItems();
     }
 
+    public InventoryPage setInventoryItems(Set<InventoryItem> inventoryItems) {
+        this.inventoryItems = inventoryItems;
+        populateItems();
+        return this;
+    }
+
     private void populateItems() {
+        if (inventoryItems == null || inventoryItems.isEmpty()) return;
         ItemStack[] contents = inventory.getContents();
         inventoryItems.forEach(item -> contents[item.indexInInventory] = item);
         for (int i = 0; i < contents.length; i++) {

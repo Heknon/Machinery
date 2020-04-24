@@ -12,6 +12,7 @@ import me.oriharel.machinery.listeners.Block;
 import me.oriharel.machinery.listeners.Interact;
 import me.oriharel.machinery.machine.Machine;
 import me.oriharel.machinery.machine.MachineManager;
+import me.oriharel.machinery.machine.PlayerMachine;
 import me.oriharel.machinery.structure.StructureManager;
 import me.oriharel.machinery.utilities.SignMenuFactory;
 import me.oriharel.machinery.utilities.Utils;
@@ -98,12 +99,16 @@ public final class Machinery extends JavaPlugin {
                 .open(target);
     }
 
+    public void updateMachineBlock(PlayerMachine machine) {
+        machineManager.setPlayerMachineBlock(machine.getMachineCore().getBlock(), machine);
+    }
+
     private void setupCommandManager() {
         this.commandManager = new BukkitCommandManager(this);
         commandManager.getCommandCompletions().registerCompletion("machines",
-                c -> Arrays.asList(machineManager.getMachines().stream().map(Machine::getMachineName).toArray(String[]::new)));
+                c -> machineManager.getMachines().stream().map(Machine::getMachineName).collect(Collectors.toList()));
         commandManager.getCommandCompletions().registerCompletion("fuels",
-                c -> Arrays.asList(fuelManager.getFuels().stream().map(Fuel::getName).toArray(String[]::new)));
+                c -> fuelManager.getFuels().stream().map(Fuel::getName).collect(Collectors.toList()));
         commandManager.getCommandContexts().registerIssuerAwareContext(Machine.class, (c) -> {
             String machineName = c.getLastArg();
             if (machineName == null) return null;

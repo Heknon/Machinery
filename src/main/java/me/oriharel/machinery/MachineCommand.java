@@ -45,7 +45,7 @@ public class MachineCommand extends BaseCommand {
             MachineBlock machineBlock = new MachineBlock(machineName.getRecipe(), machineName, machinery.getMachineManager().getMachineFactory());
             ItemStack machineItem = machineBlock.getItemStackWithAppliedPlaceholders();
             machineItem.setAmount(amount);
-            if (!Utils.inventoryHasSpaceForItemAdd(playerToGiveTo.player.getInventory(), machineItem)) {
+            if (!Utils.inventoryHasSpaceForItemAdd(playerToGiveTo.player.getInventory())) {
                 return;
             }
             playerToGiveTo.player.getInventory().addItem(machineItem);
@@ -64,7 +64,7 @@ public class MachineCommand extends BaseCommand {
                 return;
             }
 
-            if (!Utils.inventoryHasSpaceForItemAdd(playerToGiveTo.player.getInventory(), fuelName)) {
+            if (!Utils.inventoryHasSpaceForItemAdd(playerToGiveTo.player.getInventory())) {
                 return;
             }
             playerToGiveTo.player.getInventory().addItem(fuelName);

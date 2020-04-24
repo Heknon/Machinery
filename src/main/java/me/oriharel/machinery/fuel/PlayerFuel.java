@@ -22,6 +22,14 @@ public class PlayerFuel extends Fuel implements Cloneable {
         super.setEnergy(energy * getAmount());
     }
 
+    public int getBaseEnergy() {
+        return baseEnergy;
+    }
+
+    public void setEnergySloppy(int energy) {
+        super.setEnergy(energy);
+    }
+
     @Override
     public void setAmount(int amount) {
         super.setAmount(amount);
@@ -31,6 +39,14 @@ public class PlayerFuel extends Fuel implements Cloneable {
     @Override
     public PlayerFuel clone() {
         Fuel fuel = super.clone();
-        return new PlayerFuel(fuel.getName(), fuel.getType(), fuel.getNbtId(), fuel.getEnergy() / fuel.getAmount(), fuel.getAmount());
+        return new PlayerFuel(fuel.getName(), fuel.getType(), fuel.getNbtId(), baseEnergy, fuel.getAmount());
+    }
+
+    @Override
+    public String toString() {
+        return "PlayerFuel{" +
+                "baseEnergy=" + baseEnergy +
+                ",energy=" + getEnergy() +
+                '}';
     }
 }

@@ -1,33 +1,18 @@
 package me.oriharel.machinery.listeners;
 
-import com.google.common.collect.Sets;
 import me.oriharel.machinery.Machinery;
-import me.oriharel.machinery.fuel.PlayerFuel;
-import me.oriharel.machinery.inventory.*;
-import me.oriharel.machinery.items.MachineBlock;
+import me.oriharel.machinery.inventory.MachineInventoryImpl;
 import me.oriharel.machinery.machine.PlayerMachine;
-import me.oriharel.machinery.upgrades.AbstractUpgrade;
-import me.oriharel.machinery.utilities.Utils;
-import me.swanis.mobcoins.MobCoinsAPI;
-import me.swanis.mobcoins.profile.Profile;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.block.TileState;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.text.DecimalFormat;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class Interact implements Listener {
 

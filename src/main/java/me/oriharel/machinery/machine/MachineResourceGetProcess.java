@@ -96,7 +96,7 @@ public class MachineResourceGetProcess {
         System.out.println("BEFORE: " + machine.getFuels().stream().mapToInt(PlayerFuel::getEnergy).sum());
         if (fuelWithEnoughEnergy.isPresent()) {
             PlayerFuel fuel = fuelWithEnoughEnergy.get();
-            fuel.setEnergy(fuel.getEnergy() - machine.getFuelDeficiency());
+            fuel.setEnergySloppy(fuel.getEnergy() - machine.getFuelDeficiency());
             System.out.println("AFTER: " + machine.getFuels().stream().mapToInt(PlayerFuel::getEnergy).sum());
             return;
         }

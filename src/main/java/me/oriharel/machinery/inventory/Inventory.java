@@ -36,6 +36,16 @@ public class Inventory implements InventoryHolder {
         currentPage = page;
     }
 
+    public <T> void navigateToNamedRoute(String name, T data) {
+        InventoryPage page = routes.get(name);
+        if (page instanceof Datable) {
+            Datable<T> tDatableInventoryPage = (Datable<T>) page;
+            tDatableInventoryPage.setStoredData(data);
+        }
+        viewer.openInventory(page.getInventory());
+        currentPage = page;
+    }
+
     @Override
     public org.bukkit.inventory.Inventory getInventory() {
         InventoryPage page = routes.get("start");

@@ -68,7 +68,6 @@ public class MachineDataManager {
                     Bukkit.getScheduler().runTaskLater(machinery, () -> machine.getMinerProcess().startProcess(), 40);
 
                 } catch (ClassCastException e) {
-                    e.printStackTrace();
                     locationsToRemove.add(position);
                     try {
                         in.close();

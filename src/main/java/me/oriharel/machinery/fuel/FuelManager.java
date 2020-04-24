@@ -56,7 +56,7 @@ public class FuelManager {
                         .getConfig("fuels.yml")
                         .get();
         for (String key : configLoad.getKeys(false)) {
-            Bukkit.getScheduler().runTaskAsynchronously(machinery, () -> fuels.add(initializeFuel(key, configLoad)));
+            fuels.add(initializeFuel(key, configLoad));
         }
     }
 
