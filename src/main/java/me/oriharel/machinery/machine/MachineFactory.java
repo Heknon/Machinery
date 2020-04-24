@@ -43,19 +43,13 @@ public class MachineFactory {
                 "machines.yml.");
         ConfigurationSection section = machinery.getFileManager().getConfig("machines.yml").get().getConfigurationSection(machineKey);
         assert section != null;
-        String referenceBlockTypeString = section.getString("reference_block_type");
-        if (referenceBlockTypeString == null) throw new MaterialNotFoundException("You must give a reference_block_type in the machine section of machine " + machineKey);
-        Material referenceBlockType = Material.getMaterial(referenceBlockTypeString);
-        if (referenceBlockType == null) throw new MaterialNotFoundException("No material named \"" + referenceBlockTypeString + "\" was found.");
         String machineCoreBlockTypeString = section.getString("open_gui_block_type");
         if (machineCoreBlockTypeString == null)
             throw new MaterialNotFoundException("You must give a open_gui_block_type in the machine section of machine " + machineKey);
         Material machineCoreBlockType = Material.getMaterial(machineCoreBlockTypeString);
         if (machineCoreBlockType == null) throw new MaterialNotFoundException("No material named \"" + machineCoreBlockTypeString + "\" was found.");
-        int machineReach = section.getInt("mine_radius", 0);
         int maxFuel = section.getInt("max_fuel", 0);
         int fuelDeficiency = section.getInt("deficiency", 0);
-        List<String> fuelTypes = section.getStringList("fuel_types");
         String recipeName = section.getString("recipe", null);
         if (recipeName == null) throw new NullPointerException("No recipe given in machine section for machine named " + machineKey);
         recipeName = recipeName.replaceAll("\\|", ":");
