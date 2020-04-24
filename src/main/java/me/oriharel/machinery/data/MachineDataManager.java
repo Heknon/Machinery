@@ -151,7 +151,7 @@ public class MachineDataManager {
             public void run() {
                 saveMachinesDataToBlocks();
                 for (World world : Bukkit.getWorlds()) {
-                    Path file = world.getWorldFolder().toPath();
+                    Path file = world.getWorldFolder().toPath().resolve("machines.dat");
                     try {
                         Files.copy(file, file.getParent().resolve("machines.bak.dat"), StandardCopyOption.REPLACE_EXISTING);
                     } catch (IOException e) {
