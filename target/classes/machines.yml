@@ -34,17 +34,29 @@ miner:
       DIAMOND:
         min: 2
         max: 3
+      ZENCOINS:
+        min: 30
+        max: 35
     5:
       DIAMOND_ORE:
         min: 1
         max: 2
+      ZENCOINS:
+        min: 20
+        max: 25
     10:
       GOLD_ORE:
         min: 3
         max: 5
+      ZENCOINS:
+        min: 10
+        max: 15
     30:
       IRON_ORE:
         min: 5
+        max: 10
+      ZENCOINS:
+        min: 8
         max: 10
     50:
       COAL:
@@ -53,6 +65,9 @@ miner:
       IRON_INGOT:
         min: 1
         max: 5
+      ZENCOINS:
+        min: 3
+        max: 5
     90:
       COBBLESTONE:
         min: 5
@@ -60,6 +75,9 @@ miner:
       STONE:
         min: 3
         max: 10
+      ZENCOINS:
+        min: 1
+        max: 2
   type: MINER
 
 lumberjack:

@@ -1,7 +1,7 @@
 package me.oriharel.machinery.machine;
 
 import me.oriharel.machinery.Machinery;
-import me.oriharel.machinery.data.Chanceable;
+import me.oriharel.machinery.data.ChancableList;
 import me.oriharel.machinery.data.ChanceableOperation;
 import me.oriharel.machinery.message.Message;
 import me.oriharel.machinery.upgrades.AbstractUpgrade;
@@ -22,7 +22,7 @@ public class MachineResourceGetProcess {
     private PlayerMachine machine;
     private int minePeriod;
     private BukkitRunnable process;
-    private RandomCollection<ChanceableOperation<?, MachineResourceGetProcess>> chanceables;
+    private RandomCollection<ChancableList<? extends ChanceableOperation<?, MachineResourceGetProcess>>> chanceables;
     private double lootAmplifier;
 
     public MachineResourceGetProcess(PlayerMachine machine) {
@@ -107,13 +107,13 @@ public class MachineResourceGetProcess {
     private void initializeMaterialChances() {
         chanceables = new RandomCollection<>();
         ResourceMap resourceMap = machine.getFactory().getMachinery().getMachineManager().getMachineResourceTrees().get(machine.machineName);
-        for (Map.Entry<Integer, ChanceableOperation<?, MachineResourceGetProcess>> weightChanceableEntry : resourceMap.entrySet()) {
+        for (Map.Entry<Integer, ChancableList<? extends ChanceableOperation<?, MachineResourceGetProcess>>> weightChanceableEntry : resourceMap.entrySet()) {
             int weight = weightChanceableEntry.getKey();
             chanceables.add(weight, weightChanceableEntry.getValue());
         }
     }
 
-    public RandomCollection<ChanceableOperation<?, MachineResourceGetProcess>> getChanceables() {
+    public RandomCollection<ChancableList<? extends ChanceableOperation<?, MachineResourceGetProcess>>> getChanceables() {
         return chanceables;
     }
 

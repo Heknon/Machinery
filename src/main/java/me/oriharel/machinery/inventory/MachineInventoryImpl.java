@@ -300,6 +300,7 @@ public class MachineInventoryImpl {
             int fuelsToDeposit = maxEnergyCanDespositFromFuel / fuel.getBaseEnergy();
 
             fuel.setAmount(fuel.getAmount() - fuelsToDeposit);
+            fuel.setEnergy(fuel.getEnergy() - maxEnergyCanDespositFromFuel);
             inventory.setItem(indexInInventory, fuel);
             machine.addEnergy(maxEnergyCanDespositFromFuel);
             energyLeftToDeposit -= maxEnergyCanDespositFromFuel;

@@ -24,6 +24,14 @@ public class RandomCollection<E> {
         return this;
     }
 
+    public boolean isPresent(double weight) {
+        return map.containsKey(weight);
+    }
+
+    public E get(double weight) {
+        return map.get(weight);
+    }
+
     public void clear() {
         total = 0;
         map.clear();
