@@ -1,5 +1,5 @@
 package me.oriharel.machinery.data;
 
 public interface Chanceable<T> {
-    T getChanced();
+    T getChanced(double lootModifier);
 }

@@ -33,12 +33,12 @@ public class ZenCoinChance implements ChanceableOperation<Integer, MachineResour
     }
 
     @Override
-    public Integer getChanced() {
-        return range.random();
+    public Integer getChanced(double lootModifier) {
+        return (int) (range.random() * lootModifier);
     }
 
     @Override
-    public void executeChanceOperation(MachineResourceGetProcess machineResourceGetProcess) {
-        machineResourceGetProcess.addZenCoinsGained(getChanced());
+    public void executeChanceOperation(MachineResourceGetProcess machineResourceGetProcess, double lootModifier) {
+        machineResourceGetProcess.addZenCoinsGained(getChanced(lootModifier));
     }
 }

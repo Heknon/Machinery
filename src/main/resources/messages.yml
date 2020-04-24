@@ -9,6 +9,7 @@ not_enough_inventory_space: "&c&l[!] &eYou do not have enough inventory space to
 on_upgrade: "&b&l[INFO] &eYou just upgraded a machine! Cost: %amount%"
 on_downgrade: "&b&l[INFO] &eYou just downgraded a machine! You received %amount%"
 reached_max_upgrade_level: "&c&l[!] &eReached max upgrade level, cannot upgrade anymore."
+cannot_downgrade: "&c&l[!] &eThis upgrade is at level one and cannot be downgraded."
 
 sign_input:
   invalid_number: "§c&l[!] &eInvalid number!"

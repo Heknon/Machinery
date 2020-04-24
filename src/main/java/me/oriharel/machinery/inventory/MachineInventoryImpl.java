@@ -176,7 +176,7 @@ public class MachineInventoryImpl {
         for (int upgradeNumber = 0; upgradeNumber < upgrades.size(); upgradeNumber++) {
             AbstractUpgrade upgrade = upgrades.get(upgradeNumber);
 
-            for (int upgradeLevel = 1; upgradeLevel < upgrade.getLevel(); upgradeLevel++) {
+            for (int upgradeLevel = 1; upgradeLevel <= upgrade.getLevel(); upgradeLevel++) {
                 ItemStack upgradeItem = new ItemStack(Material.LIME_STAINED_GLASS_PANE, upgradeLevel);
                 ItemMeta meta = upgradeItem.getItemMeta();
                 meta.setDisplayName(ChatColor.DARK_AQUA + upgrade.getUpgradeName() + " " + ChatColor.GREEN + "(" + upgrade.getLevel() + ")");
@@ -187,12 +187,11 @@ public class MachineInventoryImpl {
 
             ItemStack nextUpgradeItem = new ItemStack(Material.GREEN_STAINED_GLASS_PANE, upgrade.getLevel() + 1);
             ItemMeta meta = nextUpgradeItem.getItemMeta();
-            meta.setDisplayName(ChatColor.DARK_AQUA + upgrade.getUpgradeName() + " " + ChatColor.GREEN + "(" + upgrade.getLevel() + ")");
+            meta.setDisplayName(ChatColor.DARK_AQUA + upgrade.getUpgradeName() + " " + ChatColor.GREEN + "(" + (upgrade.getLevel() + 1) + ")");
             meta.setLore(Collections.singletonList("§aClick to upgrade!"));
             nextUpgradeItem.setItemMeta(meta);
             upgradeItems.add(new InventoryNavigationItemData<>(craftUpgradeVerificationPage(), parentInventory, (upgradeNumber * 9) + upgrade.getLevel(), nextUpgradeItem,
                     upgrade));
-            ++upgradeNumber;
         }
 
         return new InventoryPage(machine.getUpgrades().size() * 9, "Upgrades", upgradeFillment, upgradeItems, machine);
@@ -207,13 +206,21 @@ public class MachineInventoryImpl {
                 machine,
                 (upgrade, navigableDataPage) -> {
                     NavigableDataInventoryPage<AbstractUpgrade> inventoryPage = (NavigableDataInventoryPage<AbstractUpgrade>) navigableDataPage;
-                    int upgradeCost = upgrade.getCosts().get(upgrade.getLevel() + 1);
-                    int downgradeCost = upgrade.getCosts().get(upgrade.getLevel() - 1);
+                    Map<Integer, Integer> costs = upgrade.getCosts();
+                    int upgradeCost = costs.get(upgrade.getLevel() + 1);
+                    int downgradeCost = upgrade.getCosts().getOrDefault(upgrade.getLevel() - 1, -1);
                     inventoryPage.setInventoryItems(Sets.newHashSet(
-                            new InventoryItem(2, Material.RED_STAINED_GLASS_PANE, 1, "§9DOWNGRADE", "§bDowngrade to level §e" + (upgrade.getLevel() - 1),
-                                    "§bCost: §e" + decimalFormat.format(downgradeCost) + " Zen Coins").setOnClick(() -> {
+                            new InventoryItem(2, Material.LIME_STAINED_GLASS_PANE, 1, "§6DOWNGRADE",
+                                    downgradeCost == -1 ? "§bCANNOT DOWNGRADE" : "§bDowngrade to level §e" + (upgrade.getLevel() - 1),
+                                    downgradeCost == -1 ? "" : "§bCost: §e" + decimalFormat.format(downgradeCost) + " Zen Coins").setOnClick(() -> {
+                                if (downgradeCost == -1) {
+                                    new Message("messages.yml", "cannot_downgrade", p, Utils.getLocationPlaceholders(machine.getMachineCore(),
+                                            Utils.getMachinePlaceholders(machine))).send();
+                                    return;
+                                }
                                 depositZenCoins(downgradeCost);
                                 upgrade.downgrade();
+                                machine.getMinerProcess().applyUpgradeModifiers();
                                 p.closeInventory();
                                 new Message("messages.yml", "on_downgrade", p, Utils.getLocationPlaceholders(machine.getMachineCore(),
                                         Utils.getMachinePlaceholders(machine, new Placeholder("%amount%", downgradeCost)))).send();
@@ -229,6 +236,7 @@ public class MachineInventoryImpl {
                                 }
                                 withdrawZenCoins(upgradeCost);
                                 upgrade.upgrade();
+                                machine.getMinerProcess().applyUpgradeModifiers();
                                 p.closeInventory();
                                 new Message("messages.yml", "on_upgrade", p, Utils.getLocationPlaceholders(machine.getMachineCore(),
                                         Utils.getMachinePlaceholders(machine, new Placeholder("%amount%", upgradeCost)))).send();

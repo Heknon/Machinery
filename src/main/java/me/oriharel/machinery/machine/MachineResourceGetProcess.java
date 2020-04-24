@@ -38,7 +38,7 @@ public class MachineResourceGetProcess {
 
     public void startProcess() {
         List<AbstractUpgrade> upgrades = machine.getUpgrades();
-        upgrades.forEach(upgrade -> upgrade.applyUpgradeModifier(this));
+        applyUpgradeModifiers();
         process = new BukkitRunnable() {
             @Override
             public void run() {
@@ -75,7 +75,7 @@ public class MachineResourceGetProcess {
         }
 
         ChanceableOperation<?, MachineResourceGetProcess> chance = chanceables.next();
-        chance.executeChanceOperation(this);
+        chance.executeChanceOperation(this, lootAmplifier);
     }
 
     private void runFuelRemoval() {
@@ -99,6 +99,11 @@ public class MachineResourceGetProcess {
         machine.setTotalResourcesGained(machine.getTotalResourcesGained() + totalAmount.get());
         machine.addZenCoinsGained(this.zenCoinsGained);
         this.zenCoinsGained = 0;
+    }
+
+    public void applyUpgradeModifiers() {
+        List<AbstractUpgrade> upgrades = machine.getUpgrades();
+        upgrades.forEach(upgrade -> upgrade.applyUpgradeModifier(this));
     }
 
     /**

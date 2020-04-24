@@ -18,12 +18,12 @@ public class MaterialChance implements ChanceableOperation<List<ItemStack>, Mach
 
 
     @Override
-    public List<ItemStack> getChanced() {
-        return materials.stream().map(p -> new ItemStack(p.getFirst(), p.getSecond().random())).collect(Collectors.toList());
+    public List<ItemStack> getChanced(double lootModifier) {
+        return materials.stream().map(p -> new ItemStack(p.getFirst(), (int)(p.getSecond().random() * lootModifier))).collect(Collectors.toList());
     }
 
     @Override
-    public void executeChanceOperation(MachineResourceGetProcess machineResourceGetProcess) {
-        machineResourceGetProcess.getItemsGained().addAll(getChanced());
+    public void executeChanceOperation(MachineResourceGetProcess machineResourceGetProcess, double lootModifier) {
+        machineResourceGetProcess.getItemsGained().addAll(getChanced(lootModifier));
     }
 }
