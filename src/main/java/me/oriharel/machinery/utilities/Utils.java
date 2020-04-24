@@ -18,10 +18,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.text.DecimalFormat;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public final class Utils {
 
@@ -93,7 +90,7 @@ public final class Utils {
     }
 
     public static List<Placeholder> getLocationPlaceholders(Location location, Placeholder... extraPlaceholders) {
-        List<Placeholder> placeholders = Arrays.asList(extraPlaceholders);
+        List<Placeholder> placeholders = extraPlaceholders.length == 0 ? new ArrayList<>() : new LinkedList<>(Arrays.asList(extraPlaceholders));
         placeholders.add(new Placeholder("%x%", location.getBlockX()));
         placeholders.add(new Placeholder("%y%", location.getBlockY()));
         placeholders.add(new Placeholder("%z%", location.getBlockZ()));
@@ -114,7 +111,7 @@ public final class Utils {
     }
 
     public static List<Placeholder> getMachinePlaceholders(PlayerMachine machine, Placeholder... extraPlaceholders) {
-        List<Placeholder> placeholders = Arrays.asList(extraPlaceholders);
+        List<Placeholder> placeholders = extraPlaceholders.length == 0 ? new ArrayList<>() : new LinkedList<>(Arrays.asList(extraPlaceholders));
         placeholders.add(new Placeholder("%machine_type%", machine.getType().toTitle()));
         placeholders.add(new Placeholder("%machine_energy%", machine.getEnergyInMachine()));
         placeholders.add(new Placeholder("%machine_max_fuel%", machine.getMaxFuel()));
@@ -135,7 +132,7 @@ public final class Utils {
     }
 
     public static List<Placeholder> getAmountThingPlaceholder(int amount, String thing, Placeholder... extraPlaceholders) {
-        List<Placeholder> placeholders = Arrays.asList(extraPlaceholders);
+        List<Placeholder> placeholders = extraPlaceholders.length == 0 ? new ArrayList<>() : new LinkedList<>(Arrays.asList(extraPlaceholders));
         placeholders.add(new Placeholder("%amount%", amount));
         placeholders.add(new Placeholder("%thing%", thing));
         return placeholders;

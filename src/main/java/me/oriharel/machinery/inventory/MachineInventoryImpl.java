@@ -297,9 +297,7 @@ public class MachineInventoryImpl {
             int indexInInventory = playerFuelPair.getFirst();
             int fuelEnergy = fuel.getEnergy();
             int maxEnergyCanDespositFromFuel = Math.min(fuelEnergy, energyLeftToDeposit);
-            int fuelsToDeposit = fuel.getEnergy() / maxEnergyCanDespositFromFuel;
-
-            if (fuelsToDeposit == 1 && maxEnergyCanDespositFromFuel != fuelEnergy) fuelsToDeposit = 0;
+            int fuelsToDeposit = maxEnergyCanDespositFromFuel / fuel.getBaseEnergy();
 
             fuel.setAmount(fuel.getAmount() - fuelsToDeposit);
             inventory.setItem(indexInInventory, fuel);

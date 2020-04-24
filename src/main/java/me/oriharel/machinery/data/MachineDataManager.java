@@ -94,17 +94,13 @@ public class MachineDataManager {
     }
 
     public void addMachineCoreLocation(Location location) {
-        Bukkit.getScheduler().runTaskAsynchronously(machinery, () -> {
-            Path file = location.getWorld().getWorldFolder().toPath().resolve("machines.dat");
-            createFileIfNotExist(file);
-            try {
-                Files.write(file, ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(Utils.locationToLong(location)).array(), StandardOpenOption.APPEND);
-                Files.copy(file, file.getParent().resolve("machines.bak.dat"), StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-
+        Path file = location.getWorld().getWorldFolder().toPath().resolve("machines.dat");
+        createFileIfNotExist(file);
+        try {
+            Files.write(file, ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(Utils.locationToLong(location)).array(), StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void removeMachineCoreLocation(Location location) {
@@ -154,6 +150,14 @@ public class MachineDataManager {
             @Override
             public void run() {
                 saveMachinesDataToBlocks();
+                for (World world : Bukkit.getWorlds()) {
+                    Path file = world.getWorldFolder().toPath();
+                    try {
+                        Files.copy(file, file.getParent().resolve("machines.bak.dat"), StandardCopyOption.REPLACE_EXISTING);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         };
         process.runTaskTimer(machinery, 0, 20 * 60 * 10);

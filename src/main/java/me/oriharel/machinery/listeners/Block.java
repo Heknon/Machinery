@@ -35,9 +35,13 @@ public class Block implements Listener {
         MachineBlock machineBlock;
         try {
             machineBlock = new MachineBlock(e.getItemInHand(), machinery.getMachineManager().getMachineFactory(), PlayerMachine.class);
-        } catch (MachineNotFoundException ex) {
+        } catch (Exception ex) {
             NBTTagCompound compound = CraftItemStack.asNMSCopy(e.getItemInHand()).getTag();
-            if (compound != null && compound.hasKey("machine")) e.setCancelled(true);
+            if (compound != null && compound.hasKey("machine")) {
+                ex.printStackTrace();
+                new Message("&4&l[!] &cAn error has occurred, please contact a server administrator.", e.getPlayer()).send();
+                e.setCancelled(true);
+            }
             return;
         }
         Machine machine = machineBlock.getMachine();

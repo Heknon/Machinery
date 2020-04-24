@@ -3,6 +3,8 @@ package me.oriharel.machinery.listeners;
 import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.inventory.MachineInventoryImpl;
 import me.oriharel.machinery.machine.PlayerMachine;
+import me.oriharel.machinery.message.Message;
+import me.oriharel.machinery.utilities.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.block.TileState;
 import org.bukkit.event.Event;
@@ -37,8 +39,8 @@ public class Interact implements Listener {
         PlayerMachine machine = machinery.getMachineManager().getMachineCores().get(e.getClickedBlock().getLocation());
         if (machine != null) {
             if (!machine.getPlayersWithAccessPermission().contains(e.getPlayer().getUniqueId())) {
-                e.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&',
-                        machinery.getFileManager().getConfig("config.yml").get().getString("messages.open_attempt_no_access")));
+                new Message("messages.yml", "open_attempt_no_access", e.getPlayer(), Utils.getLocationPlaceholders(machine.getMachineCore(),
+                        Utils.getMachinePlaceholders(machine))).send();
                 e.setUseInteractedBlock(Event.Result.DENY);
                 e.setCancelled(true);
                 e.getPlayer().closeInventory();
@@ -46,8 +48,8 @@ public class Interact implements Listener {
             }
             e.setUseInteractedBlock(Event.Result.DENY);
             e.setCancelled(true);
-            e.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&',
-                    machinery.getFileManager().getConfig("config.yml").get().getString("messages.open_machine_gui")));
+            new Message("messages.yml", "open_machine_gui", e.getPlayer(), Utils.getLocationPlaceholders(machine.getMachineCore(),
+                    Utils.getMachinePlaceholders(machine))).send();
             e.getPlayer().closeInventory();
 
             new MachineInventoryImpl(machine, e.getPlayer(), machinery).openInventory();

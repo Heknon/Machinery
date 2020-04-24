@@ -36,6 +36,10 @@ public class Fuel extends ItemStack implements Cloneable {
         NMS.getItemStackUnhandledNBT(this).put(FUEL_ITEM_NBT_IDENTIFIER, NBTTagByte.a(true));
     }
 
+    public int getBaseEnergy() {
+        return energy;
+    }
+
     public int getEnergy() {
         return energy * getAmount();
     }

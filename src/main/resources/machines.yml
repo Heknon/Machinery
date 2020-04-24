@@ -15,7 +15,6 @@
 
 
 miner:
-  speed: 0
   max_fuel: 100
   deficiency: 10
   open_gui_block_type: "COMMAND_BLOCK"
