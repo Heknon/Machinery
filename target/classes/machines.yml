@@ -1,23 +1,24 @@
 # DEFAULT MACHINE VALUES
 
-# reference_block_type - is the type of block in the schematic that from that block all blocks are "mined"
-# mine_radius - the mine radius from the reference block
-# speed - every how long should resources be gotten in seconds
 # max_fuel - max fuel the machine can have
 # efficiency - the amount of fuel taken each resource get event
 # fuel_types - the types of fuel the machine accepts
 # type - the machine type: LUMBERJACK, EXCAVATOR, MINER, FARMER, ALL
 # block - the block that when placed will build the machine.
 # recipe - in order to make a machine you must use the CustomRecipes plugin. reference a name of a recipe to add it as a machine type.
+# resources - a map the follows the format of "weightChance: Material: Amount" ex below:
+#
+# 30:
+#   iron_ore:
+#     min: 1
+#     max: 3
 
-schematic_name:
-  reference_block_type: "BEDROCK"
-  mine_radius: 3
-  speed: 1
+
+miner:
+  speed: 0
   max_fuel: 100
   deficiency: 10
   open_gui_block_type: "COMMAND_BLOCK"
-  fuel_types: ["fuel_type_name", "fuel_type_name2"]
   recipe: "recipes|schematic_name_recipe"
   deconstructedItem:
     displayName: "§6Machine"
@@ -28,15 +29,139 @@ schematic_name:
       "§bZen Coins in Machine: §e%zen_coins_gained%",
       "§bEnergy: §e%energy%"
     ]
+
+  resources:
+    3:
+      DIAMOND:
+        min: 2
+        max: 3
+    5:
+      DIAMOND_ORE:
+        min: 1
+        max: 2
+    10:
+      GOLD_ORE:
+        min: 3
+        max: 5
+    30:
+      IRON_ORE:
+        min: 5
+        max: 10
+    50:
+      COAL:
+        min: 3
+        max: 8
+      IRON_INGOT:
+        min: 1
+        max: 5
+    90:
+      COBBLESTONE:
+        min: 5
+        max: 15
+      STONE:
+        min: 3
+        max: 10
   type: MINER
 
-schematic_name_super_machine:
-  reference_block_type: "BEDROCK"
-  mine_radius: 20
-  speed: 10
+lumberjack:
   max_fuel: 1000
   deficiency: 50
   open_gui_block_type: "COMMAND_BLOCK"
-  fuel_types: ["fuel_type_name3"]
   recipe: "recipes|schematic_name_super_machine_recipe"
-  type: MINER
+  deconstructedItem:
+    displayName: "§6Machine"
+    lore: [
+      "§bTotal Resources Gained: §e%total_resources_gained%",
+      "§bResources in Machine: §e%resources_gained%",
+      "§bTotal Zen Coins Gained: §e%total_zen_coins_gained%",
+      "§bZen Coins in Machine: §e%zen_coins_gained%",
+      "§bEnergy: §e%energy%"
+    ]
+  resources:
+    1:
+      OAK_LOG:
+        min: 1
+        max: 5
+      SPRUCE_LOG:
+        min: 1
+        max: 5
+      BIRCH_LOG:
+        min: 1
+        max: 5
+      JUNGLE_LOG:
+        min: 1
+        max: 5
+      ACACIA_LOG:
+        min: 1
+        max: 5
+      DARK_OAK_LOG:
+        min: 1
+        max: 5
+  type: LUMBERJACK
+
+farmer:
+  max_fuel: 1000
+  deficiency: 50
+  open_gui_block_type: "COMMAND_BLOCK"
+  recipe: "recipes|schematic_name_super_machine_recipe"
+  deconstructedItem:
+    displayName: "§6Machine"
+    lore: [
+      "§bTotal Resources Gained: §e%total_resources_gained%",
+      "§bResources in Machine: §e%resources_gained%",
+      "§bTotal Zen Coins Gained: §e%total_zen_coins_gained%",
+      "§bZen Coins in Machine: §e%zen_coins_gained%",
+      "§bEnergy: §e%energy%"
+    ]
+  resources:
+    1:
+      WHEAT:
+        min: 4
+        max: 10
+    3:
+      POTATO:
+        min: 2
+        max: 6
+      MELON:
+        min: 1
+        max: 2
+      ZENCOINS:
+        min: 10
+        max: 20
+    10:
+      MELON_SLICE:
+        min: 4
+        max: 8
+      CARROT:
+        min: 2
+        max: 11
+      ZENCOINS:
+        min: 14
+        max: 40
+  type: FARMER
+
+excavator:
+  max_fuel: 1000
+  deficiency: 50
+  open_gui_block_type: "COMMAND_BLOCK"
+  recipe: "recipes|schematic_name_super_machine_recipe"
+  deconstructedItem:
+    displayName: "§6Machine"
+    lore: [
+      "§bTotal Resources Gained: §e%total_resources_gained%",
+      "§bResources in Machine: §e%resources_gained%",
+      "§bTotal Zen Coins Gained: §e%total_zen_coins_gained%",
+      "§bZen Coins in Machine: §e%zen_coins_gained%",
+      "§bEnergy: §e%energy%"
+    ]
+  type: EXCAVATOR
+  resources:
+    1:
+      GRASS_BLOCK:
+        min: 5
+        max: 7
+    3:
+      DIRT:
+        min: 8
+        max: 10
+

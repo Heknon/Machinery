@@ -33,6 +33,7 @@ public class MachineManager {
     private PlayerMachinePersistentDataType MACHINE_PERSISTENT_DATA_TYPE;
     private NamespacedKey MACHINE_NAMESPACE_KEY;
     private NamespacedKey MACHINE_LOCATIONS_NAMESPACE_KEY;
+    private Map<String, ResourceMap> machineResourceTrees;
 
     public MachineManager(Machinery machinery) {
         this.machinery = machinery;
@@ -40,6 +41,7 @@ public class MachineManager {
         this.machines = new ArrayList<Machine>();
         this.machineCores = new HashMap<>();
         this.machinePartLocations = new HashSet<>();
+        this.machineResourceTrees = new HashMap<>();
         this.temporaryPreRegisterMachineLocations = new HashSet<>();
         this.MACHINE_PERSISTENT_DATA_TYPE = new PlayerMachinePersistentDataType(machineFactory);
         this.MACHINE_NAMESPACE_KEY = new NamespacedKey(machinery, "machine");
@@ -53,6 +55,7 @@ public class MachineManager {
         for (String key : machineKeys) {
             try {
                 Machine machine = machineFactory.createMachine(key);
+                machineResourceTrees.put(key, new ResourceMap(key, configLoad));
                 machines.add(machine);
             } catch (IllegalArgumentException | NotMachineTypeException | MachineNotFoundException | MaterialNotFoundException | RecipeNotFoundException e) {
                 e.printStackTrace();
@@ -188,5 +191,9 @@ public class MachineManager {
 
     public MachineFactory getMachineFactory() {
         return machineFactory;
+    }
+
+    public Map<String, ResourceMap> getMachineResourceTrees() {
+        return machineResourceTrees;
     }
 }

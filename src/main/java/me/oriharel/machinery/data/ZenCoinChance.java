@@ -1,34 +1,44 @@
 package me.oriharel.machinery.data;
 
+import me.oriharel.machinery.machine.MachineResourceGetProcess;
+
 import java.util.Objects;
 
-public class ZenCoinChance extends Chance {
+public class ZenCoinChance implements ChanceableOperation<Integer, MachineResourceGetProcess> {
 
-    public ZenCoinChance(int minimumAmount, int maximumAmount) {
-        super(minimumAmount, maximumAmount);
+    private Range range;
+
+    public ZenCoinChance(Range range) {
+        this.range = range;
     }
-
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ZenCoinChance that = (ZenCoinChance) o;
-        return
-                minimumAmount == that.minimumAmount &&
-                        maximumAmount == that.maximumAmount;
+        return Objects.equals(range, that.range);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(minimumAmount, maximumAmount);
+        return Objects.hash(range);
     }
 
     @Override
     public String toString() {
         return "ZenCoinChance{" +
-                "minimumAmount=" + minimumAmount +
-                ", maximumAmount=" + maximumAmount +
+                "range=" + range +
                 '}';
+    }
+
+    @Override
+    public Integer getChanced() {
+        return range.random();
+    }
+
+    @Override
+    public void executeChanceOperation(MachineResourceGetProcess machineResourceGetProcess) {
+        machineResourceGetProcess.addZenCoinsGained(getChanced());
     }
 }

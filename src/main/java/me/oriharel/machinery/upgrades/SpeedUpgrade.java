@@ -27,6 +27,7 @@ public class SpeedUpgrade extends AbstractUpgrade {
         YamlConfiguration config = Machinery.getInstance().getFileManager().getConfig("upgrades.yml").get();
         ScriptEngineManager mgr = new ScriptEngineManager();
         ScriptEngine engine = mgr.getEngineByName("JavaScript");
+        // period is in ticks. 20 ticks is a second
         int basePeriod = config.getInt("speed.basePeriod") * 20;
         if (level == 1) {
             mineProcess.setMinePeriod(basePeriod);

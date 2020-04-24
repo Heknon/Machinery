@@ -1,44 +1,38 @@
 package me.oriharel.machinery.machine;
 
 import me.oriharel.machinery.Machinery;
-import me.oriharel.machinery.data.Chance;
-import me.oriharel.machinery.data.MaterialChance;
-import me.oriharel.machinery.data.ZenCoinChance;
+import me.oriharel.machinery.data.Chanceable;
+import me.oriharel.machinery.data.ChanceableOperation;
 import me.oriharel.machinery.message.Message;
 import me.oriharel.machinery.upgrades.AbstractUpgrade;
 import me.oriharel.machinery.utilities.RandomCollection;
 import me.oriharel.machinery.utilities.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.Tag;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class MachineResourceGetProcess {
-    protected List<ItemStack> itemsGained;
-    protected PlayerMachine machine;
-    protected int minePeriod;
-    protected BukkitRunnable process;
-    protected RandomCollection<Chance> materialChances;
-    protected double lootAmplifier;
-    protected Random random;
+    private List<ItemStack> itemsGained;
+    private long zenCoinsGained;
+    private PlayerMachine machine;
+    private int minePeriod;
+    private BukkitRunnable process;
+    private RandomCollection<ChanceableOperation<?, MachineResourceGetProcess>> chanceables;
+    private double lootAmplifier;
 
     public MachineResourceGetProcess(PlayerMachine machine) {
         itemsGained = new ArrayList<>();
         this.machine = machine;
         this.minePeriod = 20;
-        this.random = new Random();
-        this.materialChances = null;
+        this.chanceables = null;
         this.process = null;
         this.lootAmplifier = 1;
+        this.zenCoinsGained = 0;
         initializeMaterialChances();
     }
 
@@ -75,103 +69,52 @@ public class MachineResourceGetProcess {
         return !process.isCancelled();
     }
 
-    protected void getResources() {
-        List<ItemStack> itemsGained = this.itemsGained;
-
-
-        if (materialChances == null) {
+    private void getResources() {
+        if (chanceables == null) {
             initializeMaterialChances();
         }
-        Chance chance = materialChances.next();
-        if (chance instanceof MaterialChance) {
-            MaterialChance materialChance = (MaterialChance) chance;
-            materialChance.getMaterials().forEach(mat -> itemsGained.add(new ItemStack(mat, ThreadLocalRandom.current().nextInt(chance.getMinimumAmount(),
-                    chance.getMaximumAmount()))));
-        } else if (chance instanceof ZenCoinChance) {
-            double amount = ThreadLocalRandom.current().nextDouble(chance.getMinimumAmount(), chance.getMaximumAmount());
-            machine.addZenCoinsGained(amount);
-        }
+
+        ChanceableOperation<?, MachineResourceGetProcess> chance = chanceables.next();
+        chance.executeChanceOperation(this);
     }
 
-    public void runFuelRemoval() {
+    private void runFuelRemoval() {
         machine.removeEnergy(machine.getFuelDeficiency());
     }
 
-    protected void insertResources() {
-        HashMap<Material, ItemStack> resourcesGained = machine.getResourcesGained();
+    private void insertResources() {
+        HashMap<Material, ItemStack> machineResourcesGained = machine.getResourcesGained();
         AtomicReference<Double> totalAmount = new AtomicReference<>((double) 0);
         itemsGained.forEach(
                 item -> {
                     totalAmount.updateAndGet(v -> v + item.getAmount());
-                    if (resourcesGained.containsKey(item.getType())) {
-                        ItemStack prev = resourcesGained.get(item.getType());
+                    if (machineResourcesGained.containsKey(item.getType())) {
+                        ItemStack prev = machineResourcesGained.get(item.getType());
                         prev.setAmount(prev.getAmount() + item.getAmount());
                         return;
                     }
-                    resourcesGained.put(item.getType(), item.clone());
+                    machineResourcesGained.put(item.getType(), item.clone());
                 }
         );
         machine.setTotalResourcesGained(machine.getTotalResourcesGained() + totalAmount.get());
+        machine.addZenCoinsGained(this.zenCoinsGained);
+        this.zenCoinsGained = 0;
     }
 
     /**
      * Uses MaterialChance class to define materials given for a specific chance, in a specific range
      */
     private void initializeMaterialChances() {
-        materialChances = new RandomCollection<Chance>();
-        addZenCoinChances();
-        switch (machine.machineType) {
-            case LUMBERJACK:
-                addLumberjackMaterialChances();
-                break;
-            case EXCAVATOR:
-                addExcavatorMaterialChances();
-                break;
-            case MINER:
-                addMinerMaterialChances();
-                break;
-            case FARMER:
-                addFarmerMaterialChances();
-                break;
-            case ALL:
-                addMinerMaterialChances();
-                addFarmerMaterialChances();
-                addExcavatorMaterialChances();
-                addLumberjackMaterialChances();
-                break;
+        chanceables = new RandomCollection<>();
+        ResourceMap resourceMap = machine.getFactory().getMachinery().getMachineManager().getMachineResourceTrees().get(machine.machineName);
+        for (Map.Entry<Integer, ChanceableOperation<?, MachineResourceGetProcess>> weightChanceableEntry : resourceMap.entrySet()) {
+            int weight = weightChanceableEntry.getKey();
+            chanceables.add(weight, weightChanceableEntry.getValue());
         }
     }
 
-    private void addZenCoinChances() {
-        materialChances.add(1, new ZenCoinChance(10, 50));
-    }
-
-    private void addMinerMaterialChances() {
-        materialChances.add(3, new MaterialChance(Material.DIAMOND, (int) Math.floor(2 * lootAmplifier), (int) Math.floor(3 * lootAmplifier)));
-        materialChances.add(5, new MaterialChance(Material.DIAMOND_ORE, (int) Math.floor(1 * lootAmplifier), (int) Math.floor(2 * lootAmplifier)));
-        materialChances.add(10, new MaterialChance(Material.GOLD_ORE, (int) Math.floor(3 * lootAmplifier), (int) Math.floor(5 * lootAmplifier)));
-        materialChances.add(30, new MaterialChance(Material.IRON_ORE, (int) Math.floor(5 * lootAmplifier), (int) Math.floor(10 * lootAmplifier)));
-        materialChances.add(50, new MaterialChance((int) Math.floor(3 * lootAmplifier), (int) Math.floor(8 * lootAmplifier), Material.COAL, Material.IRON_INGOT));
-        materialChances.add(90, new MaterialChance((int) Math.floor(5 * lootAmplifier), (int) Math.floor(15 * lootAmplifier), Material.COBBLESTONE, Material.STONE));
-    }
-
-    private void addFarmerMaterialChances() {
-        materialChances.add(100, new MaterialChance(new ArrayList<>(Tag.CROPS.getValues()), (int) Math.floor(3 * lootAmplifier), (int) Math.floor(10 * lootAmplifier)));
-    }
-
-    private void addExcavatorMaterialChances() {
-        materialChances.add(1, new MaterialChance(Material.GRASS_BLOCK, (int) Math.floor(5 * lootAmplifier), (int) Math.floor(7 * lootAmplifier)));
-        materialChances.add(3, new MaterialChance(Material.DIRT, (int) Math.floor(8 * lootAmplifier), (int) Math.floor(10 * lootAmplifier)));
-    }
-
-    private void addLumberjackMaterialChances() {
-        MaterialChance chance = new MaterialChance((int) Math.floor(5 * lootAmplifier), (int) Math.floor(10 * lootAmplifier));
-        chance.getMaterials().addAll(Tag.LOGS.getValues());
-        materialChances.add(100, chance);
-    }
-
-    public RandomCollection<Chance> getMaterialChances() {
-        return materialChances;
+    public RandomCollection<ChanceableOperation<?, MachineResourceGetProcess>> getChanceables() {
+        return chanceables;
     }
 
     public double getLootAmplifier() {
@@ -188,6 +131,10 @@ public class MachineResourceGetProcess {
 
     public void setItemsGained(List<ItemStack> itemsGained) {
         this.itemsGained = itemsGained;
+    }
+
+    public void addZenCoinsGained(long amount) {
+        zenCoinsGained += amount;
     }
 
     public PlayerMachine getMachine() {

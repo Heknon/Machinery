@@ -159,4 +159,8 @@ public class PlayerMachine extends Machine {
                 ", machineResourceGetProcess=" + machineResourceGetProcess +
                 '}';
     }
+
+    public MachineFactory getFactory() {
+        return factory;
+    }
 }

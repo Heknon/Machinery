@@ -1,5 +1,0 @@
-messages:
-  not_empty_place: "&c&l[!] &eThere are blocks interfering with building the machine! Try placing it in another location."
-  open_machine_gui: "&b&l[INFO] &7Opening machine GUI"
-  break_machine_attempt: "&c&l[!] &eYou cannot break a machine block. Try deconstructing it."
-  open_attempt_no_access: "&c&l[!] &eYou tried accessing a machine that you don't have permission to access."

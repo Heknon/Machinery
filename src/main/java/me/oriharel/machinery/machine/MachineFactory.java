@@ -120,4 +120,8 @@ public class MachineFactory {
         }
         return recipe;
     }
+
+    public Machinery getMachinery() {
+        return machinery;
+    }
 }
