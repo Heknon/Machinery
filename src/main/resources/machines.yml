@@ -10,14 +10,12 @@
 # block - the block that when placed will build the machine.
 # recipe - in order to make a machine you must use the CustomRecipes plugin. reference a name of a recipe to add it as a machine type.
 
-schematic_name:
+miner:
   reference_block_type: "BEDROCK"
-  mine_radius: 3
   speed: 1
   max_fuel: 100
   deficiency: 10
   open_gui_block_type: "COMMAND_BLOCK"
-  fuel_types: ["fuel_type_name", "fuel_type_name2"]
   recipe: "recipes|schematic_name_recipe"
   deconstructedItem:
     displayName: "§6Machine"
@@ -28,15 +26,83 @@ schematic_name:
       "§bZen Coins in Machine: §e%zen_coins_gained%",
       "§bEnergy: §e%energy%"
     ]
+
+  resources:
+
   type: MINER
 
-schematic_name_super_machine:
+lumberjack:
   reference_block_type: "BEDROCK"
   mine_radius: 20
   speed: 10
   max_fuel: 1000
   deficiency: 50
   open_gui_block_type: "COMMAND_BLOCK"
-  fuel_types: ["fuel_type_name3"]
   recipe: "recipes|schematic_name_super_machine_recipe"
-  type: MINER
+  deconstructedItem:
+    displayName: "§6Machine"
+    lore: [
+      "§bTotal Resources Gained: §e%total_resources_gained%",
+      "§bResources in Machine: §e%resources_gained%",
+      "§bTotal Zen Coins Gained: §e%total_zen_coins_gained%",
+      "§bZen Coins in Machine: §e%zen_coins_gained%",
+      "§bEnergy: §e%energy%"
+    ]
+  type: LUMBERJACK
+
+farmer:
+  reference_block_type: "BEDROCK"
+  mine_radius: 20
+  speed: 10
+  max_fuel: 1000
+  deficiency: 50
+  open_gui_block_type: "COMMAND_BLOCK"
+  recipe: "recipes|schematic_name_super_machine_recipe"
+  deconstructedItem:
+    displayName: "§6Machine"
+    lore: [
+      "§bTotal Resources Gained: §e%total_resources_gained%",
+      "§bResources in Machine: §e%resources_gained%",
+      "§bTotal Zen Coins Gained: §e%total_zen_coins_gained%",
+      "§bZen Coins in Machine: §e%zen_coins_gained%",
+      "§bEnergy: §e%energy%"
+    ]
+  type: FARMER
+
+excavator:
+  reference_block_type: "BEDROCK"
+  mine_radius: 20
+  speed: 10
+  max_fuel: 1000
+  deficiency: 50
+  open_gui_block_type: "COMMAND_BLOCK"
+  recipe: "recipes|schematic_name_super_machine_recipe"
+  deconstructedItem:
+    displayName: "§6Machine"
+    lore: [
+      "§bTotal Resources Gained: §e%total_resources_gained%",
+      "§bResources in Machine: §e%resources_gained%",
+      "§bTotal Zen Coins Gained: §e%total_zen_coins_gained%",
+      "§bZen Coins in Machine: §e%zen_coins_gained%",
+      "§bEnergy: §e%energy%"
+    ]
+  type: EXCAVATOR
+
+all:
+  reference_block_type: "BEDROCK"
+  mine_radius: 20
+  speed: 10
+  max_fuel: 1000
+  deficiency: 50
+  open_gui_block_type: "COMMAND_BLOCK"
+  recipe: "recipes|schematic_name_super_machine_recipe"
+  deconstructedItem:
+    displayName: "§6Machine"
+    lore: [
+      "§bTotal Resources Gained: §e%total_resources_gained%",
+      "§bResources in Machine: §e%resources_gained%",
+      "§bTotal Zen Coins Gained: §e%total_zen_coins_gained%",
+      "§bZen Coins in Machine: §e%zen_coins_gained%",
+      "§bEnergy: §e%energy%"
+    ]
+  type: ALL

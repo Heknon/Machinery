@@ -33,12 +33,21 @@ public class Interact implements Listener {
             e.setUseInteractedBlock(Event.Result.DENY);
         }
 
+
         PlayerMachine machine = machinery.getMachineManager().getMachineCores().get(e.getClickedBlock().getLocation());
         if (machine != null) {
+            if (!machine.getPlayersWithAccessPermission().contains(e.getPlayer().getUniqueId())) {
+                e.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                        machinery.getFileManager().getConfig("config.yml").get().getString("messages.open_attempt_no_access")));
+                e.setUseInteractedBlock(Event.Result.DENY);
+                e.setCancelled(true);
+                e.getPlayer().closeInventory();
+                return;
+            }
             e.setUseInteractedBlock(Event.Result.DENY);
             e.setCancelled(true);
             e.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&',
-                    machinery.getFileManager().getConfig("config.yml").get().getString("open_machine_gui_message")));
+                    machinery.getFileManager().getConfig("config.yml").get().getString("messages.open_machine_gui")));
             e.getPlayer().closeInventory();
 
             new MachineInventoryImpl(machine, e.getPlayer(), machinery).openInventory();

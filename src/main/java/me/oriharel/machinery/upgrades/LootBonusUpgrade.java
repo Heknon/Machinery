@@ -47,8 +47,15 @@ public class LootBonusUpgrade extends AbstractUpgrade {
     @Override
     public Map<Integer, Integer> getCosts() {
         if (costs == null) costs =
-                configLoad.getConfigurationSection("lootbonus.costs").getValues(false).entrySet().stream().map(entry -> new AbstractMap.SimpleEntry<>(Integer.valueOf(entry.getKey()), Integer.parseInt((String) entry.getValue()))).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                configLoad.getConfigurationSection("lootbonus.costs").getValues(false).entrySet().stream()
+                        .map(entry -> new AbstractMap.SimpleEntry<>(Integer.valueOf(entry.getKey()), (Integer) entry.getValue()))
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         return costs;
+    }
+
+    @Override
+    public UpgradeType getUpgradeType() {
+        return UpgradeType.LOOT_BONUS;
     }
 
     @Override

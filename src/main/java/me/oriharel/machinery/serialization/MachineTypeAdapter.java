@@ -1,6 +1,5 @@
 package me.oriharel.machinery.serialization;
 
-import com.google.common.base.Preconditions;
 import com.google.gson.*;
 import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.machine.Machine;
@@ -15,7 +14,6 @@ import schematics.Schematic;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-import java.util.List;
 
 public class MachineTypeAdapter<T extends Machine> implements JsonSerializer<T>, JsonDeserializer<T> {
     protected MachineFactory factory;
@@ -41,12 +39,8 @@ public class MachineTypeAdapter<T extends Machine> implements JsonSerializer<T>,
         String machineName = machineJsonObject.get("name").getAsString();
         String recipeName = machineJsonObject.get("recipe").getAsString();
 
-
-        int machineReach = machineJsonObject.get("reach").getAsInt();
         int machineMaxFuel = machineJsonObject.get("maxFuel").getAsInt();
         int machineFuelDeficiency = machineJsonObject.get("fuelDeficiency").getAsInt();
-
-        List<String> fuelTypes = context.deserialize(machineJsonObject.get("fuelTypes"), List.class);
 
         MachineType machineType = MachineType.valueOf(machineJsonObject.get("type").getAsString());
         Material machineCoreBlockType = Material.getMaterial(machineJsonObject.get("coreBlockType").getAsString());
@@ -57,8 +51,8 @@ public class MachineTypeAdapter<T extends Machine> implements JsonSerializer<T>,
         CustomRecipe<?> recipe = CustomCrafting.getRecipeHandler().getRecipe(recipeName);
 
         if (factory == null) factory = Machinery.getInstance().getMachineManager().getMachineFactory();
-        return (T) factory.createMachine(machineReach, machineMaxFuel,
-                machineFuelDeficiency, fuelTypes, machineType, structure, recipe, machineName, machineCoreBlockType);
+        return (T) factory.createMachine(machineMaxFuel,
+                machineFuelDeficiency, machineType, structure, recipe, machineName, machineCoreBlockType);
     }
 
     protected JsonObject getSerializedMachine(T machine, JsonSerializationContext context) {
@@ -69,10 +63,8 @@ public class MachineTypeAdapter<T extends Machine> implements JsonSerializer<T>,
         obj.add("structure", new JsonPrimitive(getSchematicPath(machine.getStructure())));
         obj.add("recipe", new JsonPrimitive(machine.getRecipe().getId()));
         obj.add("fuelDeficiency", new JsonPrimitive(machine.getFuelDeficiency()));
-        obj.add("reach", new JsonPrimitive(machine.getMachineReach()));
         obj.add("maxFuel", new JsonPrimitive(machine.getMaxFuel()));
         obj.add("coreBlockType", new JsonPrimitive(machine.getMachineCoreBlockType().toString()));
-        obj.add("fuelTypes", context.serialize(machine.getFuelTypes(), List.class));
 
         return obj;
     }

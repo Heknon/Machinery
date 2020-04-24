@@ -1,14 +1,11 @@
 package me.oriharel.machinery.items;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.exceptions.MachineNotFoundException;
-import me.oriharel.machinery.fuel.PlayerFuel;
 import me.oriharel.machinery.machine.Machine;
 import me.oriharel.machinery.machine.MachineFactory;
 import me.oriharel.machinery.machine.PlayerMachine;
-import me.oriharel.machinery.serialization.PlayerMachineTypeAdapter;
 import me.oriharel.machinery.utilities.NMS;
 import me.oriharel.machinery.utilities.Utils;
 import me.wolfyscript.customcrafting.recipes.types.CustomRecipe;
@@ -87,7 +84,7 @@ public class MachineBlock {
         string = string.replaceAll("%zen_coins_gained%",
                 String.valueOf(machine instanceof PlayerMachine ? (int)((PlayerMachine) machine).getZenCoinsGained() : 0));
         string = string.replaceAll("%energy%", String.valueOf(machine instanceof PlayerMachine ?
-                ((PlayerMachine) machine).getFuels().stream().mapToInt(PlayerFuel::getEnergy).sum() : 0));
+                ((PlayerMachine) machine).getEnergyInMachine() : 0));
         return string;
     }
 

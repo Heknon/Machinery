@@ -5,7 +5,6 @@ import me.oriharel.machinery.exceptions.MachineNotFoundException;
 import me.oriharel.machinery.exceptions.MaterialNotFoundException;
 import me.oriharel.machinery.exceptions.NotMachineTypeException;
 import me.oriharel.machinery.exceptions.RecipeNotFoundException;
-import me.oriharel.machinery.fuel.PlayerFuel;
 import me.oriharel.machinery.structure.Structure;
 import me.oriharel.machinery.upgrades.AbstractUpgrade;
 import me.oriharel.machinery.utilities.NMS;
@@ -24,6 +23,7 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class MachineFactory {
@@ -65,53 +65,49 @@ public class MachineFactory {
         MachineType machineType = MachineType.getMachine(section.getString("type", null));
         Structure structure =
                 machinery.getStructureManager().getSchematicByPath(new File(machinery.getDataFolder(), "structures/" + machineKey + Machinery.STRUCTURE_EXTENSION).getPath());
-        Machine machine = new Machine(machineReach, maxFuel, fuelDeficiency, fuelTypes, machineType, structure, recipe, machineKey,
+        Machine machine = new Machine(maxFuel, fuelDeficiency, machineType, structure, recipe, machineKey,
                 machineCoreBlockType, this);
         machine.setRecipe(injectMachineNBTIntoRecipe(machine.getRecipe(), machine));
         return machine;
     }
 
     @Nullable
-    public Machine createMachine(int machineReach,
-                                 int maxFuel,
+    public Machine createMachine(int maxFuel,
                                  int fuelDeficiency,
-                                 List<String> fuelTypes,
                                  MachineType machineType,
                                  Structure structure,
                                  CustomRecipe<?> recipe,
                                  String machineKey, Material machineCoreBlockType) throws IllegalArgumentException {
         if (machineType == null) throw new IllegalArgumentException("Machine type must not be null (MachineFactory)");
-        Machine machine = new Machine(machineReach, maxFuel, fuelDeficiency, fuelTypes, machineType, structure,
+        Machine machine = new Machine(maxFuel, fuelDeficiency, machineType, structure,
                 recipe, machineKey, machineCoreBlockType, this);
         machine.setRecipe(injectMachineNBTIntoRecipe(machine.getRecipe(), machine));
         return machine;
     }
 
     @Nullable
-    public PlayerMachine createMachine(int machineReach,
-                                       int maxFuel,
+    public PlayerMachine createMachine(int maxFuel,
                                        int fuelDeficiency,
-                                       List<String> fuelTypes,
                                        MachineType machineType,
                                        Structure structure,
                                        CustomRecipe<?> recipe,
                                        String machineKey, Material machineCoreBlockType, double totalResourcesGained,
                                        HashMap<Material, ItemStack> resourcesGained,
-                                       List<PlayerFuel> fuels, Location machineCoreBlockLocation, double zenCoinsGained, double totalZenCoinsGained, UUID owner,
-                                       List<AbstractUpgrade> upgrades) throws IllegalArgumentException {
+                                       int energyInMachine, Location machineCoreBlockLocation, double zenCoinsGained, double totalZenCoinsGained, UUID owner,
+                                       List<AbstractUpgrade> upgrades, Set<UUID> playersWithAccessPermission) throws IllegalArgumentException {
         if (machineType == null) throw new IllegalArgumentException("Machine type must not be null (MachineFactory)");
-        return new PlayerMachine(machineReach, maxFuel, fuelDeficiency, fuelTypes, machineType, structure,
-                recipe, machineKey, machineCoreBlockType, totalResourcesGained, resourcesGained, fuels, machineCoreBlockLocation,
+        return new PlayerMachine(maxFuel, fuelDeficiency, machineType, structure,
+                recipe, machineKey, machineCoreBlockType, playersWithAccessPermission, totalResourcesGained, resourcesGained, energyInMachine, machineCoreBlockLocation,
                 zenCoinsGained, totalZenCoinsGained, owner, upgrades, this);
     }
 
     public PlayerMachine createMachine(Machine machine, Location machineCoreBlockLocation, double totalResourcesGained,
-                                       List<PlayerFuel> fuels, double zenCoinsGained, double totalZenCoinsGained, UUID owner,
-                                       List<AbstractUpgrade> upgrades, HashMap<Material, ItemStack> resourcesGained) throws IllegalArgumentException {
+                                       int energyInMachine, double zenCoinsGained, double totalZenCoinsGained, UUID owner,
+                                       List<AbstractUpgrade> upgrades, HashMap<Material, ItemStack> resourcesGained, Set<UUID> playersWithAccessPermission) throws IllegalArgumentException {
         if (machine == null) throw new IllegalArgumentException("Machine must not be null (MachineFactory)");
-        return new PlayerMachine(machine.machineReach, machine.maxFuel, machine.fuelDeficiency, machine.fuelTypes,
+        return new PlayerMachine(machine.maxFuel, machine.fuelDeficiency,
                 machine.machineType, machine.structure,
-                machine.recipe, machine.machineName, machine.machineCoreBlockType, totalResourcesGained, resourcesGained, fuels,
+                machine.recipe, machine.machineName, machine.machineCoreBlockType, playersWithAccessPermission, totalResourcesGained, resourcesGained, energyInMachine,
                 machineCoreBlockLocation, zenCoinsGained, totalZenCoinsGained, owner, upgrades, this);
     }
 

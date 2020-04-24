@@ -53,7 +53,6 @@ public class MachineDataManager {
                 if (position == 0) continue;
                 Location loc = Utils.longToLocation(position, world);
                 org.bukkit.block.Block block = loc.getBlock();
-
                 try {
                     if (!(block.getState() instanceof TileState)) throw new ClassCastException();
                     PlayerMachine machine = machineManager.getPlayerMachineFromBlock(block);
@@ -167,7 +166,7 @@ public class MachineDataManager {
     private void saveMachinesDataToBlocks() {
         MachineManager machineManager = machinery.getMachineManager();
         for (Map.Entry<Location, PlayerMachine> machineEntry : machineManager.getMachineCores().entrySet()) {
-            machineManager.setPlayerMachineBlock(machineEntry.getKey().getBlock(), machineEntry.getValue());
+            machinery.updateMachineBlock(machineEntry.getValue(), false);
         }
     }
 

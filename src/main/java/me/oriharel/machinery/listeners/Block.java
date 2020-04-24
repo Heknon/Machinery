@@ -5,6 +5,9 @@ import me.oriharel.machinery.exceptions.MachineNotFoundException;
 import me.oriharel.machinery.items.MachineBlock;
 import me.oriharel.machinery.machine.Machine;
 import me.oriharel.machinery.machine.PlayerMachine;
+import me.oriharel.machinery.message.Message;
+import me.oriharel.machinery.message.Placeholder;
+import me.oriharel.machinery.utilities.Utils;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -16,6 +19,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 
+import java.util.Collections;
 import java.util.List;
 
 public class Block implements Listener {
@@ -49,8 +53,7 @@ public class Block implements Listener {
     @EventHandler
     public void onBlockBreak(BlockBreakEvent e) {
         if (machinery.getMachineManager().getTemporaryPreRegisterMachineLocations().contains(e.getBlock().getLocation()) || machinery.getMachineManager().getMachinePartLocations().contains(e.getBlock().getLocation())) {
-            e.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Machinery.getInstance().getFileManager().getConfig("config.yml").get().getString(
-                    "break_machine_attempt")));
+            new Message("messages.yml", "break_machine_attempt", e.getPlayer(), Utils.getLocationPlaceholders(e.getBlock().getLocation())).send();
             e.setCancelled(true);
         }
     }

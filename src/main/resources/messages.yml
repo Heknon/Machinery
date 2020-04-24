@@ -1,0 +1,21 @@
+not_empty_place: "&c&l[!] &eThere are blocks interfering with building the machine! Try placing it in another location."
+open_machine_gui: "&b&l[INFO] &eOpening machine GUI at &7(&5%x%, %y%, %z%&7)."
+break_machine_attempt: "&c&l[!] &eYou cannot break a machine block. Try deconstructing it."
+open_attempt_no_access: "&c&l[!] &eYou tried accessing a machine that you don't have permission to access."
+not_enough_fuel_to_operate: "&c&l[!] &eYou do not have enough fuel at a machine of yours at location &7(&5%x%, %y%, %z%&7)."
+
+not_enough_inventory_space: "&c&l[!] &eYou do not have enough inventory space to store &b%amount% &cof &b%thing%."
+
+on_upgrade: "&b&l[INFO] &eYou just upgraded a machine! Cost: %amount%"
+on_downgrade: "&b&l[INFO] &eYou just downgraded a machine! You received %amount%"
+reached_max_upgrade_level: "&c&l[!] &eReached max upgrade level, cannot upgrade anymore."
+
+sign_input:
+  invalid_number: "§c&l[!] &eInvalid number!"
+  entered_number_below_zero: "&c&l[!] &eYou must enter a number above or equal to zero!"
+  withdraw: "&b&l[INFO] &eYou are withdrawing %thing% from a machine. Please enter an amount to withdraw."
+  deposit: "&b&l[INFO] &eYou are depositing %thing% into a machine. Please enter an amount to deposit."
+  not_enough_resources_in_machine: "&c&l[!] The machine you are withdrawing from doesn't have %amount% resources of %thing%."
+  not_enough_fuel_in_inventory: "&c&l[!] You don't have %amount% %thing% in your inventory in order to deposit it into the machine."
+  entered_above_max_fuel_deposit_limit: "&c&l[!] You cannot deposit more than &e%amount% &csince it will go above the fuel limitations of this machine."
+  entered_above_max_fuel_withdraw_limit: "&c&l[!] You cannot withdraw more than &e%amount% &csince it will surpass the amount of fuel in the machine."

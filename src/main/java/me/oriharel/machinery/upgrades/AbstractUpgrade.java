@@ -12,6 +12,7 @@ public abstract class AbstractUpgrade {
     protected int level;
     protected boolean runOnlyOnProcessStart;
     protected YamlConfiguration configLoad;
+    protected int maxLevel = -1;
 
     public AbstractUpgrade(int level) {
         this.level = level;
@@ -43,6 +44,11 @@ public abstract class AbstractUpgrade {
     public abstract Map<Integer, Integer> getCosts();
 
     public int getMaxLevel() {
+        if (maxLevel == -1) maxLevel = calculateMaxLevel();
+        return maxLevel;
+    }
+
+    private int calculateMaxLevel() {
         int max = 1;
         for (int key : getCosts().keySet()) {
             if (key > max) max = key;
@@ -53,6 +59,8 @@ public abstract class AbstractUpgrade {
     public boolean isRunOnlyOnProcessStart() {
         return runOnlyOnProcessStart;
     }
+
+    public abstract UpgradeType getUpgradeType();
 
     @Override
     public String toString() {

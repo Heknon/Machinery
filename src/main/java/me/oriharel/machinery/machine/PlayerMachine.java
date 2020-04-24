@@ -2,10 +2,8 @@ package me.oriharel.machinery.machine;
 
 import com.google.gson.annotations.JsonAdapter;
 import me.oriharel.machinery.Machinery;
-import me.oriharel.machinery.fuel.PlayerFuel;
 import me.oriharel.machinery.items.MachineBlock;
 import me.oriharel.machinery.serialization.AbstractUpgradeTypeAdapter;
-import me.oriharel.machinery.serialization.LocationTypeAdapter;
 import me.oriharel.machinery.structure.Structure;
 import me.oriharel.machinery.upgrades.AbstractUpgrade;
 import me.wolfyscript.customcrafting.recipes.types.CustomRecipe;
@@ -16,30 +14,33 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class PlayerMachine extends Machine {
     private final Location machineCore;
     private final UUID owner;
+    private final Set<UUID> playersWithAccessPermission;
     @JsonAdapter(AbstractUpgradeTypeAdapter.class)
     private final List<AbstractUpgrade> upgrades;
     private double totalResourcesGained;
     private HashMap<Material, ItemStack> resourcesGained;
-    private List<PlayerFuel> fuels;
+    private int energyInMachine;
     private double totalZenCoinsGained;
     private double zenCoinsGained;
     private transient MachineResourceGetProcess machineResourceGetProcess;
     private transient MachineFactory factory;
 
 
-    public PlayerMachine(int machineReach, int maxFuel, int fuelDeficiency, List<String> fuelTypes, MachineType machineType,
+    public PlayerMachine(int maxFuel, int fuelDeficiency, MachineType machineType,
                          Structure structure, CustomRecipe<?> recipe, String machineName, Material openGUIBlockType,
-                         double totalResourcesGained, HashMap<Material, ItemStack> resourcesGained, List<PlayerFuel> fuels, Location machineCore, double zenCoinsGained,
+                         Set<UUID> playersWithAccessPermission, double totalResourcesGained, HashMap<Material, ItemStack> resourcesGained, int energyInMachine, Location machineCore, double zenCoinsGained,
                          double totalZenCoinsGained, UUID owner, List<AbstractUpgrade> upgrades, MachineFactory factory) {
-        super(machineReach, maxFuel, fuelDeficiency, fuelTypes, machineType, structure, recipe, machineName, openGUIBlockType, factory);
+        super(maxFuel, fuelDeficiency, machineType, structure, recipe, machineName, openGUIBlockType, factory);
+        this.playersWithAccessPermission = playersWithAccessPermission;
         this.totalResourcesGained = totalResourcesGained;
         this.resourcesGained = resourcesGained;
-        this.fuels = fuels;
+        this.energyInMachine = energyInMachine;
         this.machineCore = machineCore;
         this.zenCoinsGained = zenCoinsGained;
         this.totalZenCoinsGained = totalZenCoinsGained;
@@ -70,16 +71,20 @@ public class PlayerMachine extends Machine {
         return machineResourceGetProcess;
     }
 
-    public List<PlayerFuel> getFuels() {
-        return fuels;
+    public int getEnergyInMachine() {
+        return energyInMachine;
     }
 
-    public void setFuels(List<PlayerFuel> fuels) {
-        this.fuels = fuels;
+    public void setEnergyInMachine(int energyInMachine) {
+        this.energyInMachine = energyInMachine;
     }
 
-    public void addFuel(PlayerFuel fuel) {
-        this.fuels.add(fuel);
+    public void addEnergy(int energy) {
+        this.energyInMachine += energy;
+    }
+
+    public void removeEnergy(int energy) {
+        this.energyInMachine -= energy;
     }
 
     public double getTotalResourcesGained() {
@@ -133,5 +138,25 @@ public class PlayerMachine extends Machine {
 
     public void setZenCoinsGained(double zenCoinsGained) {
         this.zenCoinsGained = zenCoinsGained;
+    }
+
+    public Set<UUID> getPlayersWithAccessPermission() {
+        return playersWithAccessPermission;
+    }
+
+    @Override
+    public String toString() {
+        return "PlayerMachine{" +
+                "machineCore=" + machineCore +
+                ", owner=" + owner +
+                ", playersWithAccessPermission=" + playersWithAccessPermission +
+                ", upgrades=" + upgrades +
+                ", totalResourcesGained=" + totalResourcesGained +
+                ", resourcesGained=" + resourcesGained +
+                ", energyInMachine=" + energyInMachine +
+                ", totalZenCoinsGained=" + totalZenCoinsGained +
+                ", zenCoinsGained=" + zenCoinsGained +
+                ", machineResourceGetProcess=" + machineResourceGetProcess +
+                '}';
     }
 }

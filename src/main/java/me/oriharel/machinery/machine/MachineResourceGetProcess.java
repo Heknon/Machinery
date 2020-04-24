@@ -4,9 +4,10 @@ import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.data.Chance;
 import me.oriharel.machinery.data.MaterialChance;
 import me.oriharel.machinery.data.ZenCoinChance;
-import me.oriharel.machinery.fuel.PlayerFuel;
+import me.oriharel.machinery.message.Message;
 import me.oriharel.machinery.upgrades.AbstractUpgrade;
 import me.oriharel.machinery.utilities.RandomCollection;
+import me.oriharel.machinery.utilities.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Tag;
@@ -14,9 +15,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class MachineResourceGetProcess {
@@ -41,17 +44,17 @@ public class MachineResourceGetProcess {
 
     public void startProcess() {
         List<AbstractUpgrade> upgrades = machine.getUpgrades();
-        upgrades.forEach(upgrade -> {
-            upgrade.applyUpgradeModifier(this);
-        });
+        upgrades.forEach(upgrade -> upgrade.applyUpgradeModifier(this));
         process = new BukkitRunnable() {
             @Override
             public void run() {
-                if (machine.getFuels().isEmpty() || machine.getFuels().stream().mapToInt(PlayerFuel::getEnergy).sum() < machine.getFuelDeficiency()) {
+                if (machine.getEnergyInMachine() < machine.getFuelDeficiency()) {
                     cancel();
                     Player player = Bukkit.getPlayer(machine.getOwner());
                     if (player == null || !player.isOnline()) return;
-                    player.sendMessage("§c§lOne of your machines doesn't have enough fuel to operate!");
+                    new Message("messages.yml", "not_enough_fuel_to_operate", player, Utils.getLocationPlaceholders(machine.getMachineCore(),
+                            Utils.getMachinePlaceholders(machine)));
+                    return;
                 }
                 getResources();
                 upgrades.forEach(upgrade -> {
@@ -61,7 +64,7 @@ public class MachineResourceGetProcess {
                 runFuelRemoval();
             }
         };
-        process.runTaskTimerAsynchronously(Machinery.getInstance(), 0, minePeriod);
+        process.runTaskTimerAsynchronously(Machinery.getInstance(), minePeriod, minePeriod);
     }
 
     public void endProcess() {
@@ -91,31 +94,7 @@ public class MachineResourceGetProcess {
     }
 
     public void runFuelRemoval() {
-        Optional<PlayerFuel> fuelWithEnoughEnergy =
-                machine.getFuels().stream().filter(fuel -> fuel.getEnergy() >= machine.getFuelDeficiency()).findAny();
-        System.out.println("BEFORE: " + machine.getFuels().stream().mapToInt(PlayerFuel::getEnergy).sum());
-        if (fuelWithEnoughEnergy.isPresent()) {
-            PlayerFuel fuel = fuelWithEnoughEnergy.get();
-            fuel.setEnergySloppy(fuel.getEnergy() - machine.getFuelDeficiency());
-            System.out.println("AFTER: " + machine.getFuels().stream().mapToInt(PlayerFuel::getEnergy).sum());
-            return;
-        }
-
-
-        AtomicInteger energySum = new AtomicInteger();
-        Map<Integer, PlayerFuel> fuelCanRemoveFuelMap = new HashMap<>();
-        machine.getFuels().forEach(fuel -> {
-            energySum.addAndGet(fuel.getEnergy());
-            fuelCanRemoveFuelMap.put(fuel.getEnergy(), fuel);
-            if (energySum.get() >= machine.getFuelDeficiency()) {
-                for (Map.Entry<Integer, PlayerFuel> fuelEntry : fuelCanRemoveFuelMap.entrySet()) {
-                    fuelEntry.getValue().setEnergy(fuelEntry.getKey() - Math.max(fuelEntry.getKey(), machine.fuelDeficiency));
-                    if (fuelEntry.getValue().getEnergy() <= 0) {
-                        machine.getFuels().remove(fuelEntry.getValue());
-                    }
-                }
-            }
-        });
+        machine.removeEnergy(machine.getFuelDeficiency());
     }
 
     protected void insertResources() {

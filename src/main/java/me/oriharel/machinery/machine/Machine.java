@@ -13,30 +13,24 @@ import java.util.List;
 @JsonAdapter(MachineTypeAdapter.class)
 public class Machine {
 
-    final protected List<String> fuelTypes;
     final protected MachineType machineType;
     final protected Structure structure;
     final protected String machineName;
     final protected MachineBlock machineBlock;
     final protected Material machineCoreBlockType;
     protected CustomRecipe<?> recipe;
-    protected int machineReach;
     protected int fuelDeficiency;
     protected int maxFuel;
 
     public Machine(
-            int machineReach,
             int maxFuel,
             int fuelDeficiency,
-            List<String> fuelTypes,
             MachineType machineType,
             Structure structure,
             CustomRecipe<?> recipe,
             String machineName, Material machineCoreBlockType, MachineFactory factory) {
-        this.machineReach = machineReach;
         this.maxFuel = maxFuel;
         this.fuelDeficiency = fuelDeficiency;
-        this.fuelTypes = fuelTypes;
         this.machineType = machineType;
         this.structure = structure;
         this.recipe = recipe;
@@ -48,15 +42,6 @@ public class Machine {
     public Material getMachineCoreBlockType() {
         return machineCoreBlockType;
     }
-
-    public int getMachineReach() {
-        return machineReach;
-    }
-
-    public void setMachineReach(int machineReach) {
-        this.machineReach = machineReach;
-    }
-
 
     public int getMaxFuel() {
         return maxFuel;
@@ -73,11 +58,6 @@ public class Machine {
 
     public void setFuelDeficiency(int fuelDeficiency) {
         this.fuelDeficiency = fuelDeficiency;
-    }
-
-
-    public List<String> getFuelTypes() {
-        return fuelTypes;
     }
 
 

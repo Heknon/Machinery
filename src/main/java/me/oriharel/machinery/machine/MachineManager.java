@@ -105,6 +105,7 @@ public class MachineManager {
             PersistentDataContainer persistentDataContainer = tileState.getPersistentDataContainer();
             return persistentDataContainer.get(MACHINE_NAMESPACE_KEY, MACHINE_PERSISTENT_DATA_TYPE);
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -142,14 +143,14 @@ public class MachineManager {
                 if (machine instanceof PlayerMachine) {
                     PlayerMachine pMachine = (PlayerMachine) machine;
                     machineToRegister = machineFactory.createMachine(machine, printResult.getOpenGUIBlockLocation(), pMachine.getTotalResourcesGained(),
-                            pMachine.getFuels(), pMachine.getZenCoinsGained(), pMachine.getTotalZenCoinsGained(), pMachine.getOwner(), pMachine.getUpgrades(),
-                            pMachine.getResourcesGained());
+                            pMachine.getEnergyInMachine(), pMachine.getZenCoinsGained(), pMachine.getTotalZenCoinsGained(), pMachine.getOwner(), pMachine.getUpgrades(),
+                            pMachine.getResourcesGained(), pMachine.getPlayersWithAccessPermission());
                 } else {
                     machineToRegister = Machinery.getInstance().getMachineManager().getMachineFactory().createMachine(machine,
-                            printResult.getOpenGUIBlockLocation(), 0, new ArrayList<>(), 0, 0, playerUuid, Arrays.asList(
+                            printResult.getOpenGUIBlockLocation(), 0, 0, 0, 0, playerUuid, Arrays.asList(
                                     new LootBonusUpgrade(1),
                                     new SpeedUpgrade(1)
-                            ), new HashMap<>());
+                            ), new HashMap<>(), Collections.singleton(playerUuid));
                 }
                 registerNewPlayerMachine(machineToRegister, new HashSet<>(printResult.getPlacementLocations()));
                 PostMachineBuildEvent postMachineBuildEvent = new PostMachineBuildEvent(machineToRegister, buildLocation);

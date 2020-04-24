@@ -3,10 +3,10 @@ package me.oriharel.machinery;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import co.aikar.commands.bukkit.contexts.OnlinePlayer;
-import me.oriharel.machinery.fuel.PlayerFuel;
 import me.oriharel.machinery.items.MachineBlock;
 import me.oriharel.machinery.machine.Machine;
 import me.oriharel.machinery.utilities.Utils;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -34,7 +34,7 @@ public class MachineCommand extends BaseCommand {
         @Subcommand("machine")
         @CommandCompletion("@players @range:1-10 @machines")
         @CommandPermission("machinery.give.machine")
-        public void onMachineGive(Player executor, OnlinePlayer playerToGiveTo, int amount, @Flags("other") Machine machineName) {
+        public void onMachineGive(CommandSender executor, OnlinePlayer playerToGiveTo, int amount, @Flags("other") Machine machineName) {
             if (machineName == null) {
                 executor.sendMessage("§c§lInvalid machine name!");
                 return;
@@ -51,23 +51,36 @@ public class MachineCommand extends BaseCommand {
             playerToGiveTo.player.getInventory().addItem(machineItem);
         }
 
-        // /machinery give fuel playerName amount fuelName
+        // /machinery give fuel playerName amount energy
         @Subcommand("fuel")
-        @CommandCompletion("@players @range:1-10 @fuels")
+        @CommandCompletion("@players @range:1-10 @range:20-50")
         @CommandPermission("machinery.give.fuel")
-        public void onFuelGive(Player executor, OnlinePlayer playerToGiveTo, @Flags("amount") int amount, @Flags("other") PlayerFuel fuelName) {
-            if (fuelName == null) {
-                executor.sendMessage("§c§lInvalid fuel name!");
-                return;
+        public void onFuelGive(CommandSender executor, OnlinePlayer playerToGiveTo, int amount, int energy) {
+            if (!fuelCommandBaseChecks(executor, energy, amount, playerToGiveTo.player)) return;
+
+            playerToGiveTo.player.getInventory().addItem(machinery.getFuelManager().getFuel(amount, energy));
+        }
+
+        // /machinery give fuel playerName material amount energy
+        @Subcommand("fuel")
+        @CommandCompletion("@players @range:1-10 @range:20-50")
+        @CommandPermission("machinery.give.fuel")
+        public void onFuelGive(CommandSender executor, OnlinePlayer playerToGiveTo, Material material, int amount, int energy) {
+            if (!fuelCommandBaseChecks(executor, energy, amount, playerToGiveTo.player)) return;
+
+            playerToGiveTo.player.getInventory().addItem(machinery.getFuelManager().getFuel(material, amount, energy));
+        }
+
+        private boolean fuelCommandBaseChecks(CommandSender commandSender, int energy, int amount, Player giveTo) {
+            if (energy < 1) {
+                commandSender.sendMessage("§c§lMost enter energy above 0!");
+                return false;
             } else if (amount < 1) {
-                executor.sendMessage("§c§lAMount must be more than 0");
-                return;
+                commandSender.sendMessage("§c§lAmount must be more than 0!");
+                return false;
             }
 
-            if (!Utils.inventoryHasSpaceForItemAdd(playerToGiveTo.player.getInventory())) {
-                return;
-            }
-            playerToGiveTo.player.getInventory().addItem(fuelName);
+            return Utils.inventoryHasSpaceForItemAdd(giveTo.getInventory());
         }
 
     }

@@ -31,16 +31,19 @@ public class Inventory implements InventoryHolder {
     }
 
     public void navigateToNamedRoute(String name) {
-        InventoryPage page = routes.get(name);
-        viewer.openInventory(page.getInventory());
-        currentPage = page;
+        navigateToNamedRoute(name, null);
     }
 
     public <T> void navigateToNamedRoute(String name, T data) {
         InventoryPage page = routes.get(name);
-        if (page instanceof Datable) {
-            Datable<T> tDatableInventoryPage = (Datable<T>) page;
-            tDatableInventoryPage.setStoredData(data);
+        navigateDirect(page, data);
+    }
+
+    public <T> void navigateDirect(InventoryPage page, T data) {
+        if (data != null && page instanceof NavigableDataPage) {
+            NavigableDataPage<T> tNavigableDataInventoryPage = (NavigableDataPage<T>) page;
+            tNavigableDataInventoryPage.setStoredData(data);
+            tNavigableDataInventoryPage.getInjector().apply(data, tNavigableDataInventoryPage);
         }
         viewer.openInventory(page.getInventory());
         currentPage = page;

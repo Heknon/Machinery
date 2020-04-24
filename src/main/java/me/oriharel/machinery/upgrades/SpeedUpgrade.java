@@ -55,6 +55,11 @@ public class SpeedUpgrade extends AbstractUpgrade {
     }
 
     @Override
+    public UpgradeType getUpgradeType() {
+        return UpgradeType.SPEED;
+    }
+
+    @Override
     public String toString() {
         return "SpeedUpgrade{" +
                 "level=" + level +
