@@ -4,6 +4,11 @@ import java.util.NavigableMap;
 import java.util.Random;
 import java.util.TreeMap;
 
+/**
+ * Get random object from collection with weight
+ *
+ * @param <E> type of collection
+ */
 public class RandomCollection<E> {
     private final NavigableMap<Double, E> map = new TreeMap<Double, E>();
     private final Random random;

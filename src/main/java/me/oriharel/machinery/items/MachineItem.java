@@ -20,21 +20,21 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * Inject Machine into recipe NBT
+ * Handles all the logic behind converting a machine to a item and an item to a machine
  */
-public class MachineBlock {
+public class MachineItem {
 
     private transient final CustomRecipe<?> recipe;
     private transient final Machine machine;
     private transient final Gson gson;
 
-    public MachineBlock(CustomRecipe<?> recipe, Machine machine, MachineFactory factory) {
+    public MachineItem(CustomRecipe<?> recipe, Machine machine, MachineFactory factory) {
         this.gson = Utils.getGsonSerializationBuilderInstance(machine.getClass(), factory);
         this.recipe = recipe;
         this.machine = machine;
     }
 
-    public MachineBlock(ItemStack itemStack, MachineFactory factory, Class<? extends Machine> machineType) throws MachineNotFoundException {
+    public MachineItem(ItemStack itemStack, MachineFactory factory, Class<? extends Machine> machineType) throws MachineNotFoundException {
         this.gson = Utils.getGsonSerializationBuilderInstance(machineType, factory);
         net.minecraft.server.v1_15_R1.ItemStack is = CraftItemStack.asNMSCopy(itemStack);
 
@@ -111,7 +111,7 @@ public class MachineBlock {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        MachineBlock that = (MachineBlock) o;
+        MachineItem that = (MachineItem) o;
         return Objects.equals(recipe, that.recipe) &&
                 Objects.equals(machine, that.machine);
     }

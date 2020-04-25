@@ -25,8 +25,8 @@ public class FileManager {
     /**
      * Get the config by the name(Don't forget the .yml)
      *
-     * @param name
-     * @return
+     * @param name config name to get
+     * @return this
      */
     public Config getConfig(String name) {
         if (!configs.containsKey(name))
@@ -38,8 +38,8 @@ public class FileManager {
     /**
      * Save the config by the name(Don't forget the .yml)
      *
-     * @param name
-     * @return
+     * @param name config name to save
+     * @return this
      */
     public Config saveConfig(String name) {
         return getConfig(name).save();
@@ -48,8 +48,8 @@ public class FileManager {
     /**
      * Reload the config by the name(Don't forget the .yml)
      *
-     * @param name
-     * @return
+     * @param name config name to reload
+     * @return this
      */
     public Config reloadConfig(String name) {
         return getConfig(name).reload();
@@ -68,7 +68,7 @@ public class FileManager {
         /**
          * Saves the config as long as the config isn't empty
          *
-         * @return
+         * @return this
          */
         public Config save() {
             if ((this.config == null) || (this.file == null))
@@ -101,7 +101,7 @@ public class FileManager {
         /**
          * Gets the config as a YamlConfiguration
          *
-         * @return
+         * @return this
          */
         public YamlConfiguration get() {
             if (this.config == null)
@@ -115,7 +115,7 @@ public class FileManager {
          * <p>
          * Don't forget to reload after!
          *
-         * @return
+         * @return this
          */
         public Config saveDefaultConfig() {
             file = new File(plugin.getDataFolder(), this.name);
@@ -128,7 +128,7 @@ public class FileManager {
         /**
          * Reloads the config
          *
-         * @return
+         * @return this
          */
         public Config reload() {
             if (file == null)
@@ -140,11 +140,9 @@ public class FileManager {
             try {
                 defConfigStream = new InputStreamReader(plugin.getResource(this.name), StandardCharsets.UTF_8);
 
-                if (defConfigStream != null) {
-                    YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream);
-                    this.config.setDefaults(defConfig);
-                }
-            } catch (NullPointerException e) {
+                YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream);
+                this.config.setDefaults(defConfig);
+            } catch (NullPointerException ignored) {
 
             }
             return this;
@@ -157,8 +155,8 @@ public class FileManager {
          * <p>
          * Force = false ---> Will NOT add new values from the default file
          *
-         * @param force
-         * @return
+         * @param force this
+         * @return this
          */
         public Config copyDefaults(boolean force) {
             get().options().copyDefaults(force);
@@ -168,9 +166,9 @@ public class FileManager {
         /**
          * An easy way to set a value into the config
          *
-         * @param key
-         * @param value
-         * @return
+         * @param key config key
+         * @param value value to set
+         * @return this
          */
         public Config set(String key, Object value) {
             get().set(key, value);
@@ -180,8 +178,8 @@ public class FileManager {
         /**
          * An easy way to get a value from the config
          *
-         * @param key
-         * @return
+         * @param key config key
+         * @return this
          */
         public Object get(String key) {
             return get().get(key);

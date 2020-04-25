@@ -3,12 +3,11 @@ package me.oriharel.machinery;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import co.aikar.commands.bukkit.contexts.OnlinePlayer;
-import me.oriharel.machinery.items.MachineBlock;
+import me.oriharel.machinery.items.MachineItem;
 import me.oriharel.machinery.machine.Machine;
 import me.oriharel.machinery.utilities.Utils;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -43,7 +42,7 @@ public class MachineCommand extends BaseCommand {
                 executor.sendMessage("§c§lAMount must be more than 0");
                 return;
             }
-            MachineBlock machineBlock = new MachineBlock(machineName.getRecipe(), machineName, machinery.getMachineManager().getMachineFactory());
+            MachineItem machineBlock = new MachineItem(machineName.getRecipe(), machineName, machinery.getMachineManager().getMachineFactory());
             ItemStack machineItem = machineBlock.getItemStackWithAppliedPlaceholders();
             machineItem.setAmount(amount);
             if (!Utils.inventoryHasSpaceForItemAdd(playerToGiveTo.player.getInventory())) {
@@ -72,6 +71,14 @@ public class MachineCommand extends BaseCommand {
             playerToGiveTo.player.getInventory().addItem(machinery.getFuelManager().getFuel(material, amount, energy));
         }
 
+        /**
+         * helper function to check if fuel given is valid fuel syntax
+         * @param commandSender sender of command
+         * @param energy energy to give
+         * @param amount amount to give
+         * @param giveTo who to give to
+         * @return if you can give the player fuel or not. true if yes.
+         */
         private boolean fuelCommandBaseChecks(CommandSender commandSender, int energy, int amount, Player giveTo) {
             if (energy < 1) {
                 commandSender.sendMessage("§c§lMost enter energy above 0!");

@@ -1,15 +1,12 @@
 package me.oriharel.machinery.listeners;
 
 import me.oriharel.machinery.Machinery;
-import me.oriharel.machinery.exceptions.MachineNotFoundException;
-import me.oriharel.machinery.items.MachineBlock;
+import me.oriharel.machinery.items.MachineItem;
 import me.oriharel.machinery.machine.Machine;
 import me.oriharel.machinery.machine.PlayerMachine;
 import me.oriharel.machinery.message.Message;
-import me.oriharel.machinery.message.Placeholder;
 import me.oriharel.machinery.utilities.Utils;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
@@ -19,7 +16,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 
-import java.util.Collections;
 import java.util.List;
 
 public class Block implements Listener {
@@ -30,11 +26,15 @@ public class Block implements Listener {
         this.machinery = machinery;
     }
 
+    /**
+     * called when a player places a block
+     * used to handle building a machine
+     */
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent e) {
-        MachineBlock machineBlock;
+        MachineItem machineItem;
         try {
-            machineBlock = new MachineBlock(e.getItemInHand(), machinery.getMachineManager().getMachineFactory(), PlayerMachine.class);
+            machineItem = new MachineItem(e.getItemInHand(), machinery.getMachineManager().getMachineFactory(), PlayerMachine.class);
         } catch (Exception ex) {
             NBTTagCompound compound = CraftItemStack.asNMSCopy(e.getItemInHand()).getTag();
             if (compound != null && compound.hasKey("machine")) {
@@ -44,7 +44,7 @@ public class Block implements Listener {
             }
             return;
         }
-        Machine machine = machineBlock.getMachine();
+        Machine machine = machineItem.getMachine();
         if (!machinery.getMachineManager().buildMachine(e.getPlayer().getUniqueId(), machine, e.getBlock().getLocation())) return;
         if (e.getPlayer().getGameMode() == GameMode.CREATIVE) {
             e.setCancelled(true);
@@ -54,6 +54,9 @@ public class Block implements Listener {
 
     }
 
+    /**
+     * Used to stop players from breaking parts of a machine
+     */
     @EventHandler
     public void onBlockBreak(BlockBreakEvent e) {
         if (machinery.getMachineManager().getTemporaryPreRegisterMachineLocations().contains(e.getBlock().getLocation()) || machinery.getMachineManager().getMachinePartLocations().contains(e.getBlock().getLocation())) {
@@ -62,6 +65,9 @@ public class Block implements Listener {
         }
     }
 
+    /**
+     * used to block the explosion of part of a machine
+     */
     @EventHandler
     public void onEntityExplosion(EntityExplodeEvent e) {
         List<org.bukkit.block.Block> blocks = e.blockList();

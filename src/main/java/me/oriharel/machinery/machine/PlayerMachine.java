@@ -2,7 +2,7 @@ package me.oriharel.machinery.machine;
 
 import com.google.gson.annotations.JsonAdapter;
 import me.oriharel.machinery.Machinery;
-import me.oriharel.machinery.items.MachineBlock;
+import me.oriharel.machinery.items.MachineItem;
 import me.oriharel.machinery.serialization.AbstractUpgradeTypeAdapter;
 import me.oriharel.machinery.structure.Structure;
 import me.oriharel.machinery.upgrades.AbstractUpgrade;
@@ -50,7 +50,16 @@ public class PlayerMachine extends Machine {
     }
 
 
-    public MachineBlock deconstruct() {
+    /**
+     * Clears all TileEntity block data from core block of machine
+     * gets all locations of the blocks that make up the machine
+     * unregisters the machine from the plugin
+     * stops mining process
+     * removes all machine related blocks
+     *
+     * @return MachineBlock that represents the deconstructed machine and the data in it
+     */
+    public MachineItem deconstruct() {
         MachineManager machineManager = Machinery.getInstance().getMachineManager();
         machineManager.clearMachineTileStateDataFromBlock(machineCore.getBlock());
         Location[] machinePartLocations = machineManager.getPlayerMachineLocations(machineCore.getBlock());
@@ -62,7 +71,7 @@ public class PlayerMachine extends Machine {
             Block block = loc.getBlock();
             block.setType(Material.AIR);
         }
-        return new MachineBlock(this.recipe, this, factory);
+        return new MachineItem(this.recipe, this, factory);
     }
 
     public MachineResourceGetProcess getMinerProcess() {

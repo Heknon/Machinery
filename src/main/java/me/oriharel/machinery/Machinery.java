@@ -54,13 +54,12 @@ public final class Machinery extends JavaPlugin {
     @Override
     public void onEnable() {
 
-        Utils.MACHINERY_INSTANCE = this;
-
         // save all configuration files
         fileManager = new FileManager(this);
 
         setupConfigs();
 
+        // create structures folder if non existent
         Path file = new File(getDataFolder(), "structures").toPath();
         if (!Files.exists(file)) {
             try {
@@ -78,10 +77,13 @@ public final class Machinery extends JavaPlugin {
 
         structureManager = new StructureManager(this);
         structureManager.registerOnDoneCallback(() -> {
+            // Everything in here is dependant on StructureManager. StructureManager is loaded asynchronously.
             machineManager = new MachineManager(this);
             setupCommandManager();
+
             Bukkit.getServer().getPluginManager().registerEvents(new Block(this), this);
             Bukkit.getServer().getPluginManager().registerEvents(new Interact(this), this);
+
             machineDataManager = new MachineDataManager(this);
             Bukkit.getWorlds().forEach(machineDataManager::loadMachineData);
             machineDataManager.startMachineSaveDataProcess();

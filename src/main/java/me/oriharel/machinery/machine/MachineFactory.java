@@ -34,6 +34,17 @@ public class MachineFactory {
         this.machinery = machinery;
     }
 
+    /**
+     * Create a new machine it's config name
+     *
+     * @param machineKey config name in machines.yml
+     * @return Machine representing the config data
+     * @throws IllegalArgumentException  machine key is null
+     * @throws MachineNotFoundException  machine not found in config
+     * @throws MaterialNotFoundException machine core type is not a valid type
+     * @throws RecipeNotFoundException   recipe made for machine is not found
+     * @throws NotMachineTypeException   the machine type given is not a real machine type {@see MachineType}
+     */
     @Nullable
     public Machine createMachine(String machineKey) throws IllegalArgumentException, MachineNotFoundException, MaterialNotFoundException,
             RecipeNotFoundException, NotMachineTypeException {
@@ -59,12 +70,22 @@ public class MachineFactory {
         MachineType machineType = MachineType.getMachine(section.getString("type", null));
         Structure structure =
                 machinery.getStructureManager().getSchematicByPath(new File(machinery.getDataFolder(), "structures/" + machineKey + Machinery.STRUCTURE_EXTENSION).getPath());
-        Machine machine = new Machine(maxFuel, fuelDeficiency, machineType, structure, recipe, machineKey,
-                machineCoreBlockType, this);
-        machine.setRecipe(injectMachineNBTIntoRecipe(machine.getRecipe(), machine));
-        return machine;
+        return createMachine(maxFuel, fuelDeficiency, machineType, structure, recipe, machineKey, machineCoreBlockType);
     }
 
+    /**
+     * Create a machine with already known values
+     *
+     * @param maxFuel              the max fuel a machine can hold
+     * @param fuelDeficiency       the fuel deficiency. the amount of fuel removed every resource get cycle
+     * @param machineType          the type of the machine
+     * @param structure            the build structure of the machine
+     * @param recipe               the recipe used to make the machine
+     * @param machineKey           the key of the machine in config aka machine name
+     * @param machineCoreBlockType the core block type later used to figure out, when building the machine, where the core block is
+     * @return Machine based on values given
+     * @throws IllegalArgumentException type give is null
+     */
     @Nullable
     public Machine createMachine(int maxFuel,
                                  int fuelDeficiency,
@@ -100,12 +121,18 @@ public class MachineFactory {
                                        List<AbstractUpgrade> upgrades, HashMap<Material, ItemStack> resourcesGained, Set<UUID> playersWithAccessPermission) throws IllegalArgumentException {
         if (machine == null) throw new IllegalArgumentException("Machine must not be null (MachineFactory)");
 
-        return new PlayerMachine(machine.maxFuel, machine.fuelDeficiency,
-                machine.machineType, machine.structure,
-                machine.recipe, machine.machineName, machine.machineCoreBlockType, playersWithAccessPermission, totalResourcesGained, resourcesGained, energyInMachine,
-                machineCoreBlockLocation, zenCoinsGained, totalZenCoinsGained, owner, upgrades, this);
+        return createMachine(machine.maxFuel, machine.fuelDeficiency, machine.machineType, machine.structure, machine.recipe, machine.machineName,
+                machine.machineCoreBlockType, totalResourcesGained, resourcesGained, energyInMachine, machineCoreBlockLocation, zenCoinsGained, totalZenCoinsGained,
+                owner, upgrades, playersWithAccessPermission);
     }
 
+    /**
+     * Inject machine data into a recipe
+     * used so that when crafting a recipe you will have inside the NBT (data) of the itemstack a serialized machine so that later on you could build it
+     * @param recipe the recipe to inject into
+     * @param machine the machine to inject into the recipe
+     * @return the newly injected recipe
+     */
     private CustomRecipe<?> injectMachineNBTIntoRecipe(CustomRecipe<?> recipe, Machine machine) {
         List<CustomItem> results = recipe.getCustomResults();
         for (CustomItem item : results) {

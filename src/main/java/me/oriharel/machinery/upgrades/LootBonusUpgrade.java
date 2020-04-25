@@ -22,13 +22,13 @@ public class LootBonusUpgrade extends AbstractUpgrade {
 
     @Override
     public void applyUpgradeModifier(MachineResourceGetProcess mineProcess) {
-        ScriptEngineManager mgr = new ScriptEngineManager();
-        ScriptEngine engine = mgr.getEngineByName("JavaScript");
         double baseAmplifier = configLoad.getDouble("lootbonus.baseAmplifier");
-        if (level == 1) {
+        if (level == 1) { // if level 1 don't apply any calculations on base amplifier
             mineProcess.setLootAmplifier(baseAmplifier);
             return;
         }
+        ScriptEngineManager mgr = new ScriptEngineManager();
+        ScriptEngine engine = mgr.getEngineByName("JavaScript"); // use javascript engine to evaluate math expression
         try {
             mineProcess.setLootAmplifier((Double) engine.eval(configLoad.getString("lootbonus.lootAmplifier").replaceAll("\\{basePeriod}",
                     String.valueOf(baseAmplifier)).replaceAll(

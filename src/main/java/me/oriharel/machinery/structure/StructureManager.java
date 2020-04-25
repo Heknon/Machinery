@@ -12,6 +12,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * used to register all structures found in machines.yml
+ */
 public class StructureManager {
     private HashMap<String, Structure> structures;
     private Machinery machinery;

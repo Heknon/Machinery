@@ -10,6 +10,10 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * NMS is Minecraft internals.
+ * utility class for simplifying this process
+ */
 public final class NMS {
     /**
      * Convert a map of String, Object to an NBTTagCompound
@@ -25,6 +29,11 @@ public final class NMS {
         return nbtTagCompound;
     }
 
+    /**
+     * finds type and convert to NBTBase and helps with applying recursive solution
+     * @param value the object to find the type for
+     * @return NBTBase
+     */
     private static NBTBase nbtFromMapHelper(Object value) {
         if (value instanceof Map) {
             return nbtFromMap((Map<String, Object>) value);
@@ -59,37 +68,34 @@ public final class NMS {
         return null;
     }
 
-    public static void addNBTToItemStack(ItemStack itemStack, NBTTagCompound toAddCompound, boolean force) {
-        if (toAddCompound == null) return;
-
-        if (!itemStack.hasItemMeta()) itemStack.setItemMeta(new ItemStack(itemStack.getType(), itemStack.getAmount()).getItemMeta());
-
-        Map<String, NBTBase> unhandled = getItemStackUnhandledNBT(itemStack);
-        Map<String, NBTBase> nbtBaseMap = ReflectionUtils.Fields.getFieldValueOfObject(toAddCompound, "map");
-
-        if (nbtBaseMap == null) return;
-
-        for (Map.Entry<String, NBTBase> entry : nbtBaseMap.entrySet()) {
-            if (force) {
-                unhandled.put(entry.getKey(), entry.getValue());
-            } else {
-                unhandled.putIfAbsent(entry.getKey(), entry.getValue());
-            }
-        }
-    }
-
+    /**
+     * Used when extending an ItemStack and in need of changing that ItemStacks NBT since API methods provided by Bukkit clone the item
+     * @param itemStack itemstack to get reference to unhandled NBT for
+     * @return reference to unhandled nbt of itemstack
+     */
     @Nullable
     public static Map<String, NBTBase> getItemStackUnhandledNBT(ItemStack itemStack) {
         ItemMeta metaReference = getItemStackMetaReference(itemStack);
         return ReflectionUtils.Fields.getFieldValueOfUnknownClass(metaReference, "org.bukkit.craftbukkit.v1_15_R1.inventory.CraftMetaItem", "unhandledTags");
     }
 
+    /**
+     * get a clone of the NBT map of an item
+     * @param itemStack itemstack to get clone of nbt map for
+     * @return clone of nbt map of itemstack
+     */
     @Nullable
     public static Map<String, NBTBase> getItemStackNBTTMapClone(ItemStack itemStack) {
         NBTTagCompound compound = CraftItemStack.asNMSCopy(itemStack).getTag();
         return ReflectionUtils.Fields.getFieldValueOfUnknownClass(compound, NBTTagCompound.class, "map");
     }
 
+    /**
+     * used for directly changing item meta of an itemstack
+     * ItemStack#getItemMeta returns a clone of the items's itemmeta
+     * @param itemStack the itemstack to get the reference for
+     * @return reference to itemstack meta
+     */
     @Nullable
     public static ItemMeta getItemStackMetaReference(ItemStack itemStack) {
         if (!itemStack.hasItemMeta()) itemStack.setItemMeta(new ItemStack(itemStack.getType(), itemStack.getAmount()).getItemMeta());

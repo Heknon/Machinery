@@ -6,6 +6,9 @@ import org.bukkit.entity.Player;
 
 import java.util.*;
 
+/**
+ * Used to abstract logic behind sending and formatting messages with placeholders or color formatting
+ */
 public class Message extends Text {
 
     private static final Map<String, String> CONFIG_MESSAGE_CACHE = new HashMap<>();

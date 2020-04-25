@@ -39,7 +39,7 @@ public class MachineManager {
     public MachineManager(Machinery machinery) {
         this.machinery = machinery;
         this.machineFactory = new MachineFactory(machinery);
-        this.machines = new ArrayList<Machine>();
+        this.machines = new ArrayList<>();
         this.machineCores = new HashMap<>();
         this.machinePartLocations = new HashSet<>();
         this.machineResourceTrees = new HashMap<>();
@@ -50,6 +50,9 @@ public class MachineManager {
         initializeBaseMachines();
     }
 
+    /**
+     * initialize all base machine types
+     */
     private void initializeBaseMachines() {
         YamlConfiguration configLoad = machinery.getFileManager().getConfig("machines.yml").get();
         Set<String> machineKeys = configLoad.getKeys(false);
@@ -64,6 +67,11 @@ public class MachineManager {
         }
     }
 
+    /**
+     * registers a new machine to core machine block and to plugin caches
+     * @param playerMachine the machine to register
+     * @param machineLocations the locations of the machine in the world
+     */
     public void registerNewPlayerMachine(PlayerMachine playerMachine, Set<Location> machineLocations) {
         try {
             setPlayerMachineBlock(playerMachine.getMachineCore().getBlock(), playerMachine);
@@ -84,6 +92,10 @@ public class MachineManager {
         }
     }
 
+    /**
+     * removes player machine data from all plugin caches
+     * @param machine the machine to remove
+     */
     protected void unregisterPlayerMachine(PlayerMachine machine) {
         machineCores.remove(machine.getMachineCore());
         Location[] playerMachinePartLocations = getPlayerMachineLocations(machine.getMachineCore().getBlock());
@@ -95,6 +107,12 @@ public class MachineManager {
         return machineCores;
     }
 
+    /**
+     * sets machine data to a TileState block
+     * will throw an exception if block type doesn't extend TileState
+     * @param block the machine core
+     * @param playerMachine the machine data to set
+     */
     public void setPlayerMachineBlock(Block block, PlayerMachine playerMachine) {
         TileState tileState = (TileState) block.getState();
         PersistentDataContainer persistentDataContainer = tileState.getPersistentDataContainer();
@@ -102,6 +120,11 @@ public class MachineManager {
         tileState.update();
     }
 
+    /**
+     * gets a player machine from a block storing the machine data
+     * @param block the machine core
+     * @return the PlayerMachine if data found, otherwise, null
+     */
     @Nullable
     public PlayerMachine getPlayerMachineFromBlock(Block block) {
         try {
@@ -114,6 +137,11 @@ public class MachineManager {
         }
     }
 
+    /**
+     * sets the locations belonging to the machine's entir build
+     * @param block the core block of the machine
+     * @param locations the locations belonging to the machine
+     */
     public void setPlayerMachineLocations(Block block, Location[] locations) {
         TileState tileState = (TileState) block.getState();
         PersistentDataContainer persistentDataContainer = tileState.getPersistentDataContainer();
@@ -123,12 +151,23 @@ public class MachineManager {
         tileState.update();
     }
 
+    /**
+     * get from a machine block it's other parts in the world.
+     * Ex. Used to stop players from breaking the machine
+     * @param block the machine core block
+     * @return all the locations belonging to the machine
+     */
     public Location[] getPlayerMachineLocations(Block block) {
         TileState tileState = (TileState) block.getState();
         PersistentDataContainer persistentDataContainer = tileState.getPersistentDataContainer();
         return Arrays.stream(persistentDataContainer.get(MACHINE_LOCATIONS_NAMESPACE_KEY, PersistentDataType.LONG_ARRAY)).mapToObj(packed -> Utils.longToLocation(packed, block.getWorld())).toArray(Location[]::new);
     }
 
+    /**
+     * Removes all plugin made data from a tilestate
+     * Made since if a block is air and has TileState data bad stuff will happen
+     * @param block the block to remove data from
+     */
     protected void clearMachineTileStateDataFromBlock(Block block) {
         TileState tileState = (TileState) block.getState();
         PersistentDataContainer persistentDataContainer = tileState.getPersistentDataContainer();
@@ -136,6 +175,14 @@ public class MachineManager {
         persistentDataContainer.remove(MACHINE_NAMESPACE_KEY);
     }
 
+    /**
+     * Further abstract the process of building and registering a new machine
+     * @param playerUuid uuid of machine owner
+     * @param machine the machine to create
+     * @param buildLocation the location to build it in
+     * @param <T> the type of the machine
+     * @return whether the build was successful or not
+     */
     public <T extends Machine> boolean buildMachine(UUID playerUuid, T machine, Location buildLocation) {
         try {
             PreMachineBuildEvent preMachineBuildEvent = new PreMachineBuildEvent(machine, buildLocation);

@@ -11,6 +11,9 @@ import schematics.SchematicNotLoadedException;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * Used to abstract the logic of building a schematic.
+ */
 public class Structure {
     private final Schematic schematic;
     private String name;

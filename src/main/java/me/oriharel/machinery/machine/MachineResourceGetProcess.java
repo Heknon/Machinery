@@ -36,6 +36,9 @@ public class MachineResourceGetProcess {
         initializeMaterialChances();
     }
 
+    /**
+     * starts the asynchronous process of gaining resources
+     */
     public void startProcess() {
         List<AbstractUpgrade> upgrades = machine.getUpgrades();
         applyUpgradeModifiers();
@@ -82,6 +85,10 @@ public class MachineResourceGetProcess {
         machine.removeEnergy(machine.getFuelDeficiency());
     }
 
+    /**
+     * insert all the stuff gained from the process
+     * checks if ItemStack resource type is already in machine, if it is, it adds x amount to it. If not create a new entry.
+     */
     private void insertResources() {
         HashMap<Material, ItemStack> machineResourcesGained = machine.getResourcesGained();
         AtomicReference<Double> totalAmount = new AtomicReference<>((double) 0);
@@ -101,13 +108,16 @@ public class MachineResourceGetProcess {
         this.zenCoinsGained = 0;
     }
 
+    /**
+     * Apply the upgrade modifiers on the mining process
+     */
     public void applyUpgradeModifiers() {
         List<AbstractUpgrade> upgrades = machine.getUpgrades();
         upgrades.forEach(upgrade -> upgrade.applyUpgradeModifier(this));
     }
 
     /**
-     * Uses MaterialChance class to define materials given for a specific chance, in a specific range
+     * gets the resourcemap of this machine and adds all it's values to a RandomCollection to allow to get random values from the collection based on weight
      */
     private void initializeMaterialChances() {
         chanceables = new RandomCollection<>();

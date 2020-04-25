@@ -8,6 +8,10 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * abstract implementation of upgrade.
+ * abstract since every upgrade has it's own modifying logic but behind the scenes upgrading and downgrading a upgrade is the same.
+ */
 public abstract class AbstractUpgrade {
     protected int level;
     protected boolean runOnlyOnProcessStart;

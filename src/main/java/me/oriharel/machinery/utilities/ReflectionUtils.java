@@ -7,6 +7,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+/**
+ * made to simplify some reflection operations
+ */
 public final class ReflectionUtils {
 
     public static final class Fields {

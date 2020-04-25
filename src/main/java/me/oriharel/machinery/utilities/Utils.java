@@ -23,8 +23,13 @@ import java.util.*;
 public final class Utils {
 
     public static final DecimalFormat COMMA_NUMBER_FORMAT = new DecimalFormat("#,###");
-    public static Machinery MACHINERY_INSTANCE = null;
 
+    /**
+     * Compressed the X, Y, Z coordinates of a location to a long.
+     * Compressed a location into 8 bytes
+     * @param location location to compress
+     * @return compressed location
+     */
     public static long locationToLong(Location location) {
         int x = location.getBlockX();
         int y = location.getBlockY();
@@ -32,6 +37,11 @@ public final class Utils {
         return ((long) x & 0x7FFFFFF) | (((long) z & 0x7FFFFFF) << 27) | ((long) y << 54);
     }
 
+    /**
+     * Decompresses a compressed location into an X, Y, Z only location
+     * @param packed the compressed long type location
+     * @return decompressed location
+     */
     public static Location longToLocation(long packed) {
         int x = (int) ((packed << 37) >> 37);
         int y = (int) (packed >>> 54);
@@ -39,34 +49,34 @@ public final class Utils {
         return new Location(null, x, y, z);
     }
 
+    /**
+     * decompresses a location and sets it's world
+     * @param packed the compressed long type location
+     * @param world the world to set to
+     * @return decompressed location
+     */
     public static Location longToLocation(long packed, World world) {
         Location loc = longToLocation(packed);
         loc.setWorld(world);
         return loc;
     }
 
+    /**
+     * Checks if an inventory has enough space to add an item
+     * @param inventory the inventory to check
+     * @return true if it has enough space otherwise false
+     */
     public static boolean inventoryHasSpaceForItemAdd(org.bukkit.inventory.Inventory inventory) {
         return inventory.firstEmpty() != -1;
     }
 
-    public static <T extends ItemStack> void giveItemsOrDrop(HumanEntity player, Collection<T> items, boolean cloneDrop) {
-        Inventory playerInventory = player.getInventory();
-        Location playerLocation = player.getLocation();
-        World playerWorld = player.getWorld();
-
-        for (ItemStack item : items) {
-            if (Utils.inventoryHasSpaceForItemAdd(playerInventory)) {
-                int amount = item.getAmount();
-                ItemStack toAdd = cloneDrop ? item.clone() : item;
-                if (cloneDrop) toAdd.setAmount(amount);
-                playerInventory.addItem(toAdd);
-
-            } else {
-                playerWorld.dropItemNaturally(playerLocation, cloneDrop ? item.clone() : item);
-            }
-        }
-    }
-
+    /**
+     * Give an item or drop it on the floor near the player
+     * @param player the player to give to
+     * @param item the item to give
+     * @param cloneDrop whether to clone it and give a clone or not
+     * @param <T> generic type extending ItemStack. Included to support items such as Fuel
+     */
     public static <T extends ItemStack> void giveItemOrDrop(HumanEntity player, T item, boolean cloneDrop) {
         Inventory playerInventory = player.getInventory();
         Location playerLocation = player.getLocation();
@@ -82,6 +92,14 @@ public final class Utils {
         }
     }
 
+    /**
+     * Used codebase wide in the apparent need of changing the construction of the serializer.
+     * If a type adapter needs to be added...
+     * @param machineType machineType to make a serializer for
+     * @param factory the machine factory
+     * @param <T> the machine type extending base Machine class
+     * @return Gson object for serializing a machine of machineType with
+     */
     public static <T extends Machine> Gson getGsonSerializationBuilderInstance(Class<T> machineType, MachineFactory factory) {
         return new GsonBuilder().registerTypeHierarchyAdapter(machineType, machineType == PlayerMachine.class ? new PlayerMachineTypeAdapter(factory) :
                 new MachineTypeAdapter<>(factory)).registerTypeHierarchyAdapter(AbstractUpgrade.class,
@@ -89,6 +107,12 @@ public final class Utils {
                 .registerTypeHierarchyAdapter(NBTTagCompound.class, new NBTTagCompoundTypeAdapter()).registerTypeHierarchyAdapter(UUID.class, new UUIDTypeAdapter()).create();
     }
 
+    /**
+     * used to generate placeholders for use when sending config messages using Message object
+     * @param location the location to generate placeholders for
+     * @param extraPlaceholders other placeholders that may be added upon the ones generated
+     * @return the generated placeholder for location + extra placeholders given
+     */
     public static List<Placeholder> getLocationPlaceholders(Location location, Placeholder... extraPlaceholders) {
         List<Placeholder> placeholders = extraPlaceholders.length == 0 ? new ArrayList<>() : new LinkedList<>(Arrays.asList(extraPlaceholders));
         placeholders.add(new Placeholder("%x%", location.getBlockX()));
@@ -98,18 +122,44 @@ public final class Utils {
         return placeholders;
     }
 
+    /**
+     * helper function for creating placeholder locations using overloaded getLocationPlaceholders(Location location, Placeholder... extraPlaceholders)
+     * wraps up a list into an array
+     * @param location the location to generate placeholders for
+     * @param extraPlaceholders other placeholders that may be added upon the ones generated
+     * @return the generated placeholder for location + extra placeholders given
+     */
     public static List<Placeholder> getLocationPlaceholders(Location location, List<Placeholder> extraPlaceholders) {
         return getLocationPlaceholders(location, extraPlaceholders.toArray(new Placeholder[0]));
     }
 
+    /**
+     * used to wrap up creation of placeholder array from list
+     * @param machine the location to generate placeholders for
+     * @param extraPlaceholders other placeholders that may be added upon the ones generated
+     * @return the generated placeholder for machine + extra placeholders given
+     */
     public static List<Placeholder> getMachinePlaceholders(PlayerMachine machine, List<Placeholder> extraPlaceholders) {
         return getMachinePlaceholders(machine, extraPlaceholders.toArray(new Placeholder[0]));
     }
 
+    /**
+     * used to wrap up creation of placeholder array from list
+     * @param amount the amount placeholder value
+     * @param thing the thing placeholder value
+     * @param extraPlaceholders other placeholders that may be added upon the ones generated
+     * @return the generated placeholder for amount thing + extra placeholders given
+     */
     public static List<Placeholder> getAmountThingPlaceholder(int amount, String thing, List<Placeholder> extraPlaceholders) {
         return getAmountThingPlaceholder(amount, thing, extraPlaceholders.toArray(new Placeholder[0]));
     }
 
+    /**
+     * used to generate placeholders for use when sending config messages using Message object
+     * @param machine the location to generate placeholders for
+     * @param extraPlaceholders other placeholders that may be added upon the ones generated
+     * @return the generated placeholder for machine + extra placeholders given
+     */
     public static List<Placeholder> getMachinePlaceholders(PlayerMachine machine, Placeholder... extraPlaceholders) {
         List<Placeholder> placeholders = extraPlaceholders.length == 0 ? new ArrayList<>() : new LinkedList<>(Arrays.asList(extraPlaceholders));
         placeholders.add(new Placeholder("%machine_type%", machine.getType().toTitle()));
@@ -131,6 +181,13 @@ public final class Utils {
         return placeholders;
     }
 
+    /**
+     * Used to represent something represented as an amount of a thing
+     * @param amount amount of thing
+     * @param thing thing
+     * @param extraPlaceholders other placeholders that may be added upon the ones generated
+     * @return the generated placeholder for amount thing + extra placeholders given
+     */
     public static List<Placeholder> getAmountThingPlaceholder(int amount, String thing, Placeholder... extraPlaceholders) {
         List<Placeholder> placeholders = extraPlaceholders.length == 0 ? new ArrayList<>() : new LinkedList<>(Arrays.asList(extraPlaceholders));
         placeholders.add(new Placeholder("%amount%", amount));

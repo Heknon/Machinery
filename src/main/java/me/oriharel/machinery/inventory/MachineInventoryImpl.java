@@ -5,7 +5,7 @@ import com.mojang.datafixers.util.Pair;
 import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.fuel.Fuel;
 import me.oriharel.machinery.fuel.FuelManager;
-import me.oriharel.machinery.items.MachineBlock;
+import me.oriharel.machinery.items.MachineItem;
 import me.oriharel.machinery.machine.PlayerMachine;
 import me.oriharel.machinery.message.Message;
 import me.oriharel.machinery.message.Placeholder;
@@ -162,8 +162,8 @@ public class MachineInventoryImpl {
                 new InventoryItem(6, Material.GREEN_STAINED_GLASS_PANE, 1, "§a§lAGREE", "§eThis will deconstruct your machine", "§eYou will be given your machine in " +
                         "the form of a block").setOnClick(() -> {
                     p.closeInventory();
-                    MachineBlock machineBlock = machine.deconstruct();
-                    p.getInventory().addItem(machineBlock.getItemStackWithAppliedPlaceholders());
+                    MachineItem machineItem = machine.deconstruct();
+                    p.getInventory().addItem(machineItem.getItemStackWithAppliedPlaceholders());
                 })
         ), machine);
     }
