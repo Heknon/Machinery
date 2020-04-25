@@ -218,7 +218,7 @@ public class MachineInventoryImpl {
                                             Utils.getMachinePlaceholders(machine))).send();
                                     return;
                                 }
-                                depositZenCoins(downgradeCost);
+                                depositZenCoinsIntoProfile(downgradeCost);
                                 upgrade.downgrade();
                                 machine.getMinerProcess().applyUpgradeModifiers();
                                 p.closeInventory();
@@ -239,7 +239,7 @@ public class MachineInventoryImpl {
                                             Utils.getMachinePlaceholders(machine, Utils.getAmountThingPlaceholder(upgradeCost - mobCoinsOfUser, "Zen Coins")))).send();
                                     return;
                                 }
-                                withdrawZenCoins(upgradeCost);
+                                withdrawZenCoinsFromProfile(upgradeCost);
                                 upgrade.upgrade();
                                 machine.getMinerProcess().applyUpgradeModifiers();
                                 p.closeInventory();
@@ -334,7 +334,7 @@ public class MachineInventoryImpl {
             if (num == -1) return false;
             else if (num == 0) return true;
 
-            withdrawZenCoins(num);
+            depositZenCoinsIntoProfile(num);
             machine.removeZenCoinsGained(num);
             machinery.updateMachineBlock(machine, true);
         } catch (NumberFormatException e) {
@@ -414,13 +414,13 @@ public class MachineInventoryImpl {
         return fuels;
     }
 
-    private void depositZenCoins(int amount) {
+    private void depositZenCoinsIntoProfile(int amount) {
         Profile profile = getMobCoinsProfile();
         profile.setMobCoins(profile.getMobCoins() + amount);
     }
 
-    private void withdrawZenCoins(int amount) {
-        depositZenCoins(-amount);
+    private void withdrawZenCoinsFromProfile(int amount) {
+        depositZenCoinsIntoProfile(-amount);
     }
 
     public Profile getMobCoinsProfile() {

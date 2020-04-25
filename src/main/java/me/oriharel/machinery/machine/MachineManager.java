@@ -209,7 +209,6 @@ public class MachineManager {
                 return true;
             });
             if (locations == null) {
-                new Message("messages.yml", "not_empty_place", p).send();
                 return false;
             }
             Machinery.getInstance().getMachineManager().addTemporaryPreRegisterMachinePartLocations(locations);
