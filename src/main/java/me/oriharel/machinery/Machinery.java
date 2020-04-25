@@ -3,7 +3,6 @@ package me.oriharel.machinery;
 import co.aikar.commands.BukkitCommandManager;
 import com.google.common.collect.Lists;
 import me.oriharel.machinery.data.MachineDataManager;
-import me.oriharel.machinery.fuel.Fuel;
 import me.oriharel.machinery.fuel.FuelManager;
 import me.oriharel.machinery.inventory.Listeners;
 import me.oriharel.machinery.listeners.Block;
@@ -14,12 +13,15 @@ import me.oriharel.machinery.machine.PlayerMachine;
 import me.oriharel.machinery.structure.StructureManager;
 import me.oriharel.machinery.utilities.SignMenuFactory;
 import me.oriharel.machinery.utilities.Utils;
+import me.wolfyscript.customcrafting.CustomCrafting;
 import org.bukkit.Bukkit;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
@@ -54,14 +56,19 @@ public final class Machinery extends JavaPlugin {
 
         Utils.MACHINERY_INSTANCE = this;
 
+        // save all configuration files
         fileManager = new FileManager(this);
-        fileManager.getConfig("config.yml").copyDefaults(true).save();
-        fileManager.getConfig("messages.yml").copyDefaults(true).save();
-        fileManager.getConfig("fuel.yml").copyDefaults(true).save();
-        fileManager.getConfig("upgrades.yml").copyDefaults(true).save();
-        fileManager.getConfig("machines.yml").copyDefaults(true).save();
-        File file = new File(getDataFolder(), "structures");
-        if (!file.exists()) file.mkdir();
+
+        setupConfigs();
+
+        Path file = new File(getDataFolder(), "structures").toPath();
+        if (!Files.exists(file)) {
+            try {
+                Files.createDirectory(file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
         this.signMenuFactory = new SignMenuFactory(this);
 
@@ -88,6 +95,12 @@ public final class Machinery extends JavaPlugin {
         machineDataManager.forceMachineDataSave();
     }
 
+    /**
+     * Helper function for creating a sign GUI for a user to input data in
+     * @param target the player that the sign GUI will open for
+     * @param response callback when users submits text
+     * @param defaultLines  default text
+     */
     public void createSignInput(Player target, BiPredicate<Player, String[]> response, String... defaultLines) {
         this.signMenuFactory
                 .newMenu(Lists.newArrayList(defaultLines))
@@ -96,11 +109,20 @@ public final class Machinery extends JavaPlugin {
                 .open(target);
     }
 
+    /**
+     * Helper function to update a player machine block with it's new value.
+     * used to not go through machine manager and it's "obscure" naming
+     * @param machine the new machine data
+     * @param fromAsyncThread if it is from an asynchronous thread it will summon a bukkit task on the master thread since you cannot modify blocks on other threads
+     */
     public void updateMachineBlock(PlayerMachine machine, boolean fromAsyncThread) {
         if (fromAsyncThread) Bukkit.getScheduler().runTask(this, () -> machineManager.setPlayerMachineBlock(machine.getMachineCore().getBlock(), machine));
         else machineManager.setPlayerMachineBlock(machine.getMachineCore().getBlock(), machine);
     }
 
+    /**
+     * helper function for setting up the command manager.
+     */
     private void setupCommandManager() {
         this.commandManager = new BukkitCommandManager(this);
         commandManager.getCommandCompletions().registerCompletion("machines",
@@ -111,6 +133,17 @@ public final class Machinery extends JavaPlugin {
             return machineManager.getMachines().stream().filter(machine -> machine.getMachineName().equalsIgnoreCase(machineName)).findFirst().get();
         });
         commandManager.registerCommand(new MachineCommand(this));
+    }
+
+    /**
+     * helper function for initializing all the config files this plugins uses before it starts up.
+     */
+    private void setupConfigs() {
+        fileManager.getConfig("config.yml").initialize();
+        fileManager.getConfig("messages.yml").initialize();
+        fileManager.getConfig("fuel.yml").initialize();
+        fileManager.getConfig("upgrades.yml").initialize();
+        fileManager.getConfig("machines.yml").initialize();
     }
 
     public FileManager getFileManager() {

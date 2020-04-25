@@ -9,6 +9,7 @@ import me.oriharel.machinery.machine.PlayerMachine;
 import me.oriharel.machinery.utilities.NMS;
 import me.oriharel.machinery.utilities.Utils;
 import me.wolfyscript.customcrafting.recipes.types.CustomRecipe;
+import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import net.minecraft.server.v1_15_R1.NBTTagString;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
@@ -68,7 +69,17 @@ public class MachineBlock {
             NMS.getItemStackUnhandledNBT(is).put("playerMachine", NBTTagString.a(gson.toJson(machine, PlayerMachine.class)));
             return is;
         } else if (machine.getClass() == Machine.class) {
-            return recipe.getResult();
+            // weird edge case. no clue why the hell I can't just return recipe.getResult()
+            int amount = recipe.getResult().getAmount();
+            ItemStack clone = recipe.getResult().clone();
+            clone.setAmount(amount);
+            net.minecraft.server.v1_15_R1.ItemStack isNMS = CraftItemStack.asNMSCopy(clone);
+            NBTTagCompound tag = isNMS.getTag();
+            if (tag == null) tag = new NBTTagCompound();
+            tag.remove("machine");
+            tag.set("machine", NBTTagString.a(gson.toJson(machine, Machine.class)));
+            isNMS.setTag(tag);
+            return CraftItemStack.asBukkitCopy(isNMS);
         }
         return null;
     }

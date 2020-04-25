@@ -1,0 +1,63 @@
+{
+  "mirror": {
+    "horizontal": false,
+    "vertical": false,
+    "rotation": false
+  },
+  "ingredients": {
+    "A": {
+      "var0": {
+        "item": "{id:\"minecraft:obsidian\",Count:1b}"
+      }
+    },
+    "B": {
+      "var0": {
+        "item": "{id:\"minecraft:obsidian\",Count:1b}"
+      }
+    },
+    "C": {
+      "var0": {
+        "item": "{id:\"minecraft:obsidian\",Count:1b}"
+      }
+    },
+    "D": {
+      "var0": {
+        "item": "{id:\"minecraft:obsidian\",Count:1b}"
+      }
+    },
+    "E": {
+      "var0": {
+        "item": "{id:\"minecraft:obsidian\",Count:1b}"
+      }
+    },
+    "F": {
+      "var0": {
+        "item": "{id:\"minecraft:obsidian\",Count:1b}"
+      }
+    },
+    "G": {
+      "var0": {
+        "item": "{id:\"minecraft:obsidian\",Count:1b}"
+      }
+    },
+    "H": {
+      "var0": {
+        "item": "{id:\"minecraft:obsidian\",Count:1b}"
+      }
+    },
+    "I": {
+      "var0": {
+        "item": "{id:\"minecraft:obsidian\",Count:1b}"
+      }
+    }
+  },
+  "result": {
+    "item": "{id:\"minecraft:bedrock\",Count:1b}"
+  },
+  "shapeless": false,
+  "shape": [
+    "ABC",
+    "DEF",
+    "GHI"
+  ]
+}

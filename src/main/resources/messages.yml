@@ -6,6 +6,7 @@ not_enough_fuel_to_operate: "&c&l[!] &eYou do not have enough fuel at a machine 
 
 not_enough_inventory_space: "&c&l[!] &eYou do not have enough inventory space to store &b%amount% &cof &b%thing%."
 
+insufficient_funds_for_upgrade: "&c&l[!] &eInsufficient funds! Missing %amount% %thing% in order to upgrade your machine"
 on_upgrade: "&b&l[INFO] &eYou just upgraded a machine! Cost: %amount%"
 on_downgrade: "&b&l[INFO] &eYou just downgraded a machine! You received %amount%"
 reached_max_upgrade_level: "&c&l[!] &eReached max upgrade level, cannot upgrade anymore."

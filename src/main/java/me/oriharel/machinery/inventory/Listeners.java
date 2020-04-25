@@ -21,6 +21,7 @@ public class Listeners implements Listener {
         if (!(e.getInventory().getHolder() instanceof InventoryPage)) return;
         InventoryPage inventory = (InventoryPage) e.getInventory().getHolder();
         ItemStack clicked = e.getCurrentItem();
+        e.setCancelled(inventory.cancelClick);
         if (clicked == null) return;
         for (InventoryItem item : inventory.inventoryItems) {
             if (item.indexInInventory == e.getSlot()) {
@@ -33,7 +34,7 @@ public class Listeners implements Listener {
                 }
             }
         }
-        e.setCancelled(inventory.cancelClick);
+
     }
 
     @EventHandler

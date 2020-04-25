@@ -229,9 +229,14 @@ public class MachineInventoryImpl {
                             new InventoryItem(4, Material.RED_STAINED_GLASS_PANE, 1, "§cCANCEL").setOnClick(() -> p.closeInventory()),
                             new InventoryItem(6, Material.LIME_STAINED_GLASS_PANE, 1, "§6UPGRADE", "§bUpgrade to level §e" + (upgrade.getLevel() + 1),
                                     "§bCost: §e" + decimalFormat.format(upgradeCost) + " Zen Coins").setOnClick(() -> {
+                                int mobCoinsOfUser = getMobCoinsProfile().getMobCoins();
                                 if (upgrade.getLevel() == upgrade.getMaxLevel()) {
                                     new Message("messages.yml", "reached_max_upgrade_level", p, Utils.getLocationPlaceholders(machine.getMachineCore(),
                                             Utils.getMachinePlaceholders(machine))).send();
+                                    return;
+                                } else if (upgradeCost > mobCoinsOfUser) {
+                                    new Message("messages.yml", "insufficient_funds_for_upgrade", p, Utils.getLocationPlaceholders(machine.getMachineCore(),
+                                            Utils.getMachinePlaceholders(machine, Utils.getAmountThingPlaceholder(upgradeCost - mobCoinsOfUser, "Zen Coins")))).send();
                                     return;
                                 }
                                 withdrawZenCoins(upgradeCost);
@@ -308,7 +313,7 @@ public class MachineInventoryImpl {
             int fuelsToDeposit = maxEnergyCanDespositFromFuel / fuel.getBaseEnergy();
 
             fuel.setAmount(fuel.getAmount() - fuelsToDeposit);
-            fuel.setEnergy(fuel.getEnergy() - maxEnergyCanDespositFromFuel);
+            fuel.setEnergy(fuelEnergy - maxEnergyCanDespositFromFuel);
             inventory.setItem(indexInInventory, fuel);
             machine.addEnergy(maxEnergyCanDespositFromFuel);
             energyLeftToDeposit -= maxEnergyCanDespositFromFuel;
@@ -330,6 +335,7 @@ public class MachineInventoryImpl {
             else if (num == 0) return true;
 
             withdrawZenCoins(num);
+            machine.removeZenCoinsGained(num);
             machinery.updateMachineBlock(machine, true);
         } catch (NumberFormatException e) {
             p.sendMessage("§c§lInvalid number!");
@@ -410,7 +416,6 @@ public class MachineInventoryImpl {
 
     private void depositZenCoins(int amount) {
         Profile profile = getMobCoinsProfile();
-        machine.addZenCoinsGained(amount);
         profile.setMobCoins(profile.getMobCoins() + amount);
     }
 

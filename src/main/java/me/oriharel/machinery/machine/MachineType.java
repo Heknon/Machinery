@@ -9,7 +9,7 @@ public enum MachineType {
     FARMER,
     ALL;
 
-    static MachineType getMachine(String machineType) throws NotMachineTypeException {
+    public static MachineType getMachine(String machineType) throws NotMachineTypeException {
         if (machineType == null) throw new NotMachineTypeException("You must supply a string which is not null");
         switch (machineType.toUpperCase()) {
             case "LUMBERJACK":

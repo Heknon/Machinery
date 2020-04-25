@@ -88,4 +88,17 @@ public class Machine {
         return machineName;
     }
 
+    @Override
+    public String toString() {
+        return "Machine{" +
+                "machineType=" + machineType +
+                ", structure=" + structure +
+                ", machineName='" + machineName + '\'' +
+                ", machineBlock=" + machineBlock +
+                ", machineCoreBlockType=" + machineCoreBlockType +
+                ", recipe=" + recipe +
+                ", fuelDeficiency=" + fuelDeficiency +
+                ", maxFuel=" + maxFuel +
+                '}';
+    }
 }

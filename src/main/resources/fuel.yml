@@ -1,1 +1,5 @@
 default_fuel_type: BEACON
+default_display_name: "&eFUEL"
+default_lore: [
+  "&bEnergy: &e%amount% Ea'"
+]

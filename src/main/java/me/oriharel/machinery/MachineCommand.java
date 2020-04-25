@@ -8,6 +8,7 @@ import me.oriharel.machinery.machine.Machine;
 import me.oriharel.machinery.utilities.Utils;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 

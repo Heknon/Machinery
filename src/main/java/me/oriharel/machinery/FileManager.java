@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 
 
@@ -76,6 +78,22 @@ public class FileManager {
                     config.save(this.file);
             } catch (IOException ex) {
                 ex.printStackTrace();
+            }
+            return this;
+        }
+
+        /**
+         * Used for when initializing a config into the data folder of the plugin.
+         * Checks if the file exists already. If it doesn't it force copies the default values and saves.
+         * If it does, it doesn't forcefully copy the default values.
+         * @return this
+         */
+        public Config initialize() {
+            Path file = plugin.getDataFolder().toPath().resolve(name);
+            if (!Files.exists(file)) {
+                copyDefaults(true).save();
+            } else {
+                copyDefaults(false).save();
             }
             return this;
         }

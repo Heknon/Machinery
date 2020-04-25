@@ -99,6 +99,7 @@ public class MachineFactory {
                                        int energyInMachine, double zenCoinsGained, double totalZenCoinsGained, UUID owner,
                                        List<AbstractUpgrade> upgrades, HashMap<Material, ItemStack> resourcesGained, Set<UUID> playersWithAccessPermission) throws IllegalArgumentException {
         if (machine == null) throw new IllegalArgumentException("Machine must not be null (MachineFactory)");
+
         return new PlayerMachine(machine.maxFuel, machine.fuelDeficiency,
                 machine.machineType, machine.structure,
                 machine.recipe, machine.machineName, machine.machineCoreBlockType, playersWithAccessPermission, totalResourcesGained, resourcesGained, energyInMachine,

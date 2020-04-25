@@ -25,6 +25,12 @@ public class Message extends Text {
         this.placeholders = Arrays.asList(placeholder);
     }
 
+    public Message(String text, Placeholder... placeholder) {
+        super(text);
+        this.recipients = Collections.EMPTY_LIST;
+        this.placeholders = Arrays.asList(placeholder);
+    }
+
     public Message(String configName, String configRoute, Player recipient, Placeholder... placeholders) {
         super(handleConfigCache(configName, configRoute));
         this.recipients = Collections.singletonList(recipient);
@@ -76,6 +82,10 @@ public class Message extends Text {
             recipient.sendMessage(textWithAppliedPlaceholders);
         }
         return this;
+    }
+
+    public String getAppliedText() {
+        return ChatColor.translateAlternateColorCodes('&', applyPlaceholders(text).text);
     }
 
     private Text applyPlaceholders(String text) {

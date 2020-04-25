@@ -5,6 +5,7 @@ import me.oriharel.machinery.api.events.PostMachineBuildEvent;
 import me.oriharel.machinery.api.events.PreMachineBuildEvent;
 import me.oriharel.machinery.data.PlayerMachinePersistentDataType;
 import me.oriharel.machinery.exceptions.*;
+import me.oriharel.machinery.message.Message;
 import me.oriharel.machinery.upgrades.LootBonusUpgrade;
 import me.oriharel.machinery.upgrades.SpeedUpgrade;
 import me.oriharel.machinery.utilities.Utils;
@@ -161,8 +162,7 @@ public class MachineManager {
                 return true;
             });
             if (locations == null) {
-                p.sendMessage(ChatColor.translateAlternateColorCodes('&', Machinery.getInstance().getFileManager().getConfig("config.yml").get().getString(
-                        "not_empty_place")));
+                new Message("messages.yml", "not_empty_place", p).send();
                 return false;
             }
             Machinery.getInstance().getMachineManager().addTemporaryPreRegisterMachinePartLocations(locations);
