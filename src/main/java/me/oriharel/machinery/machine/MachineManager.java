@@ -5,13 +5,11 @@ import me.oriharel.machinery.api.events.PostMachineBuildEvent;
 import me.oriharel.machinery.api.events.PreMachineBuildEvent;
 import me.oriharel.machinery.data.PlayerMachinePersistentDataType;
 import me.oriharel.machinery.exceptions.*;
-import me.oriharel.machinery.message.Message;
 import me.oriharel.machinery.upgrades.LootBonusUpgrade;
 import me.oriharel.machinery.upgrades.SpeedUpgrade;
 import me.oriharel.machinery.utilities.Utils;
 import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
@@ -65,6 +63,8 @@ public class MachineManager {
                 e.printStackTrace();
             }
         }
+        machinery.getLogger().info("Loaded all base machines!");
+        machinery.getLogger().info("Base Machines: " + machines);
     }
 
     /**
@@ -197,7 +197,7 @@ public class MachineManager {
                             pMachine.getEnergyInMachine(), pMachine.getZenCoinsGained(), pMachine.getTotalZenCoinsGained(), pMachine.getOwner(), pMachine.getUpgrades(),
                             pMachine.getResourcesGained(), pMachine.getPlayersWithAccessPermission());
                 } else {
-                    machineToRegister = Machinery.getInstance().getMachineManager().getMachineFactory().createMachine(machine,
+                    machineToRegister = machineFactory.createMachine(machine,
                             printResult.getOpenGUIBlockLocation(), 0, 0, 0, 0, playerUuid, Arrays.asList(
                                     new LootBonusUpgrade(1),
                                     new SpeedUpgrade(1)
@@ -211,7 +211,7 @@ public class MachineManager {
             if (locations == null) {
                 return false;
             }
-            Machinery.getInstance().getMachineManager().addTemporaryPreRegisterMachinePartLocations(locations);
+            addTemporaryPreRegisterMachinePartLocations(locations);
             return true;
         } catch (Exception e) {
             e.printStackTrace();

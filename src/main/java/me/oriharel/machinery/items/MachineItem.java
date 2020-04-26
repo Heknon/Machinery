@@ -58,7 +58,7 @@ public class MachineItem {
 
     public ItemStack getItemStackWithAppliedPlaceholders() {
         if (machine.getClass() == PlayerMachine.class) {
-            YamlConfiguration configLoad = Machinery.getInstance().getFileManager().getConfig("machines.yml").get();
+            YamlConfiguration configLoad = Machinery.Companion.getInstance().getFileManager().getConfig("machines.yml").get();
             ItemStack is = new ItemStack(recipe.getResult().getType(), 1);
             ItemMeta meta = is.getItemMeta();
 

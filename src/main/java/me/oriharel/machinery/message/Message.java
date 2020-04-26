@@ -70,7 +70,7 @@ public class Message extends Text {
         String cacheValue = CONFIG_MESSAGE_CACHE.getOrDefault(cacheKey, null);
 
         if (cacheValue == null) { // not present in cache
-            String value = Machinery.getInstance().getFileManager().getConfig(configName).get().getString(routeName);
+            String value = Machinery.Companion.getInstance().getFileManager().getConfig(configName).get().getString(routeName);
             CONFIG_MESSAGE_CACHE.put(cacheKey, value);
             return value;
         }

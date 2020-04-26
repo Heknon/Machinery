@@ -61,7 +61,7 @@ public class MachineResourceGetProcess {
                 runFuelRemoval();
             }
         };
-        process.runTaskTimerAsynchronously(Machinery.getInstance(), minePeriod, minePeriod);
+        process.runTaskTimerAsynchronously(Machinery.Companion.getInstance(), minePeriod, minePeriod);
     }
 
     public void endProcess() {

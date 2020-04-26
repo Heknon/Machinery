@@ -47,7 +47,7 @@ public class Block implements Listener {
         Machine machine = machineItem.getMachine();
         if (!machinery.getMachineManager().buildMachine(e.getPlayer().getUniqueId(), machine, e.getBlock().getLocation())) {
             new Message("messages.yml", "not_empty_place", e.getPlayer()).send();
-            e.getBlock().setType(Material.AIR);
+            e.setCancelled(true);
             return;
         }
         if (e.getPlayer().getGameMode() == GameMode.CREATIVE) {

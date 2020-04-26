@@ -60,7 +60,7 @@ public class PlayerMachine extends Machine {
      * @return MachineBlock that represents the deconstructed machine and the data in it
      */
     public MachineItem deconstruct() {
-        MachineManager machineManager = Machinery.getInstance().getMachineManager();
+        MachineManager machineManager = Machinery.Companion.getInstance().getMachineManager();
         machineManager.clearMachineTileStateDataFromBlock(machineCore.getBlock());
         Location[] machinePartLocations = machineManager.getPlayerMachineLocations(machineCore.getBlock());
         machineManager.unregisterPlayerMachine(this);

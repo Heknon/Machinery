@@ -2,7 +2,6 @@ package me.oriharel.machinery.utilities;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.machine.Machine;
 import me.oriharel.machinery.machine.MachineFactory;
 import me.oriharel.machinery.machine.PlayerMachine;

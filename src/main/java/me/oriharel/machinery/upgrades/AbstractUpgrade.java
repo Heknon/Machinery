@@ -5,7 +5,6 @@ import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.machine.MachineResourceGetProcess;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -21,7 +20,7 @@ public abstract class AbstractUpgrade {
     public AbstractUpgrade(int level) {
         this.level = level;
         this.runOnlyOnProcessStart = false;
-        this.configLoad = Machinery.getInstance().getFileManager().getConfig("upgrades.yml").get();
+        this.configLoad = Machinery.Companion.getInstance().getFileManager().getConfig("upgrades.yml").get();
     }
 
     protected AbstractUpgrade() {
