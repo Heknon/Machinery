@@ -1,4 +1,8 @@
-.idea/
+.idea
 src/test
+<<<<<<< HEAD
 target/
 out/
+=======
+target
+>>>>>>> parent of 4f704a6... kotlin beginning

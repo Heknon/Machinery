@@ -46,11 +46,11 @@ public class MachineTypeAdapter<T extends Machine> implements JsonSerializer<T>,
         Material machineCoreBlockType = Material.getMaterial(machineJsonObject.get("coreBlockType").getAsString());
 
         Structure structure =
-                Machinery.Companion.getInstance().getStructureManager().getSchematicByPath(machineJsonObject.get("structure").getAsString());
+                Machinery.getInstance().getStructureManager().getSchematicByPath(machineJsonObject.get("structure").getAsString());
 
         CustomRecipe<?> recipe = CustomCrafting.getRecipeHandler().getRecipe(recipeName);
 
-        if (factory == null) factory = Machinery.Companion.getInstance().getMachineManager().getMachineFactory();
+        if (factory == null) factory = Machinery.getInstance().getMachineManager().getMachineFactory();
         return (T) factory.createMachine(machineMaxFuel,
                 machineFuelDeficiency, machineType, structure, recipe, machineName, machineCoreBlockType);
     }

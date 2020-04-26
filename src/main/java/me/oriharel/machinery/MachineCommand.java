@@ -24,9 +24,7 @@ public class MachineCommand extends BaseCommand {
     @CommandPermission("machinery.help")
     public void help(CommandSender executor) {
         executor.sendMessage("§e§lCOMMANDS:");
-        executor.sendMessage("§b/machinery give machine  [playerToGiveTo] [machineName] <amount>");
-        executor.sendMessage("§b/machinery give fuel [playerToGiveTo] [machineName] <amount>");
-        executor.sendMessage("§b/machinery give fuel [playerToGiveTo] [materialType] [machineName] <amount>");
+        executor.sendMessage("§b/machinery give [playerToGiveTo] [machineName] <amount>");
     }
 
     @Subcommand("give")

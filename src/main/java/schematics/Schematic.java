@@ -1,6 +1,7 @@
 package schematics;
 
 import me.oriharel.machinery.utilities.CallbackP;
+import schematics.NBTUtils.Position;
 import net.minecraft.server.v1_15_R1.NBTCompressedStreamTools;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import net.minecraft.server.v1_15_R1.NBTTagList;
@@ -19,7 +20,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
-import schematics.NBTUtils.Position;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -290,23 +290,20 @@ public class Schematic {
             boolean validated = true;
             Set<Block> validatedBlocks = new HashSet<>(); // Stores previous blocks before placing green glass
             for (Location validate : locations) {
-                if (((validate.getBlock().getType() != Material.AIR && validate.getBlock().getType() != Material.GRASS && !validate.getBlock().getType().isSolid()) || validate.clone().subtract(0, 1,
-                        0).getBlock().getType() == Material.WATER) || new Location(validate.getWorld(), validate.getX(), loc.getY() - 1, validate.getZ()).getBlock().getType() == Material.AIR) {
+                if (((validate.getBlock().getType() != Material.AIR && validate.getBlock().getType() != Material.GRASS) || validate.clone().subtract(0, 1, 0).getBlock().getType() == Material.WATER) || new Location(validate.getWorld(), validate.getX(), loc.getY() - 1, validate.getZ()).getBlock().getType() == Material.AIR) {
                     /*
                      * Show fake block where block is interfering with schematic
                      */
                     validatedBlocks.forEach(block -> paster.sendBlockChange(block.getLocation(), block.getBlockData())); // remove validated location blocks
                     return null;
-/*
-                    paster.sendBlockChange(validate.getBlock().getLocation(), Material.RED_STAINED_GLASS.createBlockData());
-                    if (!options.contains(Options.PREVIEW)) {
-                        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
-                            if (validate.getBlock().getType() == Material.AIR) paster.sendBlockChange(validate.getBlock().getLocation(), Material.AIR.createBlockData
-                            ());
-                        }, 60);
-                    }
-                    validated = false;
-*/
+//                    paster.sendBlockChange(validate.getBlock().getLocation(), Material.RED_STAINED_GLASS.createBlockData());
+//                    if (!options.contains(Options.PREVIEW)) {
+//                        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
+//                            if (validate.getBlock().getType() == Material.AIR) paster.sendBlockChange(validate.getBlock().getLocation(), Material.AIR.createBlockData
+//                            ());
+//                        }, 60);
+//                    }
+//                    validated = false;
                 } else {
                     /*
                      * Show fake block for air
@@ -315,9 +312,8 @@ public class Schematic {
                     paster.sendBlockChange(validate.getBlock().getLocation(), Material.GREEN_STAINED_GLASS.createBlockData());
                     if (!options.contains(Options.PREVIEW)) {
                         Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
-                            if (validate.getBlock().getType() == Material.AIR || validate.getBlock().getType() == Material.GRASS || !validate.getBlock().getType().isSolid())
-                                paster.sendBlockChange(validate.getBlock().getLocation(),
-                                        Material.AIR.createBlockData());
+                            if (validate.getBlock().getType() == Material.AIR || validate.getBlock().getType() == Material.GRASS) paster.sendBlockChange(validate.getBlock().getLocation(),
+                                    Material.AIR.createBlockData());
                         }, 60);
                     }
                 }

@@ -5,6 +5,7 @@ import me.oriharel.machinery.inventory.MachineInventoryImpl;
 import me.oriharel.machinery.machine.PlayerMachine;
 import me.oriharel.machinery.message.Message;
 import me.oriharel.machinery.utilities.Utils;
+import org.bukkit.ChatColor;
 import org.bukkit.block.TileState;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;

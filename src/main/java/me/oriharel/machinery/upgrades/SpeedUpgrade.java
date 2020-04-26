@@ -24,7 +24,7 @@ public class SpeedUpgrade extends AbstractUpgrade {
 
     @Override
     public void applyUpgradeModifier(MachineResourceGetProcess mineProcess) {
-        YamlConfiguration config = Machinery.Companion.getInstance().getFileManager().getConfig("upgrades.yml").get();
+        YamlConfiguration config = Machinery.getInstance().getFileManager().getConfig("upgrades.yml").get();
 
         // period is in ticks. 20 ticks is a second
         int basePeriod = config.getInt("speed.basePeriod") * 20;

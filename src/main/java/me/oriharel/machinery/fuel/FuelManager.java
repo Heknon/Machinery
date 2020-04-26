@@ -2,6 +2,8 @@ package me.oriharel.machinery.fuel;
 
 import com.google.gson.Gson;
 import me.oriharel.machinery.Machinery;
+import me.oriharel.machinery.message.Message;
+import me.oriharel.machinery.message.Placeholder;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
