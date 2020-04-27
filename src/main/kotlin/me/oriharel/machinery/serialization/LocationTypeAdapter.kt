@@ -14,7 +14,7 @@ class LocationTypeAdapter : JsonSerializer<Location>, JsonDeserializer<Location?
         val pitch = obj["pitch"].asFloat
         val yaw = obj["yaw"].asFloat
         val xyzLoc = Utils.longToLocation(obj["xyz"].asLong, Bukkit.getWorld(UUID.fromString(obj["world"].asString)))
-        xyzLoc!!.pitch = pitch
+        xyzLoc.pitch = pitch
         xyzLoc.yaw = yaw
         return xyzLoc
     }

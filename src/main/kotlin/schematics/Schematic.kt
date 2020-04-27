@@ -163,7 +163,7 @@ class Schematic(private val plugin: JavaPlugin, private val schematic: File) {
      * @see .loadSchematic
      */
     @Throws(SchematicNotLoadedException::class)
-    fun pasteSchematic(loc: Location,
+    fun pasteSchematic(locOriginal: Location,
                        paster: Player?,
                        time: Int,
                        callback: (List<Location?>) -> Boolean,
@@ -181,6 +181,7 @@ class Schematic(private val plugin: JavaPlugin, private val schematic: File) {
             val otherloc: MutableList<Location?> = ArrayList()
             val nbtData: MutableMap<Int, Any?> = HashMap()
             val face = getDirection(paster)
+            var loc = locOriginal
 
             /*
              * Loop through all the blocks within schematic size.
@@ -192,11 +193,12 @@ class Schematic(private val plugin: JavaPlugin, private val schematic: File) {
                         val point = Vector(x, y, z)
                         var location: Location? = null
 
+                        print(length)
                         when (face) {
-                            BlockFace.NORTH -> location = Location(loc.world, x * -1 + loc.x + width.toInt() / 2, y + loc.y, z + loc.z + length.toInt() / 2)
+                            BlockFace.NORTH -> location = Location(loc.world, x * -1 + loc.x + width.toInt() / 2, y + loc.y, (z + loc.z + length.toInt() / 2))
                             BlockFace.EAST -> location = Location(loc.world, -z + loc.x - length.toInt() / 2, y + loc.y,
                                     -x - 1 + (width + loc.z) - width.toInt() / 2)
-                            BlockFace.SOUTH -> location = Location(loc.world, x + loc.x - width.toInt() / 2, y + loc.y, z * -1 + loc.z - length.toInt() / 2)
+                            BlockFace.SOUTH -> location = Location(loc.world, x + loc.x - width.toInt() / 2, y + loc.y, (z * -1 + loc.z - length.toInt() / 2))
                             BlockFace.WEST -> location = Location(loc.world, z + loc.x + length.toInt() / 2, y + loc.y,
                                     x + 1 - (width - loc.z) + width.toInt() / 2)
                             else -> {}

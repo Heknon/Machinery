@@ -30,21 +30,23 @@ class PlayerMachineTypeAdapter(factory: MachineFactory?) : MachineTypeAdapter<Pl
                 upgrades, resourcesGained, playersWithAccessPermission)
     }
 
-    override fun getSerializedMachine(machine: PlayerMachine?, context: JsonSerializationContext): JsonObject? {
+    override fun getSerializedMachine(machine: PlayerMachine?, context: JsonSerializationContext): JsonObject {
         val baseMachineSerialized = super.getSerializedMachine(machine, context)
-        baseMachineSerialized!!.add("zenCoinsGained", JsonPrimitive(machine.getZenCoinsGained()))
-        baseMachineSerialized.add("totalZenCoinsGained", JsonPrimitive(machine.getTotalZenCoinsGained()))
-        baseMachineSerialized.add("totalResourcesGained", JsonPrimitive(machine.getTotalResourcesGained()))
-        baseMachineSerialized.add("energyInMachine", JsonPrimitive(machine.getEnergyInMachine()))
-        baseMachineSerialized.add("ownerUuidMost", JsonPrimitive(machine.getOwner().mostSignificantBits))
-        baseMachineSerialized.add("ownerUuidLeast", JsonPrimitive(machine.getOwner().leastSignificantBits))
+        baseMachineSerialized.add("zenCoinsGained", JsonPrimitive(machine?.zenCoinsGained))
+        baseMachineSerialized.add("totalZenCoinsGained", JsonPrimitive(machine?.totalZenCoinsGained))
+        baseMachineSerialized.add("totalResourcesGained", JsonPrimitive(machine?.totalResourcesGained))
+        baseMachineSerialized.add("energyInMachine", JsonPrimitive(machine?.energyInMachine))
+        baseMachineSerialized.add("ownerUuidMost", JsonPrimitive(machine?.owner?.mostSignificantBits))
+        baseMachineSerialized.add("ownerUuidLeast", JsonPrimitive(machine?.owner?.leastSignificantBits))
+
         val locObj = JsonObject()
-        locObj.add("xyz", JsonPrimitive(Utils.locationToLong(machine.getMachineCore())))
-        locObj.add("world", JsonPrimitive(machine.getMachineCore().world.getUID().toString()))
+
+        locObj.add("xyz", JsonPrimitive(Utils.locationToLong(machine?.machineCore)))
+        locObj.add("world", JsonPrimitive(machine?.machineCore?.world?.uid.toString()))
         baseMachineSerialized.add("coreBlockLocation", locObj)
-        baseMachineSerialized.add("resourcesGained", context.serialize(machine.getResourcesGained(), object : TypeToken<HashMap<Material?, ItemStack?>?>() {}.type))
-        baseMachineSerialized.add("upgrades", context.serialize(machine.getUpgrades(), object : TypeToken<List<AbstractUpgrade?>?>() {}.type))
-        baseMachineSerialized.add("playersWithAccessPermission", context.serialize(machine.getPlayersWithAccessPermission(), object : TypeToken<Set<UUID?>?>() {}.type))
+        baseMachineSerialized.add("resourcesGained", context.serialize(machine?.resourcesGained, object : TypeToken<HashMap<Material?, ItemStack?>?>() {}.type))
+        baseMachineSerialized.add("upgrades", context.serialize(machine?.upgrades, object : TypeToken<List<AbstractUpgrade?>?>() {}.type))
+        baseMachineSerialized.add("playersWithAccessPermission", context.serialize(machine?.playersWithAccessPermission, object : TypeToken<Set<UUID?>?>() {}.type))
         return baseMachineSerialized
     }
 }

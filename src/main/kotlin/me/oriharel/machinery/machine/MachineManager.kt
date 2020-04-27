@@ -12,7 +12,6 @@ import me.oriharel.machinery.structure.Structure.PrintResult
 import me.oriharel.machinery.upgrades.LootBonusUpgrade
 import me.oriharel.machinery.upgrades.SpeedUpgrade
 import me.oriharel.machinery.utilities.Utils
-import org.apache.commons.lang.ArrayUtils
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -21,10 +20,8 @@ import org.bukkit.block.Block
 import org.bukkit.block.TileState
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.craftbukkit.libs.jline.internal.Nullable
-import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 import java.util.*
-import java.util.function.Function
 import kotlin.collections.ArrayList
 import kotlin.streams.toList
 
@@ -135,7 +132,9 @@ class MachineManager(private val machinery: Machinery) {
     private fun setPlayerMachineLocations(block: Block, locations: Array<Location?>?) {
         val tileState = block.state as TileState
         val persistentDataContainer = tileState.persistentDataContainer
-        val arr: Array<Long> = Arrays.stream(locations).map { return@map Utils::locationToLong }.toArray() as Array<Long>
+        val arr: Array<Long> = Array(locations?.size ?: 0) {
+            Utils.locationToLong(locations?.get(it))
+        }
 
         persistentDataContainer.set(machineLocationsNamespacedKey, PersistentDataType.LONG_ARRAY, arr.toLongArray())
         tileState.update()

@@ -29,28 +29,29 @@ open class MachineTypeAdapter<T : Machine?> //Preconditions.checkNotNull(factory
         val machineFuelDeficiency = machineJsonObject["fuelDeficiency"].asInt
         val machineType = MachineType.valueOf(machineJsonObject["type"].asString)
         val machineCoreBlockType = Material.getMaterial(machineJsonObject["coreBlockType"].asString)
-        val structure: Structure = Machinery.Companion.getInstance().getStructureManager().getSchematicByPath(machineJsonObject["structure"].asString)
+        val structure: Structure? = Machinery.instance?.structureManager?.getSchematicByPath(machineJsonObject["structure"].asString)
         val recipe = CustomCrafting.getRecipeHandler().getRecipe(recipeName)
-        if (factory == null) factory = Machinery.Companion.getInstance().getMachineManager().getMachineFactory()
+        if (factory == null) factory = Machinery.instance?.machineManager?.machineFactory
+
         return factory!!.createMachine(machineMaxFuel,
                 machineFuelDeficiency, machineType, structure, recipe, machineName, machineCoreBlockType) as T?
     }
 
     protected open fun getSerializedMachine(machine: T, context: JsonSerializationContext): JsonObject {
         val obj = JsonObject()
-        obj.add("name", JsonPrimitive(machine.getMachineName()))
-        obj.add("type", JsonPrimitive(machine.getType().toString()))
-        obj.add("structure", JsonPrimitive(getSchematicPath(machine.getStructure())))
-        obj.add("recipe", JsonPrimitive(machine.getRecipe().id))
-        obj.add("fuelDeficiency", JsonPrimitive(machine.getFuelDeficiency()))
-        obj.add("maxFuel", JsonPrimitive(machine.getMaxFuel()))
-        obj.add("coreBlockType", JsonPrimitive(machine.getMachineCoreBlockType().toString()))
+        obj.add("name", JsonPrimitive(machine?.machineName))
+        obj.add("type", JsonPrimitive(machine?.type?.toString()))
+        obj.add("structure", JsonPrimitive(getSchematicPath(machine?.structure)))
+        obj.add("recipe", JsonPrimitive(machine?.recipe?.id))
+        obj.add("fuelDeficiency", JsonPrimitive(machine?.fuelDeficiency))
+        obj.add("maxFuel", JsonPrimitive(machine?.maxFuel))
+        obj.add("coreBlockType", JsonPrimitive(machine?.machineCoreBlockType.toString()))
         return obj
     }
 
     private fun getSchematicPath(struct: Structure?): String {
         var schematic: String
-        val structure = struct.getSchematic()
+        val structure = struct?.schematic
         try {
             val a = structure!!.javaClass.getDeclaredField("schematic")
             a.isAccessible = true

@@ -14,7 +14,6 @@ import org.bukkit.event.player.PlayerInteractEvent
 import java.text.DecimalFormat
 
 class Interact(private val machinery: Machinery) : Listener {
-    private val decimalFormat: DecimalFormat
 
     @EventHandler(priority = EventPriority.HIGHEST)
     fun onPlayerInteract(e: PlayerInteractEvent) {
@@ -42,7 +41,4 @@ class Interact(private val machinery: Machinery) : Listener {
         }
     }
 
-    init {
-        decimalFormat = DecimalFormat("#.##")
-    }
 }

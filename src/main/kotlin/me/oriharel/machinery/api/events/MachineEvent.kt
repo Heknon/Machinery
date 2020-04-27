@@ -5,9 +5,7 @@ import org.bukkit.Location
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
 
-open class MachineEvent<T : Machine?>(machine: T?, buildLocation: Location) : Event() {
-    val machine: T
-    val buildLocation: Location
+open class MachineEvent<T : Machine?>(val machine: T, val buildLocation: Location) : Event() {
     override fun getHandlers(): HandlerList {
         return handlerList
     }
@@ -16,8 +14,4 @@ open class MachineEvent<T : Machine?>(machine: T?, buildLocation: Location) : Ev
         val handlerList = HandlerList()
     }
 
-    init {
-        this.machine = machine
-        this.buildLocation = buildLocation
-    }
 }

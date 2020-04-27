@@ -15,14 +15,12 @@ import java.util.*
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.Consumer
 
-class MachineResourceGetProcess(machine: PlayerMachine) {
-    var itemsGained: MutableList<ItemStack?>
+class MachineResourceGetProcess(var machine: PlayerMachine) {
+    var itemsGained: MutableList<ItemStack?> = ArrayList()
     private var zenCoinsGained: Long
-    var machine: PlayerMachine
-    var minePeriod: Int
+    var minePeriod: Int = 20
     private var process: BukkitRunnable?
-    var chanceables: RandomCollection<ChancableList<out ChanceableOperation<*, MachineResourceGetProcess?>?>?>?
-        private set
+    private var chanceables: RandomCollection<ChancableList<out ChanceableOperation<*, MachineResourceGetProcess?>?>?>?
     var lootAmplifier: Double
 
     /**
@@ -119,9 +117,6 @@ class MachineResourceGetProcess(machine: PlayerMachine) {
     }
 
     init {
-        itemsGained = ArrayList()
-        this.machine = machine
-        minePeriod = 20
         chanceables = null
         process = null
         lootAmplifier = 1.0

@@ -4,8 +4,8 @@ import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
 open class InventoryNavigationItem : InventoryItem {
-    protected var routeToName: String?
-    protected var parentInventory: Inventory
+    private var routeToName: String?
+    var parentInventory: Inventory
 
     constructor(routeToName: String?, parentInventory: Inventory, indexInInventory: Int, material: Material?, amount: Int, displayName: String?,
                 vararg lore: String?) : super(indexInInventory, material, amount, displayName, *lore) {

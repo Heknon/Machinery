@@ -18,9 +18,8 @@ class Listeners(private val machinery: Machinery) : Listener {
         for (item in inventory.inventoryItems!!) {
             if (item!!.indexInInventory == e.slot) {
                 if (item is InventoryNavigationItem) {
-                    val inventoryNavigationItem = item
-                    inventoryNavigationItem.runOnClick()
-                    inventoryNavigationItem.navigate()
+                    item.runOnClick()
+                    item.navigate()
                 } else {
                     item.runOnClick()
                 }
@@ -33,7 +32,7 @@ class Listeners(private val machinery: Machinery) : Listener {
         if (e.inventory.holder == null) return
         if (e.inventory.holder !is InventoryPage) return
         val inventory = e.inventory.holder as InventoryPage?
-        if (inventory!!.onClose != null) inventory.onClose!!.apply()
+        if (inventory!!.onClose != null) inventory.onClose!!()
     }
 
 }

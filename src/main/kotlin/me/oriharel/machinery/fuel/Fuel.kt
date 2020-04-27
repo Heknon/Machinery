@@ -14,6 +14,21 @@ class Fuel : ItemStack, Cloneable {
     var baseEnergy = 0
         private set
     private var lore: List<String>
+    var energy: Int
+        get() = baseEnergy * amount
+        /**
+         * sets the energy of a fuel.
+         * applies new lore to show the amount of energy the fuel has.
+         * sets a new NBT to hide away from the end user the amount of energy in the fuel and for easy access for the programmer
+         * @param value energy to set to
+         */
+        set(value) {
+            baseEnergy = value / amount
+            val meta = itemMeta
+            meta!!.lore = lore.stream().map { s: String -> Message(s, Placeholder("%amount%", baseEnergy)).appliedText }.collect(Collectors.toList())
+            itemMeta = meta
+            NMS.getItemStackUnhandledNBT(this)[ENERGY_NBT_KEY] = NBTTagInt.a(value)
+        }
 
     constructor(material: Material?, energy: Int, amount: Int, displayName: String, lore: List<String>) : super(material!!, amount) {
         baseEnergy = energy * amount
@@ -38,26 +53,8 @@ class Fuel : ItemStack, Cloneable {
         NMS.getItemStackUnhandledNBT(this)[FUEL_ITEM_NBT_IDENTIFIER] = NBTTagByte.a(true)
     }
 
-    fun getEnergy(): Int {
-        return baseEnergy * amount
-    }
-
-    /**
-     * sets the energy of a fuel.
-     * applies new lore to show the amount of energy the fuel has.
-     * sets a new NBT to hide away from the end user the amount of energy in the fuel and for easy access for the programmer
-     * @param energy energy to set to
-     */
-    fun setEnergy(energy: Int) {
-        baseEnergy = energy
-        val meta = itemMeta
-        meta!!.lore = lore.stream().map { s: String -> Message(s, Placeholder("%amount%", energy)).appliedText }.collect(Collectors.toList())
-        itemMeta = meta
-        NMS.getItemStackUnhandledNBT(this)[ENERGY_NBT_KEY] = NBTTagInt.a(energy)
-    }
-
     override fun clone(): Fuel {
-        val item: ItemStack = super.clone()
+        val item: ItemStack = super<ItemStack>.clone()
         item.amount = amount
         return Fuel(item, baseEnergy, lore)
     }

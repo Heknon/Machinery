@@ -33,7 +33,7 @@ class MachineCommand(private val machinery: Machinery) : BaseCommand() {
                 executor.sendMessage("§c§lAMount must be more than 0")
                 return
             }
-            val machineBlock = MachineItem(machineName.recipe, machineName, machinery.machineManager.machineFactory)
+            val machineBlock = MachineItem(machineName.recipe, machineName, machinery.machineManager?.machineFactory)
             val machineItem = machineBlock.itemStackWithAppliedPlaceholders
             machineItem!!.amount = amount
             if (!Utils.inventoryHasSpaceForItemAdd(playerToGiveTo.player.inventory)) {
@@ -48,7 +48,7 @@ class MachineCommand(private val machinery: Machinery) : BaseCommand() {
         @CommandPermission("machinery.give.fuel")
         fun onFuelGive(executor: CommandSender, playerToGiveTo: OnlinePlayer, amount: Int, energy: Int) {
             if (!fuelCommandBaseChecks(executor, energy, amount, playerToGiveTo.player)) return
-            playerToGiveTo.player.inventory.addItem(machinery.fuelManager.getFuel(amount, energy))
+            playerToGiveTo.player.inventory.addItem(machinery.fuelManager?.getFuel(amount, energy))
         }
 
         // /machinery give fuel playerName material amount energy
@@ -57,7 +57,7 @@ class MachineCommand(private val machinery: Machinery) : BaseCommand() {
         @CommandPermission("machinery.give.fuel")
         fun onFuelGive(executor: CommandSender, playerToGiveTo: OnlinePlayer, material: Material?, amount: Int, energy: Int) {
             if (!fuelCommandBaseChecks(executor, energy, amount, playerToGiveTo.player)) return
-            playerToGiveTo.player.inventory.addItem(machinery.fuelManager.getFuel(material, amount, energy))
+            playerToGiveTo.player.inventory.addItem(machinery.fuelManager?.getFuel(material, amount, energy))
         }
 
         /**

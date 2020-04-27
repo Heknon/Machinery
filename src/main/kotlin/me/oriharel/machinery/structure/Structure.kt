@@ -1,14 +1,11 @@
 package me.oriharel.machinery.structure
 
 import com.sun.istack.internal.NotNull
-import me.oriharel.machinery.utilities.CallbackP
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import schematics.Schematic
 import schematics.SchematicNotLoadedException
-import java.util.function.Consumer
-import java.util.function.Function
 
 /**
  * Used to abstract the logic of building a schematic.

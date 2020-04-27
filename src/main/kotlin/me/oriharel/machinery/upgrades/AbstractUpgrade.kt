@@ -12,15 +12,16 @@ import org.bukkit.configuration.file.YamlConfiguration
 abstract class AbstractUpgrade {
     var level: Int
         protected set
-    var isRunOnlyOnProcessStart = false
-        protected set
-    protected var configLoad: YamlConfiguration? = null
-    protected var maxLevel = -1
+    var isRunOnlyOnProcessStart: Boolean = false
+    var maxLevel: Int? = null
+        get() {
+            if (field == null) maxLevel = calculateMaxLevel()
+            return field
+        }
 
     constructor(level: Int) {
         this.level = level
         isRunOnlyOnProcessStart = false
-        configLoad = Machinery.Companion.getInstance().getFileManager().getConfig("upgrades.yml").get()
     }
 
     protected constructor() {
@@ -39,10 +40,6 @@ abstract class AbstractUpgrade {
     abstract fun applyUpgradeModifier(mineProcess: MachineResourceGetProcess)
     abstract val upgradeName: String
     abstract val costs: Map<Int, Int>?
-    fun getMaxLevel(): Int {
-        if (maxLevel == -1) maxLevel = calculateMaxLevel()
-        return maxLevel
-    }
 
     private fun calculateMaxLevel(): Int {
         var max = 1
@@ -53,9 +50,23 @@ abstract class AbstractUpgrade {
     }
 
     abstract val upgradeType: UpgradeType
+
     override fun toString(): String {
         return "AbstractUpgrade{" +
                 "level=" + level +
                 '}'
+    }
+
+    companion object {
+        private var configCache: YamlConfiguration? = null
+
+        val configLoad: YamlConfiguration?
+            get() {
+                if (configCache != null) {
+                    return configCache
+                }
+                configCache = Machinery.instance?.fileManager?.getConfig("upgrades.yml")?.get();
+                return configCache;
+            }
     }
 }

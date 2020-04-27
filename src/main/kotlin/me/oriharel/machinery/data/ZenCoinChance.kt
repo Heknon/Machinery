@@ -25,8 +25,8 @@ class ZenCoinChance(private val range: Range) : ChanceableOperation<Int, Machine
         return (range.random() * lootModifier).toInt()
     }
 
-    override fun executeChanceOperation(machineResourceGetProcess: MachineResourceGetProcess?, lootModifier: Double) {
-        machineResourceGetProcess?.addZenCoinsGained(getChanced(lootModifier)!!.toLong())
+    override fun executeChanceOperation(param1: MachineResourceGetProcess?, lootModifier: Double) {
+        param1?.addZenCoinsGained(getChanced(lootModifier)!!.toLong())
     }
 
 }

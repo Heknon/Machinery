@@ -13,7 +13,6 @@ enum class MachineType {
             FARMER -> "Farmer"
             ALL -> "All Miner"
         }
-        return "Miner"
     }
 
     companion object {

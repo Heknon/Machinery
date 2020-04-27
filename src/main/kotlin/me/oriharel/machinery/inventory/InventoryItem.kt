@@ -1,6 +1,5 @@
 package me.oriharel.machinery.inventory
 
-import me.oriharel.machinery.utilities.Callback
 import me.oriharel.machinery.utilities.NMS
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
@@ -8,7 +7,7 @@ import java.util.*
 
 open class InventoryItem : ItemStack {
     var indexInInventory: Int
-    protected var onClick: Callback? = null
+    private var onClick: (() -> Unit)? = null
 
     constructor(indexInInventory: Int, material: Material?, amount: Int, displayName: String?, vararg lore: String?) : super(material!!, amount) {
         val meta = NMS.getItemStackMetaReference(this)
@@ -29,11 +28,11 @@ open class InventoryItem : ItemStack {
 
     fun runOnClick(): InventoryItem {
         if (onClick == null) return this
-        onClick!!.apply()
+        onClick?.invoke()
         return this
     }
 
-    fun setOnClick(onClick: Callback?): InventoryItem {
+    fun setOnClick(onClick: (() -> Unit)): InventoryItem {
         this.onClick = onClick
         return this
     }

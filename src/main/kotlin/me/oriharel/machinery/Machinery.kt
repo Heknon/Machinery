@@ -90,12 +90,12 @@ class Machinery : JavaPlugin() {
      * @param response callback when users submits text
      * @param defaultLines  default text
      */
-    fun createSignInput(target: Player, response: BiPredicate<Player, Array<String>>?, vararg defaultLines: String?) {
+    fun createSignInput(target: Player, response: BiPredicate<Player, Array<String>>?, vararg defaultLines: String) {
         signMenuFactory
-                .newMenu(Lists.newArrayList(*defaultLines))
-                .reopenIfFail()
-                .response(response)
-                .open(target)
+                ?.newMenu(listOf(*defaultLines))
+                ?.reopenIfFail()
+                ?.response(response)
+                ?.open(target)
     }
 
     /**
@@ -120,7 +120,7 @@ class Machinery : JavaPlugin() {
         ) { c: BukkitCommandCompletionContext? -> machineManager!!.machines.stream().map { machine: Machine? -> machine?.machineName }.collect(Collectors.toList()) }
         commandManager!!.commandContexts.registerIssuerAwareContext(Machine::class.java) { c: BukkitCommandExecutionContext ->
             val machineName = c.lastArg ?: return@registerIssuerAwareContext null
-            machineManager!!.machines.stream().filter { machine: Machine? -> machine.getMachineName().equals(machineName, ignoreCase = true) }.findFirst().get()
+            machineManager!!.machines.stream().filter { machine: Machine? -> machine?.machineName.equals(machineName, ignoreCase = true) }.findFirst().get()
         }
         commandManager!!.registerCommand(MachineCommand(this))
     }

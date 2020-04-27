@@ -162,9 +162,9 @@ object Utils {
         placeholders.add(Placeholder("%machine_energy%", machine.energyInMachine))
         placeholders.add(Placeholder("%machine_max_fuel%", machine.maxFuel))
         placeholders.add(Placeholder("%machine_fuel_deficiency%", machine.fuelDeficiency))
-        placeholders.add(Placeholder("%machine_total_zen_coins_gained%", machine.totalZenCoinsGained as Int))
-        placeholders.add(Placeholder("%machine_zen_coins_gained%", machine.zenCoinsGained as Int))
-        placeholders.add(Placeholder("%machine_total_resources_gained%", machine.totalResourcesGained as Int))
+        placeholders.add(Placeholder("%machine_total_zen_coins_gained%", machine.totalZenCoinsGained.toInt()))
+        placeholders.add(Placeholder("%machine_zen_coins_gained%", machine.zenCoinsGained.toInt()))
+        placeholders.add(Placeholder("%machine_total_resources_gained%", machine.totalResourcesGained.toInt()))
         placeholders.add(Placeholder("%machine_resources_gained%", machine.resourcesGained?.values?.stream()?.mapToInt { obj: ItemStack? -> obj!!.amount }?.sum()))
         placeholders.add(Placeholder("%upgrade_loot_bonus_name%",
                 machine.upgrades?.stream()?.filter { u: AbstractUpgrade? -> u?.upgradeType == UpgradeType.LOOT_BONUS }?.findAny()?.get()?.upgradeName))

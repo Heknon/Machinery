@@ -11,8 +11,8 @@ class MaterialChance(private val materials: List<Pair<Material?, Range>>) : Chan
         return materials.stream().map { p: Pair<Material?, Range> -> ItemStack(p.first!!, (p.second.random() * lootModifier).toInt()) }.collect(Collectors.toList())
     }
 
-    override fun executeChanceOperation(machineResourceGetProcess: MachineResourceGetProcess?, lootModifier: Double) {
-        machineResourceGetProcess?.itemsGained?.addAll(getChanced(lootModifier))
+    override fun executeChanceOperation(param1: MachineResourceGetProcess?, lootModifier: Double) {
+        param1?.itemsGained?.addAll(getChanced(lootModifier))
     }
 
 }

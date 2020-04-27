@@ -3,7 +3,7 @@ package me.oriharel.machinery.data
 import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 
-class Range(val start: Int, val end: Int) {
+class Range(private val start: Int, private val end: Int) {
     fun random(): Int {
         return ThreadLocalRandom.current().nextInt(start, end + 1)
     }

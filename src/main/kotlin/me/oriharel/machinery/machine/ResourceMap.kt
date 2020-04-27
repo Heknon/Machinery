@@ -7,12 +7,12 @@ import org.bukkit.configuration.MemorySection
 import org.bukkit.configuration.file.YamlConfiguration
 import java.util.*
 
+/**
+ * initializes the resource map of a machine - where the weight chance of getting a certain item is
+ * @param machineName the name of the machine to get the resource map for
+ * @param configLoad the load of machines.yml
+ */
 class ResourceMap(machineName: String?, configLoad: YamlConfiguration?) : HashMap<Int?, ChancableList<out ChanceableOperation<*, MachineResourceGetProcess?>?>?>() {
-    /**
-     * initializes the resource map of a machine - where the weight chance of getting a certain item is
-     * @param machineName the name of the machine to get the resource map for
-     * @param configLoad the load of machines.yml
-     */
     init {
         val resourcesSection = configLoad!!.getConfigurationSection(machineName!!)!!.getConfigurationSection("resources")
         val serializedSection = resourcesSection!!.getValues(false)

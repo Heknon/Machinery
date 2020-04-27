@@ -2,6 +2,7 @@ package me.oriharel.machinery.message
 
 import me.oriharel.machinery.utilities.Utils
 
+
 class Placeholder {
     val placeholder: String
     val replacement: String?

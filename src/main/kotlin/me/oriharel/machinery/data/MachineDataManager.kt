@@ -1,7 +1,6 @@
 package me.oriharel.machinery.data
 
 import me.oriharel.machinery.Machinery
-import me.oriharel.machinery.utilities.Callback
 import me.oriharel.machinery.utilities.Utils
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -38,15 +37,14 @@ class MachineDataManager(private val machinery: Machinery) {
                     val position = buffer.getLong(i * 8)
                     if (position == 0L) continue
                     val loc = Utils.longToLocation(position, world)
-                    val block = loc!!.block
+                    val block = loc.block
                     try {
                         if (block.state !is TileState) throw ClassCastException()
                         val machine = machineManager!!.getPlayerMachineFromBlock(block) ?: throw ClassCastException()
                         machineManager.machineCores[loc] = machine
-                        var locations: Array<Location?>?
-                        locations = machineManager.getPlayerMachineLocations(block)
-                        Arrays.stream(locations).forEach(Consumer { l: Location -> l.world = world })
-                        machineManager.machinePartLocations.addAll(Arrays.asList(*locations))
+                        val locations: List<Location> = machineManager.getPlayerMachineLocations(block)
+                        locations.forEach(Consumer { l: Location -> l.world = world })
+                        machineManager.machinePartLocations.addAll(locations)
                         Bukkit.getScheduler().runTaskLater(machinery, Runnable { machine.minerProcess.startProcess() }, 40)
                     } catch (e: ClassCastException) {
                         locationsToRemove.add(position)
@@ -68,7 +66,7 @@ class MachineDataManager(private val machinery: Machinery) {
         } catch (ex: IOException) {
             if (ex is NoSuchFileException) {
                 machinery.server.logger.log(Level.INFO, "Couldn't find machines data 'machines.dat' for world " + world.name + ". creating...")
-                createFileIfNotExist(data, Callback { machinery.server.logger.log(Level.INFO, "Created machines.dat for world " + world.name) })
+                createFileIfNotExist(data) { machinery.server.logger.log(Level.INFO, "Created machines.dat for world " + world.name) }
                 return
             }
             ex.printStackTrace()
@@ -104,7 +102,7 @@ class MachineDataManager(private val machinery: Machinery) {
         }
     }
 
-    fun removeMachineCoreLocations(locations: Set<Long>, world: World) {
+    private fun removeMachineCoreLocations(locations: Set<Long>, world: World) {
         val file = world.worldFolder.toPath().resolve("machines.dat")
         try {
             val bytes = Files.readAllBytes(file)
@@ -144,7 +142,7 @@ class MachineDataManager(private val machinery: Machinery) {
 
     private fun saveMachinesDataToBlocks() {
         val machineManager = machinery.machineManager
-        for ((_, value) in machineManager.machineCores) {
+        for ((_, value) in machineManager?.machineCores!!) {
             machinery.updateMachineBlock(value, false)
         }
     }
@@ -167,11 +165,11 @@ class MachineDataManager(private val machinery: Machinery) {
         }
     }
 
-    private fun createFileIfNotExist(file: Path, ifSuccess: Callback) {
+    private fun createFileIfNotExist(file: Path, ifSuccess: () -> Unit) {
         if (!file.toFile().exists()) {
             try {
                 file.toFile().createNewFile()
-                ifSuccess.apply()
+                ifSuccess()
             } catch (e: IOException) {
                 e.printStackTrace()
             }

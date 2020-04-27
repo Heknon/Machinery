@@ -7,38 +7,33 @@ import org.bukkit.inventory.ItemStack
  * Requires an InventoryPage that implements DatablePage
  * @param <T> type of data
 </T> */
-class InventoryNavigationItemData<T> : InventoryNavigationItem, NavigableData<T> {
-    override var storedData: T
-        private set
-        public get() {
-            return field
-        }
-    set
-    private var routePage: NavigableDataInventoryPage<T>
+class InventoryNavigationItemData<S> : InventoryNavigationItem, NavigableData<S> {
+    override var storedData: S
+    private var routePage: NavigableDataInventoryPage<S>
 
-    constructor(routePage: NavigableDataInventoryPage<T>, parentInventory: Inventory, indexInInventory: Int, material: Material?, amount: Int, displayName: String?,
-                navigationData: T, vararg lore: String?) : super(null, parentInventory, indexInInventory, material, amount, displayName, *lore) {
+    constructor(routePage: NavigableDataInventoryPage<S>, parentInventory: Inventory, indexInInventory: Int, material: Material?, amount: Int, displayName: String?,
+                navigationData: S, vararg lore: String?) : super(null, parentInventory, indexInInventory, material, amount, displayName, *lore) {
         storedData = navigationData
         this.routePage = routePage
     }
 
-    constructor(routePage: NavigableDataInventoryPage<T>, parentInventory: Inventory, indexInInventory: Int, itemStack: ItemStack?, navigationData: T) : super(null, parentInventory, indexInInventory, itemStack) {
+    constructor(routePage: NavigableDataInventoryPage<S>, parentInventory: Inventory, indexInInventory: Int, itemStack: ItemStack?, navigationData: S) : super(null, parentInventory, indexInInventory, itemStack) {
         storedData = navigationData
         this.routePage = routePage
     }
 
-    constructor(routePage: NavigableDataInventoryPage<T>, parentInventory: Inventory, indexInInventory: Int, material: Material?, amount: Int, displayName: String?,
-                navigationData: T) : super(null, parentInventory, indexInInventory, material, amount, displayName) {
+    constructor(routePage: NavigableDataInventoryPage<S>, parentInventory: Inventory, indexInInventory: Int, material: Material?, amount: Int, displayName: String?,
+                navigationData: S) : super(null, parentInventory, indexInInventory, material, amount, displayName) {
         storedData = navigationData
         this.routePage = routePage
     }
 
-    override fun navigate(): InventoryNavigationItemData<T> {
+    override fun navigate(): InventoryNavigationItemData<S> {
         parentInventory.navigateDirect(routePage, storedData)
         return this
     }
 
-    override fun setStoredData(data: T): InventoryNavigationItemData<T> {
+    fun setStoredData(data: S): InventoryNavigationItemData<S> {
         storedData = data
         return this
     }

@@ -30,6 +30,7 @@ class Message : Text {
     }
 
     constructor(configName: String, configRoute: String, recipient: Player?, vararg placeholders: Placeholder) : super(handleConfigCache(configName, configRoute)) {
+        print(text)
         recipients = listOf(recipient)
         this.placeholders = mutableListOf(*placeholders)
     }
@@ -87,12 +88,12 @@ class Message : Text {
 
         private fun handleConfigCache(configName: String, routeName: String): String? {
             val configLoad: YamlConfiguration? = CONFIG_CACHE[configName]
-                    ?: CONFIG_CACHE.put(configName, Machinery.instance?.fileManager?.getConfig(configName)?.get())
+                    ?: CONFIG_CACHE.put(configName, Machinery.instance?.fileManager?.getConfig(configName)?.get()).let { CONFIG_CACHE[configName] }
             val cacheKey = "$configName|$routeName"
 
             return CONFIG_MESSAGE_CACHE[cacheKey] ?: CONFIG_MESSAGE_CACHE.getOrPut(cacheKey, {
                 configLoad?.getString(routeName)
-            })
+            }).let { CONFIG_MESSAGE_CACHE[cacheKey] }
         }
     }
 }

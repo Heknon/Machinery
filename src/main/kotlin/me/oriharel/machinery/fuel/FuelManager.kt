@@ -6,7 +6,7 @@ import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
 class FuelManager(private val machinery: Machinery) {
-    private val gson: Gson
+    private val gson: Gson = Gson()
     private val defaultType: Material?
     private val defaultLore: List<String>
     private val defaultDisplayName: String
@@ -27,8 +27,7 @@ class FuelManager(private val machinery: Machinery) {
     }
 
     init {
-        gson = Gson()
-        val configLoad = machinery.fileManager.getConfig("fuel.yml").get()
+        val configLoad = machinery.fileManager?.getConfig("fuel.yml")?.get()
         defaultType = Material.getMaterial(configLoad!!.getString("default_fuel_type")!!)
         defaultLore = configLoad.getStringList("default_lore")
         defaultDisplayName = configLoad.getString("default_display_name")!!

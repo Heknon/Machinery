@@ -1,19 +1,18 @@
 package me.oriharel.machinery.structure
 
 import me.oriharel.machinery.Machinery
-import me.oriharel.machinery.utilities.Callback
 import org.bukkit.Bukkit
+import org.bukkit.configuration.file.YamlConfiguration
 import schematics.Schematic
 import java.io.File
 import java.util.*
-import java.util.function.Consumer
 
 /**
  * used to register all structures found in machines.yml
  */
 class StructureManager(private val machinery: Machinery) {
-    private val structures: HashMap<String, Structure?>
-    private val callbacksOnDone: MutableList<Callback>
+    private val structures: HashMap<String, Structure?> = HashMap()
+    private val callbacksOnDone: MutableList<() -> Unit>
 
     /**
      * Get a schematic by it's path in jar
@@ -35,13 +34,20 @@ class StructureManager(private val machinery: Machinery) {
     }
 
     private fun registerSchematics() {
-        val configLoad = machinery.fileManager.getConfig("machines.yml").get()
-        val keys = configLoad!!.getKeys(false)
+        val configLoad: YamlConfiguration? = machinery.fileManager?.getConfig("machines.yml")?.get()
+        val keys = configLoad?.getKeys(false)
         Bukkit.getScheduler().runTaskAsynchronously(machinery, Runnable {
-            for (key in keys) {
-                registerSchematic(key)
+            if (keys != null) {
+                for (key in keys) {
+                    registerSchematic(key)
+                }
             }
-            Bukkit.getScheduler().runTask(machinery, Runnable { callbacksOnDone.forEach(Consumer { obj: Callback -> obj.apply() }) })
+
+            Bukkit.getScheduler().runTask(machinery, Runnable {
+                for (callback in callbacksOnDone) {
+                    callback()
+                }
+            })
         })
     }
 
@@ -50,7 +56,6 @@ class StructureManager(private val machinery: Machinery) {
     }
 
     init {
-        structures = HashMap()
         callbacksOnDone = ArrayList()
         Bukkit.getScheduler().runTaskAsynchronously(machinery, Runnable { registerSchematics() })
     }

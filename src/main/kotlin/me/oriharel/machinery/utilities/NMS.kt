@@ -32,36 +32,51 @@ object NMS {
      * @return NBTBase
      */
     private fun nbtFromMapHelper(value: Any): NBTBase? {
-        if (value is Map<*, *>) {
-            return nbtFromMap(value as Map<String?, Any>)
-        } else if (value is List<*>) {
-            val nbtTagList = NBTTagList()
-            for (o in value) {
-                nbtTagList.add(nbtFromMapHelper(o))
+        when (value) {
+            is Map<*, *> -> {
+                return nbtFromMap(value as Map<String?, Any>)
             }
-            return nbtTagList
-        } else if (value is String) {
-            return NBTTagString.a(value.replace("Â§", "§"))
-        } else if (value is Int) {
-            return NBTTagInt.a(value)
-        } else if (value is Byte) {
-            return NBTTagByte.a(value)
-        } else if (value is ByteArray) {
-            return NBTTagByteArray(value)
-        } else if (value is Boolean) {
-            return NBTTagByte.a(value)
-        } else if (value is Double) {
-            return NBTTagDouble.a(value)
-        } else if (value is Float) {
-            return NBTTagFloat.a(value)
-        } else if (value is IntArray) {
-            return NBTTagIntArray(value)
-        } else if (value is Long) {
-            return NBTTagLong.a(value)
-        } else if (value is Short) {
-            return NBTTagShort.a(value)
+            is List<*> -> {
+                val nbtTagList = NBTTagList()
+
+                for (o in value) {
+                    if (o == null) continue
+                    nbtTagList.add(nbtFromMapHelper(o))
+                }
+                return nbtTagList
+            }
+            is String -> {
+                return NBTTagString.a(value.replace("Â§", "§"))
+            }
+            is Int -> {
+                return NBTTagInt.a(value)
+            }
+            is Byte -> {
+                return NBTTagByte.a(value)
+            }
+            is ByteArray -> {
+                return NBTTagByteArray(value)
+            }
+            is Boolean -> {
+                return NBTTagByte.a(value)
+            }
+            is Double -> {
+                return NBTTagDouble.a(value)
+            }
+            is Float -> {
+                return NBTTagFloat.a(value)
+            }
+            is IntArray -> {
+                return NBTTagIntArray(value)
+            }
+            is Long -> {
+                return NBTTagLong.a(value)
+            }
+            is Short -> {
+                return NBTTagShort.a(value)
+            }
+            else -> return null
         }
-        return null
     }
 
     /**

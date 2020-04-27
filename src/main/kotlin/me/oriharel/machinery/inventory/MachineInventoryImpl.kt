@@ -8,7 +8,6 @@ import me.oriharel.machinery.machine.PlayerMachine
 import me.oriharel.machinery.message.Message
 import me.oriharel.machinery.message.Placeholder
 import me.oriharel.machinery.upgrades.AbstractUpgrade
-import me.oriharel.machinery.utilities.BiSupplier
 import me.oriharel.machinery.utilities.Utils
 import me.swanis.mobcoins.MobCoinsAPI
 import me.swanis.mobcoins.profile.Profile
@@ -21,9 +20,11 @@ import org.bukkit.inventory.ItemStack
 import java.text.DecimalFormat
 import java.util.*
 import java.util.function.BiPredicate
-import java.util.function.Consumer
 import java.util.stream.Collectors
 import java.util.stream.IntStream
+import kotlin.math.ceil
+import kotlin.math.max
+import kotlin.math.min
 
 class MachineInventoryImpl(private val machine: PlayerMachine, private val p: Player, private val machinery: Machinery) {
     private val decimalFormat: DecimalFormat
@@ -37,7 +38,7 @@ class MachineInventoryImpl(private val machine: PlayerMachine, private val p: Pl
     private fun craftInventory() {
 
         // filter list to remove 0 amounts
-        val resources: List<ItemStack> = ArrayList(machine.resourcesGained.values).stream().filter { `is`: ItemStack? -> `is`!!.amount != 0 }.collect(Collectors.toList())
+        val resources: List<ItemStack?> = machine.resourcesGained?.values?.filter { itemStack ->  itemStack?.amount != 0 }?.toList()!!
         routes["start"] = craftMainMenuPage(resources)
         routes["resources"] = craftResourcesPage(resources)
         routes["fuels"] = craftFuelsPage()
@@ -46,7 +47,7 @@ class MachineInventoryImpl(private val machine: PlayerMachine, private val p: Pl
         routes["upgradeVerification"] = craftUpgradeVerificationPage()
     }
 
-    private fun craftMainMenuPage(resources: List<ItemStack>): InventoryPage {
+    private fun craftMainMenuPage(resources: List<ItemStack?>): InventoryPage {
         return InventoryPage(54, machine.type.toTitle(), defaultFillment, Sets.newHashSet(
                 InventoryItem(
                         20,
@@ -64,7 +65,7 @@ class MachineInventoryImpl(private val machine: PlayerMachine, private val p: Pl
                         1,
                         "Storage",
                         "§9Click to open open the storage of the machine",
-                        "§bThere are currently §e" + decimalFormat.format(resources.stream().mapToInt { obj: ItemStack -> obj.amount }.sum().toLong()) + " §bresources stored in the " +
+                        "§bThere are currently §e" + decimalFormat.format(resources.stream().mapToInt { itemStack: ItemStack? -> itemStack!!.amount }.sum().toLong()) + " §bresources stored in the " +
                                 "machine"),
                 InventoryItem(
                         45,
@@ -103,12 +104,12 @@ class MachineInventoryImpl(private val machine: PlayerMachine, private val p: Pl
         ), machine)
     }
 
-    private fun craftResourcesPage(resources: List<ItemStack>): InventoryPage {
-        val closestMultipleTo9 = Math.max((Math.ceil(resources.size / 9.0) * 9).toInt(), 9)
-        return InventoryPage(Math.min(closestMultipleTo9, 54), "Resources", null,
+    private fun craftResourcesPage(resources: List<ItemStack?>): InventoryPage {
+        val closestMultipleTo9 = max((ceil(resources.size / 9.0) * 9).toInt(), 9)
+        return InventoryPage(min(closestMultipleTo9, 54), "Resources", null,
                 IntStream.range(0, resources.size).mapToObj { i: Int ->
                     val resource = resources[i]
-                    val itemStack = resource.clone()
+                    val itemStack = resource!!.clone()
                     itemStack.amount = 1
                     val meta = itemStack.itemMeta
                     meta!!.lore = Arrays.asList("§d§lThere are currently", "§e§l" + decimalFormat.format(resource.amount.toLong()) + " §d§lof this item stored.")
@@ -147,7 +148,7 @@ class MachineInventoryImpl(private val machine: PlayerMachine, private val p: Pl
         val upgradeFillment: InventoryItem = InventoryFillmentItem(Material.RED_STAINED_GLASS_PANE, 1, ChatColor.RED.toString() + "BLOCKED", "§cPurchase previous upgrade(s).")
         for (upgradeNumber in upgrades!!.indices) {
             val upgrade = upgrades[upgradeNumber]
-            for (upgradeLevel in 1..upgrade.level) {
+            for (upgradeLevel in 1..upgrade!!.level) {
                 val upgradeItem = ItemStack(Material.LIME_STAINED_GLASS_PANE, upgradeLevel)
                 val meta = upgradeItem.itemMeta
                 meta!!.setDisplayName(ChatColor.DARK_AQUA.toString() + upgrade.upgradeName + " " + ChatColor.GREEN + "(" + upgrade.level + ")")
@@ -155,6 +156,7 @@ class MachineInventoryImpl(private val machine: PlayerMachine, private val p: Pl
                 upgradeItem.itemMeta = meta
                 upgradeItems.add(InventoryItem(upgradeNumber * 9 + (upgradeLevel - 1), upgradeItem))
             }
+
             val nextUpgradeItem = ItemStack(Material.GREEN_STAINED_GLASS_PANE, upgrade.level + 1)
             val meta = nextUpgradeItem.itemMeta
             meta!!.setDisplayName(ChatColor.DARK_AQUA.toString() + upgrade.upgradeName + " " + ChatColor.GREEN + "(" + (upgrade.level + 1) + ")")
@@ -163,7 +165,7 @@ class MachineInventoryImpl(private val machine: PlayerMachine, private val p: Pl
             upgradeItems.add(InventoryNavigationItemData(craftUpgradeVerificationPage(), parentInventory, upgradeNumber * 9 + upgrade.level, nextUpgradeItem,
                     upgrade))
         }
-        return InventoryPage(machine.upgrades.size * 9, "Upgrades", upgradeFillment, upgradeItems, machine)
+        return InventoryPage((machine.upgrades?.size ?: 1) * 9, "Upgrades", upgradeFillment, upgradeItems, machine)
     }
 
     private fun craftUpgradeVerificationPage(): NavigableDataInventoryPage<AbstractUpgrade?> {
@@ -173,51 +175,8 @@ class MachineInventoryImpl(private val machine: PlayerMachine, private val p: Pl
                 defaultFillment,
                 null,
                 machine,
-                BiSupplier<AbstractUpgrade, NavigableDataPage<AbstractUpgrade>> { upgrade: AbstractUpgrade, navigableDataPage: NavigableDataPage<AbstractUpgrade?> ->
-                    val inventoryPage = navigableDataPage as NavigableDataInventoryPage<AbstractUpgrade?>
-                    val costs = upgrade.costs
-                    val upgradeCost = costs!![upgrade.level + 1]!!
-                    val downgradeCost = upgrade.costs.getOrDefault(upgrade.level - 1, -1)
-                    inventoryPage.setInventoryItems(Sets.newHashSet(
-                            InventoryItem(2, Material.LIME_STAINED_GLASS_PANE, 1, "§6DOWNGRADE",
-                                    if (downgradeCost == -1) "§bCANNOT DOWNGRADE" else "§bDowngrade to level §e" + (upgrade.level - 1),
-                                    if (downgradeCost == -1) "" else "§bCost: §e" + decimalFormat.format(downgradeCost.toLong()) + " Zen Coins").setOnClick {
-                                if (downgradeCost == -1) {
-                                    Message("messages.yml", "cannot_downgrade", p, Utils.getLocationPlaceholders(machine.machineCore,
-                                            Utils.getMachinePlaceholders(machine))).send()
-                                    return@setOnClick
-                                }
-                                depositZenCoinsIntoProfile(downgradeCost)
-                                upgrade.downgrade()
-                                machine.minerProcess.applyUpgradeModifiers()
-                                p.closeInventory()
-                                Message("messages.yml", "on_downgrade", p, Utils.getLocationPlaceholders(machine.machineCore,
-                                        Utils.getMachinePlaceholders(machine, Placeholder("%amount%", downgradeCost)))).send()
-                                machinery.machineManager.setPlayerMachineBlock(machine.machineCore.block, machine)
-                            },
-                            InventoryItem(4, Material.RED_STAINED_GLASS_PANE, 1, "§cCANCEL").setOnClick { p.closeInventory() },
-                            InventoryItem(6, Material.LIME_STAINED_GLASS_PANE, 1, "§6UPGRADE", "§bUpgrade to level §e" + (upgrade.level + 1),
-                                    "§bCost: §e" + decimalFormat.format(upgradeCost.toLong()) + " Zen Coins").setOnClick {
-                                val mobCoinsOfUser = mobCoinsProfile.mobCoins
-                                if (upgrade.level == upgrade.maxLevel) {
-                                    Message("messages.yml", "reached_max_upgrade_level", p, Utils.getLocationPlaceholders(machine.machineCore,
-                                            Utils.getMachinePlaceholders(machine))).send()
-                                    return@setOnClick
-                                } else if (upgradeCost > mobCoinsOfUser) {
-                                    Message("messages.yml", "insufficient_funds_for_upgrade", p, Utils.getLocationPlaceholders(machine.machineCore,
-                                            Utils.getMachinePlaceholders(machine, Utils.getAmountThingPlaceholder(upgradeCost - mobCoinsOfUser, "Zen Coins")))).send()
-                                    return@setOnClick
-                                }
-                                withdrawZenCoinsFromProfile(upgradeCost)
-                                upgrade.upgrade()
-                                machine.minerProcess.applyUpgradeModifiers()
-                                p.closeInventory()
-                                Message("messages.yml", "on_upgrade", p, Utils.getLocationPlaceholders(machine.machineCore,
-                                        Utils.getMachinePlaceholders(machine, Placeholder("%amount%", upgradeCost)))).send()
-                                machinery.updateMachineBlock(machine, true)
-                            }
-                    ))
-                })
+                this::upgradeInventory
+        )
     }
 
     private fun handleFuelWithdrawSign(p: Player, lines: Array<String>): Boolean {
@@ -227,15 +186,15 @@ class MachineInventoryImpl(private val machine: PlayerMachine, private val p: Pl
                         Utils.getMachinePlaceholders(machine, Placeholder("%amount%", energyInMachine)))), false)
         if (amountToWithdraw == -1) return false
         if (amountToWithdraw == 0) {
-            getPlayerFuelsInInventory(p.inventory).forEach(Consumer { f: Pair<Int?, Fuel?> ->
-                if (f.second!!.energy != 0) return@forEach
+            for (f in getPlayerFuelsInInventory(p.inventory)) {
+                if (f.second!!.energy != 0) continue
                 f.second!!.amount = 0
                 p.inventory.setItem(f.first!!, f.second)
-            })
+            }
             return true
         }
         machine.removeEnergy(amountToWithdraw)
-        Utils.giveItemOrDrop(p, machinery.fuelManager.getFuel(1, amountToWithdraw), false)
+        Utils.giveItemOrDrop(p, machinery.fuelManager?.getFuel(1, amountToWithdraw), false)
         machinery.updateMachineBlock(machine, true)
         return true
     }
@@ -246,19 +205,19 @@ class MachineInventoryImpl(private val machine: PlayerMachine, private val p: Pl
         val amountToDeposit = validateAndGetNumber(lines, maxDeposit, "Fuel", Message("messages.yml", "sign_input.entered_above_max_fuel_deposit_limit", p,
                 Utils.getLocationPlaceholders(machine.machineCore,
                         Utils.getMachinePlaceholders(machine, Placeholder("%amount%", maxDeposit)))), false)
+
         if (amountToDeposit == -1) return false
         if (amountToDeposit == 0) {
-            getPlayerFuelsInInventory(p.inventory).forEach(Consumer { f: Pair<Int?, Fuel?> ->
-                if (f.second!!.energy != 0) return@forEach
+            for (f in getPlayerFuelsInInventory(p.inventory)) {
+                if (f.second!!.energy != 0) continue
                 f.second!!.amount = 0
                 p.inventory.setItem(f.first!!, f.second)
-            })
+            }
             return true
         }
         val inventory: org.bukkit.inventory.Inventory = p.inventory
-        val fuelsOnPlayer: List<Pair<Int, Fuel>> = getPlayerFuelsInInventory(p.inventory).stream().sorted(Comparator.comparingInt { pair: Pair<Int?, Fuel> -> pair.second.energy }
-                .reversed()).collect(Collectors.toList())
-        val fuelEnergyInInventory = fuelsOnPlayer.stream().mapToInt { pair: Pair<Int, Fuel> -> pair.second.energy }.sum()
+        val fuelsOnPlayer: List<Pair<Int?, Fuel?>> = getPlayerFuelsInInventory(p.inventory).sortedByDescending { t -> t.second!!.energy }
+        val fuelEnergyInInventory = fuelsOnPlayer.stream().mapToInt { pair -> pair.second?.energy!! }.sum()
         if (fuelEnergyInInventory < amountToDeposit) {
             Message("messages.yml", "sign_input.not_enough_fuel_in_inventory", p, Utils.getLocationPlaceholders(machine.machineCore,
                     Utils.getMachinePlaceholders(machine, Utils.getAmountThingPlaceholder(amountToDeposit, "Fuel Energy")))).send()
@@ -266,11 +225,12 @@ class MachineInventoryImpl(private val machine: PlayerMachine, private val p: Pl
         }
         var energyLeftToDeposit = amountToDeposit
         for (playerFuelPair in fuelsOnPlayer) {
-            val fuel = playerFuelPair.second
-            val indexInInventory = playerFuelPair.first
+            val fuel: Fuel = playerFuelPair.second!!
+            val indexInInventory: Int = playerFuelPair.first!!
             val fuelEnergy = fuel.energy
-            val maxEnergyCanDespositFromFuel = Math.min(fuelEnergy, energyLeftToDeposit)
+            val maxEnergyCanDespositFromFuel = min(fuelEnergy, energyLeftToDeposit)
             val fuelsToDeposit = maxEnergyCanDespositFromFuel / fuel.baseEnergy
+
             fuel.amount = fuel.amount - fuelsToDeposit
             fuel.energy = fuelEnergy - maxEnergyCanDespositFromFuel
             inventory.setItem(indexInInventory, fuel)
@@ -359,6 +319,52 @@ class MachineInventoryImpl(private val machine: PlayerMachine, private val p: Pl
             fuels.add(Pair.of(i, fuelManager!!.getFuel(item)))
         }
         return fuels
+    }
+
+    private fun upgradeInventory(upgrade: AbstractUpgrade?, navigableDataPage: NavigableDataPage<AbstractUpgrade?>) {
+        val inventoryPage = navigableDataPage as NavigableDataInventoryPage<AbstractUpgrade>
+        val costs = upgrade!!.costs
+        val upgradeCost = costs!!.getValue(upgrade.level + 1)
+        val downgradeCost = upgrade.costs?.getOrDefault(upgrade.level - 1, -1)!!
+        inventoryPage.setInventoryItems(Sets.newHashSet(
+                InventoryItem(2, Material.LIME_STAINED_GLASS_PANE, 1, "§6DOWNGRADE",
+                        if (downgradeCost == -1) "§bCANNOT DOWNGRADE" else "§bDowngrade to level §e" + (upgrade.level - 1),
+                        if (downgradeCost == -1) "" else "§bCost: §e" + decimalFormat.format(downgradeCost.toLong()) + " Zen Coins").setOnClick {
+                    if (downgradeCost == -1) {
+                        Message("messages.yml", "cannot_downgrade", p, Utils.getLocationPlaceholders(machine.machineCore,
+                                Utils.getMachinePlaceholders(machine))).send()
+                        return@setOnClick
+                    }
+                    depositZenCoinsIntoProfile(downgradeCost)
+                    upgrade.downgrade()
+                    machine.minerProcess.applyUpgradeModifiers()
+                    p.closeInventory()
+                    Message("messages.yml", "on_downgrade", p, Utils.getLocationPlaceholders(machine.machineCore,
+                            Utils.getMachinePlaceholders(machine, Placeholder("%amount%", downgradeCost)))).send()
+                    machinery.machineManager?.setPlayerMachineBlock(machine.machineCore?.block!!, machine)
+                },
+                InventoryItem(4, Material.RED_STAINED_GLASS_PANE, 1, "§cCANCEL").setOnClick { p.closeInventory() },
+                InventoryItem(6, Material.LIME_STAINED_GLASS_PANE, 1, "§6UPGRADE", "§bUpgrade to level §e" + (upgrade.level + 1),
+                        "§bCost: §e" + decimalFormat.format(upgradeCost.toLong()) + " Zen Coins").setOnClick {
+                    val mobCoinsOfUser = mobCoinsProfile.mobCoins
+                    if (upgrade.level == upgrade.maxLevel) {
+                        Message("messages.yml", "reached_max_upgrade_level", p, Utils.getLocationPlaceholders(machine.machineCore,
+                                Utils.getMachinePlaceholders(machine))).send()
+                        return@setOnClick
+                    } else if (upgradeCost > mobCoinsOfUser) {
+                        Message("messages.yml", "insufficient_funds_for_upgrade", p, Utils.getLocationPlaceholders(machine.machineCore,
+                                Utils.getMachinePlaceholders(machine, Utils.getAmountThingPlaceholder(upgradeCost - mobCoinsOfUser, "Zen Coins")))).send()
+                        return@setOnClick
+                    }
+                    withdrawZenCoinsFromProfile(upgradeCost)
+                    upgrade.upgrade()
+                    machine.minerProcess.applyUpgradeModifiers()
+                    p.closeInventory()
+                    Message("messages.yml", "on_upgrade", p, Utils.getLocationPlaceholders(machine.machineCore,
+                            Utils.getMachinePlaceholders(machine, Placeholder("%amount%", upgradeCost)))).send()
+                    machinery.updateMachineBlock(machine, true)
+                }
+        ))
     }
 
     private fun depositZenCoinsIntoProfile(amount: Int) {
