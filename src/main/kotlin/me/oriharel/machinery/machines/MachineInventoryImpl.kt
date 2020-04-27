@@ -39,7 +39,7 @@ class MachineInventoryImpl(private val machine: PlayerMachine, private val p: Pl
     private fun craftInventory() {
 
         // filter list to remove 0 amounts
-        val resources: List<ItemStack?> = machine.resourcesGained?.values?.filter { itemStack ->  itemStack?.amount != 0 }?.toList()!!
+        val resources: List<ItemStack?> = machine.resourcesGained?.values?.filter { itemStack -> itemStack?.amount != 0 }?.toList()!!
         routes["start"] = craftMainMenuPage(resources)
         routes["resources"] = craftResourcesPage(resources)
         routes["fuels"] = craftFuelsPage()

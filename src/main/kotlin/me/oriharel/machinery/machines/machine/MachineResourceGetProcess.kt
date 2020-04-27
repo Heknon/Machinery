@@ -1,9 +1,9 @@
 package me.oriharel.machinery.machines.machine
 
 import me.oriharel.machinery.Machinery
-import me.oriharel.machinery.resources.chance.ChancableList
 import me.oriharel.machinery.message.ChanceableOperation
 import me.oriharel.machinery.message.Message
+import me.oriharel.machinery.resources.chance.ChancableList
 import me.oriharel.machinery.upgrades.AbstractUpgrade
 import me.oriharel.machinery.utilities.RandomCollection
 import me.oriharel.machinery.utilities.Utils

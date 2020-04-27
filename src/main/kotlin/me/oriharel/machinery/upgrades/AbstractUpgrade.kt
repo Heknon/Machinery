@@ -57,8 +57,8 @@ abstract class AbstractUpgrade(currentLevel: Int) {
                 if (configCache != null) {
                     return configCache
                 }
-                configCache = Machinery.instance?.fileManager?.getConfig("upgrades.yml")?.get();
-                return configCache;
+                configCache = Machinery.instance?.fileManager?.getConfig("upgrades.yml")?.get()
+                return configCache
             }
     }
 }

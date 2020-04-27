@@ -3,8 +3,8 @@ package me.oriharel.machinery.machines.items
 import com.google.gson.Gson
 import me.oriharel.machinery.Machinery
 import me.oriharel.machinery.exceptions.MachineNotFoundException
-import me.oriharel.machinery.machines.machine.Machine
 import me.oriharel.machinery.machines.MachineFactory
+import me.oriharel.machinery.machines.machine.Machine
 import me.oriharel.machinery.machines.machine.PlayerMachine
 import me.oriharel.machinery.utilities.NMS
 import me.oriharel.machinery.utilities.Utils

@@ -2,13 +2,16 @@ package me.oriharel.machinery.utilities
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import me.oriharel.machinery.machines.machine.Machine
 import me.oriharel.machinery.machines.MachineFactory
+import me.oriharel.machinery.machines.machine.Machine
 import me.oriharel.machinery.machines.machine.PlayerMachine
 import me.oriharel.machinery.machines.serializers.MachineTypeAdapter
 import me.oriharel.machinery.machines.serializers.PlayerMachineTypeAdapter
 import me.oriharel.machinery.message.Placeholder
-import me.oriharel.machinery.serialization.*
+import me.oriharel.machinery.serialization.AbstractUpgradeTypeAdapter
+import me.oriharel.machinery.serialization.LocationTypeAdapter
+import me.oriharel.machinery.serialization.NBTTagCompoundTypeAdapter
+import me.oriharel.machinery.serialization.UUIDTypeAdapter
 import me.oriharel.machinery.upgrades.AbstractUpgrade
 import me.oriharel.machinery.upgrades.UpgradeType
 import net.minecraft.server.v1_15_R1.NBTTagCompound

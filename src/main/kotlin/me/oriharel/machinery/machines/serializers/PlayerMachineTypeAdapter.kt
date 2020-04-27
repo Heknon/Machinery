@@ -2,8 +2,8 @@ package me.oriharel.machinery.machines.serializers
 
 import com.google.gson.*
 import com.google.gson.reflect.TypeToken
-import me.oriharel.machinery.machines.machine.Machine
 import me.oriharel.machinery.machines.MachineFactory
+import me.oriharel.machinery.machines.machine.Machine
 import me.oriharel.machinery.machines.machine.PlayerMachine
 import me.oriharel.machinery.upgrades.AbstractUpgrade
 import me.oriharel.machinery.utilities.Utils

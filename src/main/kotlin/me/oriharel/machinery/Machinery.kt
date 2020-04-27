@@ -4,13 +4,13 @@ import co.aikar.commands.BukkitCommandCompletionContext
 import co.aikar.commands.BukkitCommandExecutionContext
 import co.aikar.commands.BukkitCommandManager
 import me.oriharel.machinery.commands.MachineCommand
-import me.oriharel.machinery.machines.MachineDataManager
 import me.oriharel.machinery.fuel.FuelManager
 import me.oriharel.machinery.inventory.Listeners
+import me.oriharel.machinery.machines.MachineDataManager
+import me.oriharel.machinery.machines.MachineManager
 import me.oriharel.machinery.machines.listeners.Block
 import me.oriharel.machinery.machines.listeners.Interact
 import me.oriharel.machinery.machines.machine.Machine
-import me.oriharel.machinery.machines.MachineManager
 import me.oriharel.machinery.machines.machine.PlayerMachine
 import me.oriharel.machinery.structure.StructureManager
 import me.oriharel.machinery.utilities.SignMenuFactory

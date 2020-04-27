@@ -1,7 +1,7 @@
 package me.oriharel.machinery.resources.chance
 
-import me.oriharel.machinery.message.ChanceableOperation
 import me.oriharel.machinery.machines.machine.MachineResourceGetProcess
+import me.oriharel.machinery.message.ChanceableOperation
 import java.util.*
 
 class ChancableList<T : ChanceableOperation<*, MachineResourceGetProcess?>?> : ArrayList<T>(), ChanceableOperation<T, MachineResourceGetProcess> {

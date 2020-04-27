@@ -17,7 +17,6 @@ class NavigableDataInventoryPage<T> : InventoryPage, NavigableDataPage<T?> {
     }
 
 
-
     override var injector: (T?, NavigableDataPage<T?>) -> Unit
     override var storedData: T?
 }
