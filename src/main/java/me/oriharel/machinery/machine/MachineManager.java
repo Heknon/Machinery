@@ -28,9 +28,9 @@ public class MachineManager {
     private final Machinery machinery;
     private MachineFactory machineFactory;
     private List<Machine> machines;
-    private HashMap<Location, PlayerMachine> machineCores;
-    private HashSet<Location> machinePartLocations;
-    private HashSet<Location> temporaryPreRegisterMachineLocations;
+    private Map<Location, PlayerMachine> machineCores;
+    private Set<Location> machinePartLocations;
+    private Set<Location> temporaryPreRegisterMachineLocations;
     private PlayerMachinePersistentDataType MACHINE_PERSISTENT_DATA_TYPE;
     private NamespacedKey MACHINE_NAMESPACE_KEY;
     private NamespacedKey MACHINE_LOCATIONS_NAMESPACE_KEY;
@@ -103,7 +103,7 @@ public class MachineManager {
         machinery.getMachineDataManager().removeMachineCoreLocation(machine.getMachineCore());
     }
 
-    public HashMap<Location, PlayerMachine> getMachineCores() {
+    public Map<Location, PlayerMachine> getMachineCores() {
         return machineCores;
     }
 
@@ -197,7 +197,7 @@ public class MachineManager {
                             pMachine.getEnergyInMachine(), pMachine.getZenCoinsGained(), pMachine.getTotalZenCoinsGained(), pMachine.getOwner(), pMachine.getUpgrades(),
                             pMachine.getResourcesGained(), pMachine.getPlayersWithAccessPermission());
                 } else {
-                    machineToRegister = Machinery.getInstance().getMachineManager().getMachineFactory().createMachine(machine,
+                    machineToRegister = machineFactory.createMachine(machine,
                             printResult.getOpenGUIBlockLocation(), 0, 0, 0, 0, playerUuid, Arrays.asList(
                                     new LootBonusUpgrade(1),
                                     new SpeedUpgrade(1)
@@ -206,12 +206,13 @@ public class MachineManager {
                 registerNewPlayerMachine(machineToRegister, new HashSet<>(printResult.getPlacementLocations()));
                 PostMachineBuildEvent postMachineBuildEvent = new PostMachineBuildEvent(machineToRegister, buildLocation);
                 Bukkit.getPluginManager().callEvent(postMachineBuildEvent);
+                removeTemporaryPreRegisterMachinePartLocations(printResult.getPlacementLocations());
                 return true;
             });
             if (locations == null) {
                 return false;
             }
-            Machinery.getInstance().getMachineManager().addTemporaryPreRegisterMachinePartLocations(locations);
+            addTemporaryPreRegisterMachinePartLocations(locations);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -219,16 +220,20 @@ public class MachineManager {
         }
     }
 
-    public HashSet<Location> getMachinePartLocations() {
+    public Set<Location> getMachinePartLocations() {
         return machinePartLocations;
     }
 
-    public HashSet<Location> getTemporaryPreRegisterMachineLocations() {
+    public Set<Location> getTemporaryPreRegisterMachineLocations() {
         return temporaryPreRegisterMachineLocations;
     }
 
     public void addTemporaryPreRegisterMachinePartLocations(List<Location> locations) {
         temporaryPreRegisterMachineLocations.addAll(locations);
+    }
+
+    public void removeTemporaryPreRegisterMachinePartLocations(List<Location> locations) {
+        temporaryPreRegisterMachineLocations.removeAll(locations);
     }
 
     public List<Machine> getMachines() {
