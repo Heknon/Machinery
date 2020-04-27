@@ -49,7 +49,7 @@ class MachineInventoryImpl(private val machine: PlayerMachine, private val p: Pl
     }
 
     private fun craftMainMenuPage(resources: List<ItemStack?>): InventoryPage {
-        return InventoryPage(54, machine.type.toTitle(), defaultFillment, Sets.newHashSet(
+        return InventoryPage(54, machine.name?.replace('_', ' ')?.capitalize(), defaultFillment, Sets.newHashSet(
                 InventoryItem(
                         20,
                         Material.GHAST_TEAR,
