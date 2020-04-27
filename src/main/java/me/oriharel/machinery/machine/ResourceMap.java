@@ -16,8 +16,9 @@ public class ResourceMap extends HashMap<Integer, ChancableList<? extends Chance
 
     /**
      * initializes the resource map of a machine - where the weight chance of getting a certain item is
+     *
      * @param machineName the name of the machine to get the resource map for
-     * @param configLoad the load of machines.yml
+     * @param configLoad  the load of machines.yml
      */
     public ResourceMap(String machineName, YamlConfiguration configLoad) {
         ConfigurationSection resourcesSection = configLoad.getConfigurationSection(machineName).getConfigurationSection("resources");

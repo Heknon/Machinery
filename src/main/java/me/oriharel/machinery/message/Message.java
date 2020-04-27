@@ -52,19 +52,6 @@ public class Message extends Text {
         this.placeholders = new ArrayList<>();
     }
 
-    /**
-     * Replace a placeholder that is already in the list of this messages placeholders. Used mostly for replacing already committed values.
-     * Will still add the replacement placeholder if if the placeholder was not found
-     * @param placeholder the placeholder string to find
-     * @param replacement replacement
-     * @return this
-     */
-    public Message replacePlaceholder(String placeholder, Placeholder replacement) {
-        placeholders.removeIf(p -> p.getPlaceholder().equalsIgnoreCase(placeholder));
-        placeholders.add(replacement);
-        return this;
-    }
-
     private static String handleConfigCache(String configName, String routeName) {
         String cacheKey = configName + "|" + routeName;
         String cacheValue = CONFIG_MESSAGE_CACHE.getOrDefault(cacheKey, null);
@@ -76,6 +63,20 @@ public class Message extends Text {
         }
 
         return cacheValue;
+    }
+
+    /**
+     * Replace a placeholder that is already in the list of this messages placeholders. Used mostly for replacing already committed values.
+     * Will still add the replacement placeholder if if the placeholder was not found
+     *
+     * @param placeholder the placeholder string to find
+     * @param replacement replacement
+     * @return this
+     */
+    public Message replacePlaceholder(String placeholder, Placeholder replacement) {
+        placeholders.removeIf(p -> p.getPlaceholder().equalsIgnoreCase(placeholder));
+        placeholders.add(replacement);
+        return this;
     }
 
     public Message send() {

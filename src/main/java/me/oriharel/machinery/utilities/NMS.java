@@ -3,7 +3,6 @@ package me.oriharel.machinery.utilities;
 import net.minecraft.server.v1_15_R1.*;
 import org.bukkit.craftbukkit.libs.jline.internal.Nullable;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftMetaBlockState;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -31,6 +30,7 @@ public final class NMS {
 
     /**
      * finds type and convert to NBTBase and helps with applying recursive solution
+     *
      * @param value the object to find the type for
      * @return NBTBase
      */
@@ -70,6 +70,7 @@ public final class NMS {
 
     /**
      * Used when extending an ItemStack and in need of changing that ItemStacks NBT since API methods provided by Bukkit clone the item
+     *
      * @param itemStack itemstack to get reference to unhandled NBT for
      * @return reference to unhandled nbt of itemstack
      */
@@ -81,6 +82,7 @@ public final class NMS {
 
     /**
      * get a clone of the NBT map of an item
+     *
      * @param itemStack itemstack to get clone of nbt map for
      * @return clone of nbt map of itemstack
      */
@@ -93,6 +95,7 @@ public final class NMS {
     /**
      * used for directly changing item meta of an itemstack
      * ItemStack#getItemMeta returns a clone of the items's itemmeta
+     *
      * @param itemStack the itemstack to get the reference for
      * @return reference to itemstack meta
      */

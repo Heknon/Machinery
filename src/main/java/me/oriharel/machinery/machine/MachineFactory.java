@@ -129,7 +129,8 @@ public class MachineFactory {
     /**
      * Inject machine data into a recipe
      * used so that when crafting a recipe you will have inside the NBT (data) of the itemstack a serialized machine so that later on you could build it
-     * @param recipe the recipe to inject into
+     *
+     * @param recipe  the recipe to inject into
      * @param machine the machine to inject into the recipe
      * @return the newly injected recipe
      */

@@ -2,6 +2,7 @@ package me.oriharel.machinery.utilities;
 
 /**
  * Callback with two parameters
+ *
  * @param <T> parameter one type
  * @param <U> parameter two type
  */

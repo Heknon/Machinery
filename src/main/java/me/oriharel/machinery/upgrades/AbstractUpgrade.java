@@ -5,7 +5,6 @@ import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.machine.MachineResourceGetProcess;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**

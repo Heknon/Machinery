@@ -86,6 +86,7 @@ public class FileManager {
          * Used for when initializing a config into the data folder of the plugin.
          * Checks if the file exists already. If it doesn't it force copies the default values and saves.
          * If it does, it doesn't forcefully copy the default values.
+         *
          * @return this
          */
         public Config initialize() {
@@ -166,7 +167,7 @@ public class FileManager {
         /**
          * An easy way to set a value into the config
          *
-         * @param key config key
+         * @param key   config key
          * @param value value to set
          * @return this
          */

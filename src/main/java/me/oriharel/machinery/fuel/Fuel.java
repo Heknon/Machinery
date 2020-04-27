@@ -6,13 +6,11 @@ import me.oriharel.machinery.utilities.NMS;
 import net.minecraft.server.v1_15_R1.NBTTagByte;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import net.minecraft.server.v1_15_R1.NBTTagInt;
-import net.minecraft.server.v1_15_R1.NBTTagString;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,6 +60,7 @@ public class Fuel extends ItemStack implements Cloneable {
      * sets the energy of a fuel.
      * applies new lore to show the amount of energy the fuel has.
      * sets a new NBT to hide away from the end user the amount of energy in the fuel and for easy access for the programmer
+     *
      * @param energy energy to set to
      */
     public void setEnergy(int energy) {

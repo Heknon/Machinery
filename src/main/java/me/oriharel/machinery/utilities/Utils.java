@@ -2,7 +2,6 @@ package me.oriharel.machinery.utilities;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import me.oriharel.machinery.Machinery;
 import me.oriharel.machinery.machine.Machine;
 import me.oriharel.machinery.machine.MachineFactory;
 import me.oriharel.machinery.machine.PlayerMachine;
@@ -27,6 +26,7 @@ public final class Utils {
     /**
      * Compressed the X, Y, Z coordinates of a location to a long.
      * Compressed a location into 8 bytes
+     *
      * @param location location to compress
      * @return compressed location
      */
@@ -39,6 +39,7 @@ public final class Utils {
 
     /**
      * Decompresses a compressed location into an X, Y, Z only location
+     *
      * @param packed the compressed long type location
      * @return decompressed location
      */
@@ -51,8 +52,9 @@ public final class Utils {
 
     /**
      * decompresses a location and sets it's world
+     *
      * @param packed the compressed long type location
-     * @param world the world to set to
+     * @param world  the world to set to
      * @return decompressed location
      */
     public static Location longToLocation(long packed, World world) {
@@ -63,6 +65,7 @@ public final class Utils {
 
     /**
      * Checks if an inventory has enough space to add an item
+     *
      * @param inventory the inventory to check
      * @return true if it has enough space otherwise false
      */
@@ -72,10 +75,11 @@ public final class Utils {
 
     /**
      * Give an item or drop it on the floor near the player
-     * @param player the player to give to
-     * @param item the item to give
+     *
+     * @param player    the player to give to
+     * @param item      the item to give
      * @param cloneDrop whether to clone it and give a clone or not
-     * @param <T> generic type extending ItemStack. Included to support items such as Fuel
+     * @param <T>       generic type extending ItemStack. Included to support items such as Fuel
      */
     public static <T extends ItemStack> void giveItemOrDrop(HumanEntity player, T item, boolean cloneDrop) {
         Inventory playerInventory = player.getInventory();
@@ -95,9 +99,10 @@ public final class Utils {
     /**
      * Used codebase wide in the apparent need of changing the construction of the serializer.
      * If a type adapter needs to be added...
+     *
      * @param machineType machineType to make a serializer for
-     * @param factory the machine factory
-     * @param <T> the machine type extending base Machine class
+     * @param factory     the machine factory
+     * @param <T>         the machine type extending base Machine class
      * @return Gson object for serializing a machine of machineType with
      */
     public static <T extends Machine> Gson getGsonSerializationBuilderInstance(Class<T> machineType, MachineFactory factory) {
@@ -109,7 +114,8 @@ public final class Utils {
 
     /**
      * used to generate placeholders for use when sending config messages using Message object
-     * @param location the location to generate placeholders for
+     *
+     * @param location          the location to generate placeholders for
      * @param extraPlaceholders other placeholders that may be added upon the ones generated
      * @return the generated placeholder for location + extra placeholders given
      */
@@ -125,7 +131,8 @@ public final class Utils {
     /**
      * helper function for creating placeholder locations using overloaded getLocationPlaceholders(Location location, Placeholder... extraPlaceholders)
      * wraps up a list into an array
-     * @param location the location to generate placeholders for
+     *
+     * @param location          the location to generate placeholders for
      * @param extraPlaceholders other placeholders that may be added upon the ones generated
      * @return the generated placeholder for location + extra placeholders given
      */
@@ -135,7 +142,8 @@ public final class Utils {
 
     /**
      * used to wrap up creation of placeholder array from list
-     * @param machine the location to generate placeholders for
+     *
+     * @param machine           the location to generate placeholders for
      * @param extraPlaceholders other placeholders that may be added upon the ones generated
      * @return the generated placeholder for machine + extra placeholders given
      */
@@ -145,8 +153,9 @@ public final class Utils {
 
     /**
      * used to wrap up creation of placeholder array from list
-     * @param amount the amount placeholder value
-     * @param thing the thing placeholder value
+     *
+     * @param amount            the amount placeholder value
+     * @param thing             the thing placeholder value
      * @param extraPlaceholders other placeholders that may be added upon the ones generated
      * @return the generated placeholder for amount thing + extra placeholders given
      */
@@ -156,7 +165,8 @@ public final class Utils {
 
     /**
      * used to generate placeholders for use when sending config messages using Message object
-     * @param machine the location to generate placeholders for
+     *
+     * @param machine           the location to generate placeholders for
      * @param extraPlaceholders other placeholders that may be added upon the ones generated
      * @return the generated placeholder for machine + extra placeholders given
      */
@@ -183,8 +193,9 @@ public final class Utils {
 
     /**
      * Used to represent something represented as an amount of a thing
-     * @param amount amount of thing
-     * @param thing thing
+     *
+     * @param amount            amount of thing
+     * @param thing             thing
      * @param extraPlaceholders other placeholders that may be added upon the ones generated
      * @return the generated placeholder for amount thing + extra placeholders given
      */

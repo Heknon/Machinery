@@ -2,6 +2,7 @@ package me.oriharel.machinery.utilities;
 
 /**
  * Callbacks with only one parameter
+ *
  * @param <P> type of parameter
  */
 @FunctionalInterface

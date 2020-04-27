@@ -12,8 +12,6 @@ import me.oriharel.machinery.machine.MachineManager;
 import me.oriharel.machinery.machine.PlayerMachine;
 import me.oriharel.machinery.structure.StructureManager;
 import me.oriharel.machinery.utilities.SignMenuFactory;
-import me.oriharel.machinery.utilities.Utils;
-import me.wolfyscript.customcrafting.CustomCrafting;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -99,9 +97,10 @@ public final class Machinery extends JavaPlugin {
 
     /**
      * Helper function for creating a sign GUI for a user to input data in
-     * @param target the player that the sign GUI will open for
-     * @param response callback when users submits text
-     * @param defaultLines  default text
+     *
+     * @param target       the player that the sign GUI will open for
+     * @param response     callback when users submits text
+     * @param defaultLines default text
      */
     public void createSignInput(Player target, BiPredicate<Player, String[]> response, String... defaultLines) {
         this.signMenuFactory
@@ -114,7 +113,8 @@ public final class Machinery extends JavaPlugin {
     /**
      * Helper function to update a player machine block with it's new value.
      * used to not go through machine manager and it's "obscure" naming
-     * @param machine the new machine data
+     *
+     * @param machine         the new machine data
      * @param fromAsyncThread if it is from an asynchronous thread it will summon a bukkit task on the master thread since you cannot modify blocks on other threads
      */
     public void updateMachineBlock(PlayerMachine machine, boolean fromAsyncThread) {

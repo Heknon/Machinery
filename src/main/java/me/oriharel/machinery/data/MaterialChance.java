@@ -5,7 +5,7 @@ import me.oriharel.machinery.machine.MachineResourceGetProcess;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class MaterialChance implements ChanceableOperation<List<ItemStack>, MachineResourceGetProcess> {
@@ -19,7 +19,7 @@ public class MaterialChance implements ChanceableOperation<List<ItemStack>, Mach
 
     @Override
     public List<ItemStack> getChanced(double lootModifier) {
-        return materials.stream().map(p -> new ItemStack(p.getFirst(), (int)(p.getSecond().random() * lootModifier))).collect(Collectors.toList());
+        return materials.stream().map(p -> new ItemStack(p.getFirst(), (int) (p.getSecond().random() * lootModifier))).collect(Collectors.toList());
     }
 
     @Override

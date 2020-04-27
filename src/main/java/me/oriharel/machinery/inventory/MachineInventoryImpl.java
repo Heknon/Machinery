@@ -39,8 +39,9 @@ public class MachineInventoryImpl {
 
     /**
      * Construct a machine inventory for a specific player and machine.
-     * @param machine the machine to contstruct the inventory for
-     * @param p the player who is opening the inventory
+     *
+     * @param machine   the machine to contstruct the inventory for
+     * @param p         the player who is opening the inventory
      * @param machinery the main plugin instance
      */
     public MachineInventoryImpl(PlayerMachine machine, Player p, Machinery machinery) {

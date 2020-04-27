@@ -5,6 +5,7 @@ import org.bukkit.inventory.ItemStack;
 
 /**
  * Requires an InventoryPage that implements DatablePage
+ *
  * @param <T> type of data
  */
 public class InventoryNavigationItemData<T> extends InventoryNavigationItem implements NavigableData<T> {
@@ -12,7 +13,8 @@ public class InventoryNavigationItemData<T> extends InventoryNavigationItem impl
     private T navigationData;
     private NavigableDataInventoryPage<T> routePage;
 
-    public InventoryNavigationItemData(NavigableDataInventoryPage<T> routePage, Inventory parentInventory, int indexInInventory, Material material, int amount, String displayName,
+    public InventoryNavigationItemData(NavigableDataInventoryPage<T> routePage, Inventory parentInventory, int indexInInventory, Material material, int amount,
+                                       String displayName,
                                        T navigationData, String... lore) {
         super(null, parentInventory, indexInInventory, material, amount, displayName, lore);
         this.navigationData = navigationData;
@@ -25,7 +27,8 @@ public class InventoryNavigationItemData<T> extends InventoryNavigationItem impl
         this.routePage = routePage;
     }
 
-    public InventoryNavigationItemData(NavigableDataInventoryPage<T> routePage, Inventory parentInventory, int indexInInventory, Material material, int amount, String displayName,
+    public InventoryNavigationItemData(NavigableDataInventoryPage<T> routePage, Inventory parentInventory, int indexInInventory, Material material, int amount,
+                                       String displayName,
                                        T navigationData) {
         super(null, parentInventory, indexInInventory, material, amount, displayName);
         this.navigationData = navigationData;

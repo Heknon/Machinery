@@ -86,14 +86,14 @@ public class MachineItem {
 
     private String applyPlaceholders(String string) {
         string = string.replaceAll("%total_resources_gained%",
-                String.valueOf(machine instanceof PlayerMachine ? (int)((PlayerMachine) machine).getTotalResourcesGained() : 0));
+                String.valueOf(machine instanceof PlayerMachine ? (int) ((PlayerMachine) machine).getTotalResourcesGained() : 0));
         string = string.replaceAll("%resources_gained%",
                 String.valueOf(machine instanceof PlayerMachine ?
                         ((PlayerMachine) machine).getResourcesGained().values().stream().mapToInt(ItemStack::getAmount).sum() : 0));
         string = string.replaceAll("%total_zen_coins_gained%",
-                String.valueOf(machine instanceof PlayerMachine ? (int)((PlayerMachine) machine).getTotalZenCoinsGained() : 0));
+                String.valueOf(machine instanceof PlayerMachine ? (int) ((PlayerMachine) machine).getTotalZenCoinsGained() : 0));
         string = string.replaceAll("%zen_coins_gained%",
-                String.valueOf(machine instanceof PlayerMachine ? (int)((PlayerMachine) machine).getZenCoinsGained() : 0));
+                String.valueOf(machine instanceof PlayerMachine ? (int) ((PlayerMachine) machine).getZenCoinsGained() : 0));
         string = string.replaceAll("%energy%", String.valueOf(machine instanceof PlayerMachine ?
                 ((PlayerMachine) machine).getEnergyInMachine() : 0));
         return string;

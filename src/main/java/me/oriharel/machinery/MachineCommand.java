@@ -73,10 +73,11 @@ public class MachineCommand extends BaseCommand {
 
         /**
          * helper function to check if fuel given is valid fuel syntax
+         *
          * @param commandSender sender of command
-         * @param energy energy to give
-         * @param amount amount to give
-         * @param giveTo who to give to
+         * @param energy        energy to give
+         * @param amount        amount to give
+         * @param giveTo        who to give to
          * @return if you can give the player fuel or not. true if yes.
          */
         private boolean fuelCommandBaseChecks(CommandSender commandSender, int energy, int amount, Player giveTo) {

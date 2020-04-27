@@ -1,7 +1,6 @@
 package me.oriharel.machinery.utilities;
 
 import com.google.gson.reflect.TypeToken;
-import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -42,7 +41,8 @@ public final class ReflectionUtils {
          */
         public static <R, T> R getFieldValueOfObjectExact(T instance, String fieldName) {
             try {
-                Field field = new TypeToken<T>(){}.getClass().getDeclaredField(fieldName);
+                Field field = new TypeToken<T>() {
+                }.getClass().getDeclaredField(fieldName);
                 field.setAccessible(true);
                 return (R) field.get(instance);
             } catch (NoSuchFieldException | IllegalAccessException e) {

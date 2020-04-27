@@ -34,7 +34,8 @@ public class PlayerMachine extends Machine {
 
     public PlayerMachine(int maxFuel, int fuelDeficiency, MachineType machineType,
                          Structure structure, CustomRecipe<?> recipe, String machineName, Material openGUIBlockType,
-                         Set<UUID> playersWithAccessPermission, double totalResourcesGained, HashMap<Material, ItemStack> resourcesGained, int energyInMachine, Location machineCore, double zenCoinsGained,
+                         Set<UUID> playersWithAccessPermission, double totalResourcesGained, HashMap<Material, ItemStack> resourcesGained, int energyInMachine,
+                         Location machineCore, double zenCoinsGained,
                          double totalZenCoinsGained, UUID owner, List<AbstractUpgrade> upgrades, MachineFactory factory) {
         super(maxFuel, fuelDeficiency, machineType, structure, recipe, machineName, openGUIBlockType, factory);
         this.playersWithAccessPermission = playersWithAccessPermission;
@@ -100,12 +101,24 @@ public class PlayerMachine extends Machine {
         return totalResourcesGained;
     }
 
+    public void setTotalResourcesGained(double totalResourcesGained) {
+        this.totalResourcesGained = totalResourcesGained;
+    }
+
     public double getTotalZenCoinsGained() {
         return totalZenCoinsGained;
     }
 
+    public void setTotalZenCoinsGained(double totalZenCoinsGained) {
+        this.totalZenCoinsGained = totalZenCoinsGained;
+    }
+
     public double getZenCoinsGained() {
         return zenCoinsGained;
+    }
+
+    public void setZenCoinsGained(double zenCoinsGained) {
+        this.zenCoinsGained = zenCoinsGained;
     }
 
     public void addZenCoinsGained(double zenCoinsGained) {
@@ -135,18 +148,6 @@ public class PlayerMachine extends Machine {
 
     public List<AbstractUpgrade> getUpgrades() {
         return upgrades;
-    }
-
-    public void setTotalResourcesGained(double totalResourcesGained) {
-        this.totalResourcesGained = totalResourcesGained;
-    }
-
-    public void setTotalZenCoinsGained(double totalZenCoinsGained) {
-        this.totalZenCoinsGained = totalZenCoinsGained;
-    }
-
-    public void setZenCoinsGained(double zenCoinsGained) {
-        this.zenCoinsGained = zenCoinsGained;
     }
 
     public Set<UUID> getPlayersWithAccessPermission() {
