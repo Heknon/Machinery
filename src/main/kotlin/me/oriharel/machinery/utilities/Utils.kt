@@ -2,9 +2,11 @@ package me.oriharel.machinery.utilities
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import me.oriharel.machinery.machine.Machine
-import me.oriharel.machinery.machine.MachineFactory
-import me.oriharel.machinery.machine.PlayerMachine
+import me.oriharel.machinery.machines.machine.Machine
+import me.oriharel.machinery.machines.MachineFactory
+import me.oriharel.machinery.machines.machine.PlayerMachine
+import me.oriharel.machinery.machines.serializers.MachineTypeAdapter
+import me.oriharel.machinery.machines.serializers.PlayerMachineTypeAdapter
 import me.oriharel.machinery.message.Placeholder
 import me.oriharel.machinery.serialization.*
 import me.oriharel.machinery.upgrades.AbstractUpgrade
@@ -17,9 +19,11 @@ import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import java.text.DecimalFormat
 import java.util.*
+import javax.script.ScriptEngineManager
 
 object Utils {
     val COMMA_NUMBER_FORMAT = DecimalFormat("#,###")
+    private val SCRIPT_ENGINE = ScriptEngineManager().getEngineByName("JavaScript")
 
     /**
      * Compressed the X, Y, Z coordinates of a location to a long.
@@ -65,6 +69,10 @@ object Utils {
      */
     fun inventoryHasSpaceForItemAdd(inventory: Inventory): Boolean {
         return inventory.firstEmpty() != -1
+    }
+
+    fun <T> evaluateJavaScriptExpression(eval: String): T {
+        return SCRIPT_ENGINE.eval(eval) as T
     }
 
     /**
@@ -158,7 +166,7 @@ object Utils {
      */
     fun getMachinePlaceholders(machine: PlayerMachine, vararg extraPlaceholders: Placeholder): MutableList<Placeholder> {
         val placeholders: MutableList<Placeholder> = if (extraPlaceholders.isEmpty()) mutableListOf() else mutableListOf(*extraPlaceholders)
-        placeholders.add(Placeholder("%machine_type%", machine.type.toTitle()))
+        placeholders.add(Placeholder("%machine_nane%", machine.name))
         placeholders.add(Placeholder("%machine_energy%", machine.energyInMachine))
         placeholders.add(Placeholder("%machine_max_fuel%", machine.maxFuel))
         placeholders.add(Placeholder("%machine_fuel_deficiency%", machine.fuelDeficiency))

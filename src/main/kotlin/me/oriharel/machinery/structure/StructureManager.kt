@@ -14,6 +14,11 @@ class StructureManager(private val machinery: Machinery) {
     private val structures: HashMap<String, Structure?> = HashMap()
     private val callbacksOnDone: MutableList<() -> Unit>
 
+    init {
+        callbacksOnDone = ArrayList()
+        Bukkit.getScheduler().runTaskAsynchronously(machinery, Runnable { registerSchematics() })
+    }
+
     /**
      * Get a schematic by it's path in jar
      *
@@ -24,10 +29,15 @@ class StructureManager(private val machinery: Machinery) {
         return structures.getOrDefault(path, null)
     }
 
+    fun registerOnDoneCallback(callback: () -> Unit) {
+        callbacksOnDone.add(callback)
+    }
+
     private fun registerSchematic(key: String) {
         if (structures.containsKey(key)) return
-        val file = File(machinery.dataFolder, "structures/" + key + Machinery.Companion.STRUCTURE_EXTENSION)
+        val file = File(machinery.dataFolder, "structures/" + key + Machinery.STRUCTURE_EXTENSION)
         val schematic = Schematic(machinery, file)
+
         schematic.loadSchematic()
         val structure = Structure(schematic, key)
         structures[file.path] = structure
@@ -36,27 +46,16 @@ class StructureManager(private val machinery: Machinery) {
     private fun registerSchematics() {
         val configLoad: YamlConfiguration? = machinery.fileManager?.getConfig("machines.yml")?.get()
         val keys = configLoad?.getKeys(false)
+
         Bukkit.getScheduler().runTaskAsynchronously(machinery, Runnable {
-            if (keys != null) {
-                for (key in keys) {
+            if (keys != null)
+                for (key in keys)
                     registerSchematic(key)
-                }
-            }
 
             Bukkit.getScheduler().runTask(machinery, Runnable {
-                for (callback in callbacksOnDone) {
+                for (callback in callbacksOnDone)
                     callback()
-                }
             })
         })
-    }
-
-    fun registerOnDoneCallback(callback: () -> Unit) {
-        callbacksOnDone.add(callback)
-    }
-
-    init {
-        callbacksOnDone = ArrayList()
-        Bukkit.getScheduler().runTaskAsynchronously(machinery, Runnable { registerSchematics() })
     }
 }

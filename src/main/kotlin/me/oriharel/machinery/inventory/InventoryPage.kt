@@ -1,6 +1,6 @@
 package me.oriharel.machinery.inventory
 
-import me.oriharel.machinery.machine.PlayerMachine
+import me.oriharel.machinery.machines.machine.PlayerMachine
 import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftInventoryCustom
 import org.bukkit.inventory.Inventory

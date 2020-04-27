@@ -1,50 +1,34 @@
 package me.oriharel.machinery.upgrades
 
-import me.oriharel.machinery.machine.MachineResourceGetProcess
-import org.bukkit.Bukkit
-import javax.script.ScriptEngineManager
-import javax.script.ScriptException
+import me.oriharel.machinery.machines.machine.MachineResourceGetProcess
+import me.oriharel.machinery.utilities.Utils
 
 class SpeedUpgrade(level: Int) : AbstractUpgrade(level) {
-    override var costs: Map<Int, Int>? = null
-        get() {
-            if (field == null) field = configLoad?.getConfigurationSection("speed.costs")?.getValues(false)?.entries?.associate { it.key.toInt() to it.value as Int }
-            return field
-        }
+    private val speedCalculateExpression: String = configLoad?.getString("speed.calculate")!!
+    private val basePeriod: Int = (configLoad?.getInt("speed.basePeriod") ?: 10) * 20
+
+    override val costs: Map<Int, Int>? = configLoad?.getConfigurationSection("speed.costs")?.getValues(false)?.entries?.associate { it.key.toInt() to it.value as Int }
+    override val upgradeName: String = "Speed Upgrade"
+    override val isRunOnlyOnProcessStart: Boolean = true
+    override val upgradeType: UpgradeType = UpgradeType.SPEED
 
     override fun applyUpgradeModifier(mineProcess: MachineResourceGetProcess) {
-        // period is in ticks. 20 ticks is a second
-        val basePeriod = (configLoad?.getInt("speed.basePeriod") ?: 10) * 20
-        if (level == 1) { // if level 1 don't apply any calculations on base speed
+        return if (level == 1)
             mineProcess.minePeriod = basePeriod
-            return
-        }
-        val mgr = ScriptEngineManager()
-        val engine = mgr.getEngineByName("JavaScript")
-        try {
-            mineProcess.minePeriod = engine.eval(configLoad?.getString("speed.calculate")!!.replace("\\{basePeriod}".toRegex(), basePeriod.toString()).replace(
-                    "\\{level}".toRegex(), level.toString())) as Int
-        } catch (e: ScriptException) {
-            Bukkit.getLogger().severe("Failed to calculate mine period!")
-            Bukkit.getLogger().severe(e.message)
-        }
+        else
+            mineProcess.minePeriod = Utils.evaluateJavaScriptExpression(placeholderAppliedExpression)
+
     }
 
-    override val upgradeName: String
-        get() = "Speed Upgrade"
-
-    override val upgradeType: UpgradeType
-        get() = UpgradeType.SPEED
+    private val placeholderAppliedExpression: String
+        get() = speedCalculateExpression
+                .replace("\\{basePeriod}".toRegex(), basePeriod.toString())
+                .replace("\\{level}".toRegex(), level.toString())
 
     override fun toString(): String {
         return "SpeedUpgrade{" +
                 "level=" + level +
                 ", runOnlyOnProcessStart=" + isRunOnlyOnProcessStart +
                 '}'
-    }
-
-    init {
-        isRunOnlyOnProcessStart = true
-        costs = null
     }
 }

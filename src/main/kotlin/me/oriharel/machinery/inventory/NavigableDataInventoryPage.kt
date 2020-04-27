@@ -1,6 +1,6 @@
 package me.oriharel.machinery.inventory
 
-import me.oriharel.machinery.machine.PlayerMachine
+import me.oriharel.machinery.machines.machine.PlayerMachine
 
 class NavigableDataInventoryPage<T> : InventoryPage, NavigableDataPage<T?> {
 

@@ -1,8 +1,8 @@
 package me.oriharel.machinery.data
 
 import com.google.gson.Gson
-import me.oriharel.machinery.machine.MachineFactory
-import me.oriharel.machinery.machine.PlayerMachine
+import me.oriharel.machinery.machines.MachineFactory
+import me.oriharel.machinery.machines.machine.PlayerMachine
 import me.oriharel.machinery.utilities.Utils
 import org.bukkit.persistence.PersistentDataAdapterContext
 import org.bukkit.persistence.PersistentDataType

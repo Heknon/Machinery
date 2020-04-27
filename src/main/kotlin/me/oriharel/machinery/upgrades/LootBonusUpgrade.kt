@@ -1,41 +1,30 @@
 package me.oriharel.machinery.upgrades
 
-import me.oriharel.machinery.machine.MachineResourceGetProcess
-import org.bukkit.Bukkit
-import javax.script.ScriptEngineManager
-import javax.script.ScriptException
+import me.oriharel.machinery.machines.machine.MachineResourceGetProcess
+import me.oriharel.machinery.utilities.Utils
 
 class LootBonusUpgrade(level: Int) : AbstractUpgrade(level) {
-    override var costs: Map<Int, Int>? = null
-        get() {
-            if (field == null) field = configLoad?.getConfigurationSection("lootbonus.costs")?.getValues(false)?.entries?.associate { it.key.toInt() to it.value as Int }
-            return field
-        }
+    private val lootAmplifierExpression: String = configLoad!!.getString("lootbonus.lootAmplifier")!!
+    private val baseAmplifier: Double = configLoad!!.getDouble("lootbonus.baseAmplifier")
+
+    override val costs = configLoad?.getConfigurationSection("lootbonus.costs")?.getValues(false)?.entries?.associate { it.key.toInt() to it.value as Int }
+    override val upgradeType: UpgradeType = UpgradeType.LOOT_BONUS
+    override val isRunOnlyOnProcessStart: Boolean = true
+    override val upgradeName: String = "Loot Bonus Upgrade"
 
     override fun applyUpgradeModifier(mineProcess: MachineResourceGetProcess) {
-        val baseAmplifier = configLoad!!.getDouble("lootbonus.baseAmplifier")
-        if (level == 1) { // if level 1 don't apply any calculations on base amplifier
-            mineProcess.lootAmplifier = baseAmplifier
-            return
-        }
-        val mgr = ScriptEngineManager()
-        val engine = mgr.getEngineByName("JavaScript") // use javascript engine to evaluate math expression
 
-        try {
-            mineProcess.lootAmplifier = engine.eval(configLoad!!.getString("lootbonus.lootAmplifier")!!.replace("\\{basePeriod}".toRegex(), baseAmplifier.toString()).replace(
-                    "\\{level}".toRegex(), level.toString())) as Double
-        } catch (e: ScriptException) {
-            Bukkit.getLogger().severe("Failed to calculate loot amplifier!")
-            Bukkit.getLogger().severe(e.message)
-        }
+        return if (level == 1)
+            mineProcess.lootAmplifier = baseAmplifier
+        else
+            mineProcess.lootAmplifier = Utils.evaluateJavaScriptExpression(placeholderAppliedExpression)
+
     }
 
-    override val upgradeName: String
-        get() = "Loot Bonus Upgrade"
-
-
-    override val upgradeType: UpgradeType
-        get() = UpgradeType.LOOT_BONUS
+    private val placeholderAppliedExpression: String
+        get() = lootAmplifierExpression
+                .replace("\\{basePeriod}".toRegex(), baseAmplifier.toString())
+                .replace("\\{level}".toRegex(), level.toString())
 
     override fun toString(): String {
         return "LootBonusUpgrade{" +
@@ -44,8 +33,5 @@ class LootBonusUpgrade(level: Int) : AbstractUpgrade(level) {
                 '}'
     }
 
-    init {
-        isRunOnlyOnProcessStart = true
-        costs = null
-    }
+
 }

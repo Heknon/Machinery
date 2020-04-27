@@ -3,15 +3,15 @@ package me.oriharel.machinery
 import co.aikar.commands.BukkitCommandCompletionContext
 import co.aikar.commands.BukkitCommandExecutionContext
 import co.aikar.commands.BukkitCommandManager
-import com.google.common.collect.Lists
-import me.oriharel.machinery.data.MachineDataManager
+import me.oriharel.machinery.commands.MachineCommand
+import me.oriharel.machinery.machines.MachineDataManager
 import me.oriharel.machinery.fuel.FuelManager
 import me.oriharel.machinery.inventory.Listeners
-import me.oriharel.machinery.listeners.Block
-import me.oriharel.machinery.listeners.Interact
-import me.oriharel.machinery.machine.Machine
-import me.oriharel.machinery.machine.MachineManager
-import me.oriharel.machinery.machine.PlayerMachine
+import me.oriharel.machinery.machines.listeners.Block
+import me.oriharel.machinery.machines.listeners.Interact
+import me.oriharel.machinery.machines.machine.Machine
+import me.oriharel.machinery.machines.MachineManager
+import me.oriharel.machinery.machines.machine.PlayerMachine
 import me.oriharel.machinery.structure.StructureManager
 import me.oriharel.machinery.utilities.SignMenuFactory
 import org.bukkit.Bukkit
@@ -25,11 +25,6 @@ import java.util.function.BiPredicate
 import java.util.function.Consumer
 import java.util.stream.Collectors
 
-/**
- * Next time I am doing this....
- * It's gonna be in Kotlin....
- * The horror's I have seen...
- */
 class Machinery : JavaPlugin() {
     var fileManager: FileManager? = null
         private set
@@ -43,6 +38,8 @@ class Machinery : JavaPlugin() {
         private set
     private var signMenuFactory: SignMenuFactory? = null
     private var commandManager: BukkitCommandManager? = null
+
+
     override fun onLoad() {
         instance = this
     }
@@ -52,6 +49,8 @@ class Machinery : JavaPlugin() {
         // save all configuration files
         fileManager = FileManager(this)
         setupConfigs()
+
+        logger.fine("Machinery - Made by Heknon - https://oriharel.me")
 
         // create structures folder if non existent
         val file = File(dataFolder, "structures").toPath()
@@ -107,8 +106,8 @@ class Machinery : JavaPlugin() {
     fun updateMachineBlock(machine: PlayerMachine?, fromAsyncThread: Boolean) {
         if (fromAsyncThread) Bukkit.getScheduler().runTask(
                 this,
-                Runnable { machineManager!!.setPlayerMachineBlock(machine?.machineCore?.block!!, machine) }
-        ) else machineManager!!.setPlayerMachineBlock(machine?.machineCore?.block!!, machine)
+                Runnable { machineManager!!.setPlayerMachineBlock(machine?.core?.block!!, machine) }
+        ) else machineManager!!.setPlayerMachineBlock(machine?.core?.block!!, machine)
     }
 
     /**
@@ -117,10 +116,10 @@ class Machinery : JavaPlugin() {
     private fun setupCommandManager() {
         commandManager = BukkitCommandManager(this)
         commandManager!!.commandCompletions.registerCompletion("machines"
-        ) { c: BukkitCommandCompletionContext? -> machineManager!!.machines.stream().map { machine: Machine? -> machine?.machineName }.collect(Collectors.toList()) }
+        ) { c: BukkitCommandCompletionContext? -> machineManager!!.machines.stream().map { machine: Machine? -> machine?.name }.collect(Collectors.toList()) }
         commandManager!!.commandContexts.registerIssuerAwareContext(Machine::class.java) { c: BukkitCommandExecutionContext ->
             val machineName = c.lastArg ?: return@registerIssuerAwareContext null
-            machineManager!!.machines.stream().filter { machine: Machine? -> machine?.machineName.equals(machineName, ignoreCase = true) }.findFirst().get()
+            machineManager!!.machines.stream().filter { machine: Machine? -> machine?.name.equals(machineName, ignoreCase = true) }.findFirst().get()
         }
         commandManager!!.registerCommand(MachineCommand(this))
     }

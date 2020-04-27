@@ -45,6 +45,8 @@ class Schematic(private val plugin: JavaPlugin, private val schematic: File) {
     private val signs: MutableMap<Vector, List<String?>> = HashMap()
     var chests: Map<Vector?, Map<Int?, ItemStack?>?>? = null
         private set
+    val isNotLoaded: Boolean get() = width.toInt() == 0 || height.toInt() == 0 || length.toInt() == 0 || blocks.isEmpty()
+    val isLoaded: Boolean get() = !isNotLoaded
     private val blocks: MutableMap<Int, BlockData> = HashMap()
     private val delayedBlocks: List<Material> = listOf(Material.LAVA,
             Material.WATER,
