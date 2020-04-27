@@ -37,6 +37,12 @@ public class MachineInventoryImpl {
     private Inventory parentInventory;
     private HashMap<String, InventoryPage> routes;
 
+    /**
+     * Construct a machine inventory for a specific player and machine.
+     * @param machine the machine to contstruct the inventory for
+     * @param p the player who is opening the inventory
+     * @param machinery the main plugin instance
+     */
     public MachineInventoryImpl(PlayerMachine machine, Player p, Machinery machinery) {
         this.p = p;
         this.machine = machine;
@@ -48,14 +54,20 @@ public class MachineInventoryImpl {
         craftInventory();
     }
 
+    /**
+     * open the constructed inventory for the player
+     */
     public void openInventory() {
         p.openInventory(parentInventory.getInventory());
     }
 
 
+    /**
+     * craft the inventory routes
+     */
     private void craftInventory() {
 
-        // filter list to remove 0 amounts
+        // filter list to remove 0 amounts from machine resources
         List<ItemStack> resources = new ArrayList<>(machine.getResourcesGained().values()).stream().filter(is -> is.getAmount() != 0).collect(Collectors.toList());
 
         routes.put("start", craftMainMenuPage(resources));
@@ -209,6 +221,7 @@ public class MachineInventoryImpl {
                     Map<Integer, Integer> costs = upgrade.getCosts();
                     int upgradeCost = costs.get(upgrade.getLevel() + 1);
                     int downgradeCost = upgrade.getCosts().getOrDefault(upgrade.getLevel() - 1, -1);
+
                     inventoryPage.setInventoryItems(Sets.newHashSet(
                             new InventoryItem(2, Material.LIME_STAINED_GLASS_PANE, 1, "§6DOWNGRADE",
                                     downgradeCost == -1 ? "§bCANNOT DOWNGRADE" : "§bDowngrade to level §e" + (upgrade.getLevel() - 1),

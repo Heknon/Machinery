@@ -9,6 +9,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.Arrays;
 import java.util.Objects;
 
+/**
+ * representation of the base InventoryItem in the Inventory API
+ */
 public class InventoryItem extends ItemStack {
     protected int indexInInventory;
     protected Callback onClick = null;

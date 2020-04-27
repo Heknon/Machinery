@@ -5,6 +5,9 @@ import org.bukkit.inventory.InventoryHolder;
 
 import java.util.Map;
 
+/**
+ * The main inventory class of the API that handles all navigation
+ */
 public class Inventory implements InventoryHolder {
 
     protected Map<String, InventoryPage> routes;

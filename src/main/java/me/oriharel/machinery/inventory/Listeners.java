@@ -7,6 +7,9 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ * Event listener for handling inventory API related events
+ */
 public class Listeners implements Listener {
 
     private Machinery machinery;

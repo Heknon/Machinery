@@ -3,6 +3,9 @@ package me.oriharel.machinery.inventory;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ * a class for easy inventory navigation
+ */
 public class InventoryNavigationItem extends InventoryItem {
 
     protected String routeToName;
