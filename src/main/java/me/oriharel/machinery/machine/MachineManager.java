@@ -5,13 +5,11 @@ import me.oriharel.machinery.api.events.PostMachineBuildEvent;
 import me.oriharel.machinery.api.events.PreMachineBuildEvent;
 import me.oriharel.machinery.data.PlayerMachinePersistentDataType;
 import me.oriharel.machinery.exceptions.*;
-import me.oriharel.machinery.message.Message;
 import me.oriharel.machinery.upgrades.LootBonusUpgrade;
 import me.oriharel.machinery.upgrades.SpeedUpgrade;
 import me.oriharel.machinery.utilities.Utils;
 import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
@@ -34,7 +32,7 @@ public class MachineManager {
     private PlayerMachinePersistentDataType MACHINE_PERSISTENT_DATA_TYPE;
     private NamespacedKey MACHINE_NAMESPACE_KEY;
     private NamespacedKey MACHINE_LOCATIONS_NAMESPACE_KEY;
-    private Map<String, ResourceMap> machineResourceTrees;
+    private Map<String, ResourceMap> machineResourceMaps;
 
     public MachineManager(Machinery machinery) {
         this.machinery = machinery;
@@ -42,7 +40,7 @@ public class MachineManager {
         this.machines = new ArrayList<>();
         this.machineCores = new HashMap<>();
         this.machinePartLocations = new HashSet<>();
-        this.machineResourceTrees = new HashMap<>();
+        this.machineResourceMaps = new HashMap<>();
         this.temporaryPreRegisterMachineLocations = new HashSet<>();
         this.MACHINE_PERSISTENT_DATA_TYPE = new PlayerMachinePersistentDataType(machineFactory);
         this.MACHINE_NAMESPACE_KEY = new NamespacedKey(machinery, "machine");
@@ -59,7 +57,7 @@ public class MachineManager {
         for (String key : machineKeys) {
             try {
                 Machine machine = machineFactory.createMachine(key);
-                machineResourceTrees.put(key, new ResourceMap(key, configLoad));
+                machineResourceMaps.put(key, new ResourceMap(key, configLoad));
                 machines.add(machine);
             } catch (IllegalArgumentException | NotMachineTypeException | MachineNotFoundException | MaterialNotFoundException | RecipeNotFoundException e) {
                 e.printStackTrace();
@@ -244,7 +242,7 @@ public class MachineManager {
         return machineFactory;
     }
 
-    public Map<String, ResourceMap> getMachineResourceTrees() {
-        return machineResourceTrees;
+    public Map<String, ResourceMap> getMachineResourceMaps() {
+        return machineResourceMaps;
     }
 }

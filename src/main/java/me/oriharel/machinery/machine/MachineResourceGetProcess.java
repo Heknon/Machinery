@@ -121,7 +121,7 @@ public class MachineResourceGetProcess {
      */
     private void initializeMaterialChances() {
         chanceables = new RandomCollection<>();
-        ResourceMap resourceMap = machine.getFactory().getMachinery().getMachineManager().getMachineResourceTrees().get(machine.machineName);
+        ResourceMap resourceMap = machine.getFactory().getMachinery().getMachineManager().getMachineResourceMaps().get(machine.machineName);
         for (Map.Entry<Integer, ChancableList<? extends ChanceableOperation<?, MachineResourceGetProcess>>> weightChanceableEntry : resourceMap.entrySet()) {
             int weight = weightChanceableEntry.getKey();
             chanceables.add(weight, weightChanceableEntry.getValue());
